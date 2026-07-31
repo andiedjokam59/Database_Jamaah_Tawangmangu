@@ -42,18 +42,20 @@
             opacity: 1;
         }
 
-        /* STYLES STICKY COLUMN DINAMIS SAAT SCROLL */
+        /* STYLES STICKY COLUMN SUPER SMOOTH ON SCROLL */
         .sticky-col {
             position: sticky;
             left: 0;
             background-color: #ffffff !important;
             z-index: 10;
-            transition: max-width 0.2s ease, box-shadow 0.2s ease;
+            /* Menggunakan cubic-bezier agar transisi mengecil/membesar sangat halus */
+            transition: max-width 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s ease;
             box-shadow: none;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 300px; /* Lebar default komplit/utuh saat pertama buka */
+            max-width: 280px; /* Lebar default komplit/utuh saat pertama buka */
+            will-change: max-width; /* Memanfaatkan GPU Rendering */
         }
 
         /* Efek saat pembungkus tabel di-scroll ke kanan */
@@ -764,14 +766,21 @@
         let currentMode = "DAFTAR";
         let activeSectionId = null;
 
-        // DETEKSI SCROLL UNTUK EFEK PEMOTONGAN TEKS DINAMIS ON-SCROLL
+        // DETEKSI SCROLL DENGAN DEBOUNCE / REQUESTANIMATIONFRAME UNTUK PERGERAKAN OLEH SMOOTH
         function initScrollDetectors() {
             document.querySelectorAll('.overflow-x-auto').forEach(container => {
+                let ticking = false;
                 container.addEventListener('scroll', function() {
-                    if (this.scrollLeft > 5) {
-                        this.classList.add('is-scrolled');
-                    } else {
-                        this.classList.remove('is-scrolled');
+                    if (!ticking) {
+                        window.requestAnimationFrame(() => {
+                            if (container.scrollLeft > 10) {
+                                container.classList.add('is-scrolled');
+                            } else {
+                                container.classList.remove('is-scrolled');
+                            }
+                            ticking = false;
+                        });
+                        ticking = true;
                     }
                 });
             });
