@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendataan, Sarpras & Absensi Jamaah</title>
+
+    <link rel="icon" type="image/jpeg" href="logo insan qurany.png">
+	<link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ea580c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Library SheetJS untuk Export Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fff7ed; /* Orange 50 */
+        }
+        
+        /* Boks Round dan Border Jelas */
+        .rounded-box-input {
+            transition: all 0.2s ease-in-out;
+            background-color: #ffffff;
+            border: 2px solid #fed7aa; /* Orange 200 */
+            border-radius: 0.75rem;
+        }
+        .rounded-box-input:focus {
+            background-color: #ffffff;
+            border-color: #f97316; /* Orange 500 */
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+            outline: none;
+        }
+
+        /* CLASS ANIMASI MODAL SMOOTH */
+        .modal-backdrop {
+            transition: opacity 0.25s ease-out;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .modal-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .modal-content-card {
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease-out;
+            transform: scale(0.95) translateY(10px);
+            opacity: 0;
+        }
+        .modal-backdrop.active .modal-content-card {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        /* STYLES TRANSISI KONTEN UTAMA (SECTION) LEBIH SMOOTH & MEMPERTAHANKAN GRID */
+        .section-content {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .section-content.section-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* STYLES KHUSUS PRINT / CETAK */
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+            .printable-active, .printable-active * {
+                visibility: visible !important;
+            }
+            .printable-active {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                padding: 10px !important;
+                background-color: white !important;
+                color: black !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+            }
+            th, td {
+                border: 1px solid #666 !important;
+                padding: 6px !important;
+            }
+        }
+		
+		/* ANIMASI FADE & SLIDE DUA HALUS UNTUK LIST */
+		@keyframes fadeInUp {
+			from {
+				opacity: 0;
+				transform: translateY(12px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.animate-fade-in-up {
+			animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		}
+
+		/* KUSTOM SCROLLBAR BAGUS & ELEGAN */
+		#autoJamaahList::-webkit-scrollbar {
+			width: 5px;
+		}
+		#autoJamaahList::-webkit-scrollbar-track {
+			background: #fff7ed;
+			border-radius: 8px;
+		}
+		#autoJamaahList::-webkit-scrollbar-thumb {
+			background: #fdba74;
+			border-radius: 8px;
+		}
+		#autoJamaahList::-webkit-scrollbar-thumb:hover {
+			background: #f97316;
+		}
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6 antialiased text-slate-800">
+
+    <!-- CONTAINER UTAMA -->
+    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-orange-100 w-full max-w-2xl my-4 relative">
+        
+        <!-- Header Logo (Selalu Tampil) -->
+        <div class="flex justify-center mb-4">
+            <div class="w-24 h-24 rounded-full border-2 border-orange-400 p-1 bg-white shadow-md flex items-center justify-center overflow-hidden">
+                <img src="logo insan qurany.png" alt="Logo Insan Qur'any Tawangmangu" class="w-full h-full object-contain">
+            </div>
+        </div>
+
+        <div class="text-center mb-6">
+            <h2 id="mainTitle" class="text-2xl font-bold text-slate-800">INSAN QUR'ANY<br>TAWANGMANGU</h2>
+            <p id="mainSubtitle" class="text-xs text-slate-500 mt-1">Sistem Informasi Jamaah & Sarana Prasarana</p>
+            <div class="w-12 h-1 bg-orange-500 mx-auto mt-3 rounded-full"></div>
+        </div>
+
+        <!-- ================= DASHBOARD DENGAN 4 IKON PILIHAN UTAMA ================= -->
+        <div id="mainDashboard" class="section-content grid grid-cols-2 gap-4 py-4">
+            <!-- 1. Database (Input / Edit Jamaah) -->
+            <button type="button" onclick="showSection('database')" class="flex flex-col items-center justify-center p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
+                <div class="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                </div>
+                <span class="text-xs font-bold text-slate-800 group-hover:text-orange-600">DATABASE</span>
+                <span class="text-[10px] text-slate-500 text-center mt-1">Input & Edit Jamaah</span>
+            </button>
+
+            <!-- 2. Absensi -->
+            <button type="button" onclick="showSection('absensi')" class="flex flex-col items-center justify-center p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
+                <div class="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <span class="text-xs font-bold text-slate-800 group-hover:text-orange-600">ABSENSI</span>
+                <span class="text-[10px] text-slate-500 text-center mt-1">Absensi Kegiatan</span>
+            </button>
+
+            <!-- 3. Sarpras -->
+            <button type="button" onclick="showSection('sarpras')" class="flex flex-col items-center justify-center p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
+                <div class="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 21h13V9L9.5 4 3 9v12z"></path>
+                        <path d="M7 13h5v8H7z"></path>
+                        <path d="M16 21h5v-6l-2.5-2L16 15v6z"></path>
+                    </svg>
+                </div>
+                <span class="text-xs font-bold text-slate-800 group-hover:text-orange-600">SARPRAS</span>
+                <span class="text-[10px] text-slate-500 text-center mt-1">Fasilitas Kelompok</span>
+            </button>
+
+            <!-- 4. Rekap -->
+            <button type="button" onclick="showSection('rekap')" class="flex flex-col items-center justify-center p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
+                <div class="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <span class="text-xs font-bold text-slate-800 group-hover:text-orange-600">REKAP</span>
+                <span class="text-[10px] text-slate-500 text-center mt-1">Data & Laporan</span>
+            </button>
+        </div>
+
+        <!-- ================= SECTION DATABASE JAMAAH ================= -->
+        <div id="sectionDatabase" class="section-content hidden">
+            <button type="button" onclick="showSection('home')" class="mb-4 inline-flex items-center gap-1 text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-200 transition">
+                &larr; Kembali ke Menu Utama
+            </button>
+
+            <!-- Mode Navigation -->
+            <div class="bg-orange-100/70 p-1 rounded-xl grid grid-cols-2 gap-1 mb-6 max-w-xs mx-auto border border-orange-200">
+                <button type="button" id="tabDaftar" onclick="switchMode('DAFTAR')" class="py-2 text-xs font-semibold rounded-lg bg-orange-500 text-white shadow-sm transition">Daftar Baru</button>
+                <button type="button" id="tabUpdate" onclick="switchMode('UPDATE')" class="py-2 text-xs font-semibold rounded-lg text-orange-800 hover:bg-orange-200/50 transition">Update Data</button>
+            </div>
+
+            <!-- FILTER DESA & KELOMPOK UNTUK UPDATE MODE -->
+            <div id="searchSection" class="hidden bg-orange-50/50 p-4 rounded-xl border border-orange-200 mb-6 space-y-3">
+                <h3 class="text-xs font-bold text-orange-800 uppercase">Pilih Desa dan Kelompok Dulu</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Desa</label>
+                        <select id="searchDesa" class="rounded-box-input w-full p-2 text-xs">
+                            <option value="">-- Desa --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Kelompok</label>
+                        <select id="searchKelompok" disabled class="rounded-box-input w-full p-2 text-xs bg-slate-50">
+                            <option value="">-- Pilih Desa Dulu --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- DAFTAR NAMA JAMAAH DARI KELOMPOK (OTOMATIS TAMPIL DI BAWAHNYA) -->
+                <div id="autoJamaahListContainer" class="hidden mt-3 pt-3 border-t border-orange-200/70">
+                    <p class="text-[11px] font-semibold text-slate-600 mb-2">Pilih nama jamaah di bawah ini untuk mengedit data:</p>
+                    <div id="autoJamaahList" class="max-h-48 overflow-y-auto space-y-1.5 pr-1"></div>
+                </div>
+            </div>
+
+            <!-- Form Main Jamaah -->
+            <form id="formJamaah" class="space-y-4 pt-2">
+                <input type="hidden" id="edit_jamaah_id">
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap</label>
+                    <input type="text" id="nama" required placeholder="Sesuai KTP/KK" oninput="autoCapitalize(this)" class="rounded-box-input w-full p-2.5 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Kelamin</label>
+                    <select id="jenis_kelamin" required class="rounded-box-input w-full p-2.5 text-sm">
+                        <option value="">-- Pilih --</option>
+                        <option value="L">Laki-laki</option>
+                        <option value="P">Perempuan</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Tempat Lahir</label>
+                    <input type="text" id="tempat_lahir" required placeholder="Kota/Kab" oninput="autoCapitalize(this)" class="rounded-box-input w-full p-2.5 text-sm">
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">Tanggal Lahir</label>
+                        <span id="displayUmur" class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200 hidden">
+                            Umur: <span id="umurVal">0</span> thn
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <select id="tgl_lahir_tgl" required onchange="hitungUmurOtomatis()" class="rounded-box-input w-full p-2.5 text-sm">
+                            <option value="">Tanggal</option>
+                        </select>
+                        <select id="tgl_lahir_bln" required onchange="hitungUmurOtomatis()" class="rounded-box-input w-full p-2.5 text-sm">
+                            <option value="">Bulan</option>
+                            <option value="01">Januari</option>
+                            <option value="02">Februari</option>
+                            <option value="03">Maret</option>
+                            <option value="04">April</option>
+                            <option value="05">Mei</option>
+                            <option value="06">Juni</option>
+                            <option value="07">Juli</option>
+                            <option value="08">Agustus</option>
+                            <option value="09">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Desember</option>
+                        </select>
+                        <select id="tgl_lahir_thn" required onchange="hitungUmurOtomatis()" class="rounded-box-input w-full p-2.5 text-sm">
+                            <option value="">Tahun</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Desa</label>
+                        <select id="desa" required class="rounded-box-input w-full p-2.5 text-sm">
+                            <option value="">-- Pilih Desa --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Kelompok</label>
+                        <select id="kelompok" required disabled class="rounded-box-input w-full p-2.5 text-sm bg-slate-50">
+                            <option value="">-- Pilih Desa Dulu --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Status Jamaah</label>
+                    <select id="status" required class="rounded-box-input w-full p-2.5 text-sm font-semibold">
+                        <option value="Menikah">Menikah</option>
+                        <option value="Duda">Duda</option>
+                        <option value="Janda">Janda</option>
+                        <option value="Manula">Manula</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="submitJamaahBtn" class="w-full py-3 mt-4 text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-xl shadow-md hover:shadow-lg transition">
+                    Simpan Data Jamaah
+                </button>
+            </form>
+        </div>
+
+        <!-- ================= SECTION ABSENSI KEGIATAN (DASBOR UTAMA) ================= -->
+        <div id="sectionAbsensi" class="section-content hidden">
+            <button type="button" onclick="showSection('home')" class="mb-4 inline-flex items-center gap-1 text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-200 transition">
+                &larr; Kembali ke Menu Utama
+            </button>
+
+            <div class="flex justify-between items-center border-b border-orange-100 pb-3 mb-4">
+                <h3 class="font-bold text-orange-600 text-base">Absensi Kegiatan Jamaah</h3>
+            </div>
+
+            <div class="flex justify-between items-center border-b border-orange-100 mb-4">
+                <div class="flex">
+                    <button onclick="switchTabAbsensi('INPUT')" id="tabInputAbsensi" class="py-2 px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600">Form Absensi</button>
+                    <button onclick="switchTabAbsensi('REKAP')" id="tabRekapAbsensi" class="py-2 px-4 text-xs font-bold text-slate-400">Rekapan</button>
+                </div>
+                <button type="button" id="btnPrintAbsensi" onclick="printData('printableAbsensi')" class="hidden px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-lg transition flex items-center gap-1 shadow-sm">
+                    🖨️ Print
+                </button>
+            </div>
+
+            <!-- FORM ABSENSI (INPUT/UPDATE) -->
+            <form id="formAbsensiKegiatan" class="space-y-3">
+                <input type="hidden" id="edit_absensi_id">
+                <input type="hidden" id="edit_tanggal_kegiatan">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Kegiatan</label>
+                    <select id="abs_nama" required onchange="toggleNamaKegiatanLainnya(this)" class="rounded-box-input w-full p-2.5 text-sm">
+                        <option value="">-- Pilih Nama Kegiatan --</option>
+                        <option value="Penyampaian materi PPG pusat">Penyampaian materi PPG pusat</option>
+                        <option value="Pengajian ibu-ibu daerah">Pengajian ibu-ibu daerah</option>
+                        <option value="Pengajian umum daerah">Pengajian umum daerah</option>
+                        <option value="Pengajian remaja daerah">Pengajian remaja daerah</option>
+                        <option value="Penyampaian CAI">Penyampaian CAI</option>
+                        <option value="LAINNYA">-- Ketik Lainnya --</option>
+                    </select>
+                    <input type="text" id="abs_nama_custom" placeholder="Ketik nama kegiatan lainnya..." oninput="autoCapitalize(this)" class="hidden rounded-box-input w-full p-2.5 text-sm mt-2">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Desa</label>
+                        <select id="abs_desa" required class="rounded-box-input w-full p-2 text-xs">
+                            <option value="">-- Desa --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Kelompok</label>
+                        <select id="abs_kelompok" required disabled class="rounded-box-input w-full p-2 text-xs bg-slate-50">
+                            <option value="">-- Kelompok --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Laki-laki</label>
+                        <input type="number" id="abs_laki" min="0" value="0" required class="rounded-box-input w-full p-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Perempuan</label>
+                        <input type="number" id="abs_perempuan" min="0" value="0" required class="rounded-box-input w-full p-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Ijin</label>
+                        <input type="number" id="abs_ijin" min="0" value="0" required class="rounded-box-input w-full p-2 text-xs">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Infaq (Rp)</label>
+                    <input type="number" id="abs_infaq" min="0" value="0" class="rounded-box-input w-full p-2.5 text-sm">
+                </div>
+                <button type="submit" id="absBtn" class="w-full py-2.5 bg-orange-500 text-white rounded-xl font-semibold text-xs hover:bg-orange-600 transition shadow-sm">Simpan Absensi</button>
+            </form>
+
+            <!-- REKAP ABSENSI -->
+            <div id="printableAbsensi" class="hidden space-y-4">
+                <div class="space-y-2 no-print">
+                    <div>
+                        <select id="filterKegiatanAbsensi" onchange="loadRekapAbsensi()" class="w-full text-xs p-2.5 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
+                            <option value="">-- Semua Kegiatan --</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <select id="filterDesaAbsensi" onchange="loadRekapAbsensi()" class="w-full text-xs p-2 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
+                            <option value="">Semua Desa</option>
+                        </select>
+                        <select id="filterBulanAbsensi" onchange="loadRekapAbsensi()" class="w-full text-xs p-2 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
+                            <option value="">Semua Bulan</option>
+                            <option value="01">Januari</option>
+                            <option value="02">Februari</option>
+                            <option value="03">Maret</option>
+                            <option value="04">April</option>
+                            <option value="05">Mei</option>
+                            <option value="06">Juni</option>
+                            <option value="07">Juli</option>
+                            <option value="08">Agustus</option>
+                            <option value="09">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Desember</option>
+                        </select>
+                        <select id="filterTahun" onchange="loadRekapAbsensi()" class="w-full text-xs p-2 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm"></select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-orange-100 rounded-xl">
+                    <table class="w-full text-xs text-left">
+                        <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
+                            <tr>
+                                <th class="p-2 whitespace-nowrap">Kelompok</th>
+                                <th class="p-2 text-center whitespace-nowrap">Tanggal</th>
+                                <th class="p-2 text-center whitespace-nowrap">Hadir (L/P)</th>
+                                <th class="p-2 text-center whitespace-nowrap">Ijin</th>
+                                <th class="p-2 text-right whitespace-nowrap">Infaq</th>
+                                <th class="p-2 text-center no-print whitespace-nowrap">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyRekapAbsensi" class="divide-y divide-orange-50 text-slate-600"></tbody>
+                        <tfoot id="tfootRekapAbsensi" class="bg-orange-100/60 font-bold text-orange-950 border-t border-orange-200"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SECTION SARPRAS (DASBOR UTAMA) ================= -->
+        <div id="sectionSarpras" class="section-content hidden">
+            <button type="button" onclick="showSection('home')" class="mb-4 inline-flex items-center gap-1 text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-200 transition">
+                &larr; Kembali ke Menu Utama
+            </button>
+
+            <div class="flex justify-between items-center border-b border-orange-100 pb-3 mb-4">
+                <h3 class="font-bold text-orange-600 text-base">Kelola Sarpras Kelompok</h3>
+            </div>
+
+            <div class="flex border-b border-orange-100 mb-4">
+                <button onclick="switchTabSarpras('INPUT')" id="tabInputSarpras" class="py-2 px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600">Form Sarpras</button>
+                <button onclick="switchTabSarpras('UPDATE')" id="tabUpdateSarpras" class="py-2 px-4 text-xs font-bold text-slate-400">Update Data Sarpras</button>
+            </div>
+
+            <!-- FORM SARPRAS -->
+            <form id="formSarpras" class="space-y-3">
+                <input type="hidden" id="edit_sarpras_id">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Desa</label>
+                        <select id="sarp_desa" required class="rounded-box-input w-full p-2 text-xs">
+                            <option value="">-- Desa --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Kelompok</label>
+                        <select id="sarp_kelompok" required disabled class="rounded-box-input w-full p-2 text-xs bg-slate-50">
+                            <option value="">-- Kelompok --</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Status Tanah</label>
+                    <select id="sarp_status_tanah" required class="rounded-box-input w-full p-2 text-xs">
+                        <option value="">-- Pilih Status Tanah --</option>
+                        <option value="Milik Sendiri">Milik Sendiri</option>
+                        <option value="Wakaf">Wakaf</option>
+                        <option value="Sewa">Sewa</option>
+                        <option value="Numpang">Numpang</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Sub Kelompok</label>
+                        <input type="number" id="sarp_sub" min="0" value="0" required class="rounded-box-input w-full p-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Jumlah Masjid</label>
+                        <input type="number" id="sarp_masjid" min="0" value="0" required class="rounded-box-input w-full p-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Jumlah Aula</label>
+                        <input type="number" id="sarp_aula" min="0" value="0" required class="rounded-box-input w-full p-2 text-xs">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">WC Pria</label>
+                        <input type="number" id="sarp_km_pria" min="0" value="0" required class="rounded-box-input w-full p-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">WC Wanita</label>
+                        <input type="number" id="sarp_km_wanita" min="0" value="0" required class="rounded-box-input w-full p-2 text-xs">
+                    </div>
+                </div>
+                <button type="submit" id="sarpBtn" class="w-full py-2.5 bg-orange-500 text-white rounded-xl font-semibold text-xs hover:bg-orange-600 transition shadow-sm mt-2">
+                    Simpan Sarpras
+                </button>
+            </form>
+
+            <!-- TABEL LIST UPDATE SARPRAS -->
+            <div id="sectionListSarpras" class="hidden space-y-3">
+                <div class="bg-orange-50/50 p-2.5 rounded-xl border border-orange-200">
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Desa</label>
+                    <select id="sarp_desa_update" onchange="loadListSarpras()" class="rounded-box-input w-full p-2 text-xs">
+                        <option value="">Semua Desa</option>
+                    </select>
+                </div>
+
+                <div class="overflow-x-auto border border-orange-100 rounded-xl">
+                    <table class="w-full text-xs text-left">
+                        <thead class="bg-orange-50 text-slate-900 font-bold border-b border-orange-100">
+                            <tr>
+                                <th class="p-2 text-slate-900">Kelompok</th>
+                                <th class="p-2 text-center text-slate-900">Status Tanah</th>
+                                <th class="p-2 text-center text-slate-900">Masjid/Aula</th>
+                                <th class="p-2 text-center text-slate-900">WC (L/P)</th>
+                                <th class="p-2 text-center text-slate-900">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyListSarpras" class="divide-y divide-orange-50 text-slate-600"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SECTION REKAP (DASBOR UTAMA) ================= -->
+        <div id="sectionRekap" class="section-content hidden">
+            <button type="button" onclick="showSection('home')" class="mb-4 inline-flex items-center gap-1 text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-200 transition">
+                &larr; Kembali ke Menu Utama
+            </button>
+
+            <div class="flex justify-between items-center border-b border-orange-100 pb-3 mb-4">
+                <h3 class="font-bold text-orange-600 text-base">Rekapan Data Jamaah & Sarpras</h3>
+            </div>
+
+            <div class="flex justify-between items-center border-b border-orange-100 mb-4 overflow-x-auto gap-2">
+                <div class="flex whitespace-nowrap gap-1">
+                    <button onclick="switchTabRekap('STATUS_KESELURUHAN')" id="tabStatusKeseluruhan" class="py-2 px-3 text-xs font-bold border-b-2 border-orange-500 text-orange-600 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path>
+                        </svg>
+                        Status Jamaah
+                    </button>
+                    <button onclick="switchTabRekap('REKAP_KELOMPOK')" id="tabRekapKelompok" class="py-2 px-3 text-xs font-bold text-slate-400 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        Rekap Per Klp
+                    </button>
+                    <button onclick="switchTabRekap('DAFTAR_JAMAAH')" id="tabDaftarJamaah" class="py-2 px-3 text-xs font-bold text-slate-400 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        Daftar Nama
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" id="btnExportExcel" onclick="exportTableToExcel('tbodyRekapKelompok', 'tfootRekapKelompok')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-lg transition flex items-center gap-1 shadow-sm shrink-0">
+                        🟢 Export Excel
+                    </button>
+                    <button type="button" id="btnPrintRekap" onclick="printData('printableRekapContent')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-lg transition flex items-center gap-1 shadow-sm shrink-0">
+                        🖨️ Print
+                    </button>
+                </div>
+            </div>
+
+            <div id="printableRekapContent">
+                <!-- TAB 1: REKAP STATUS JAMAAH KESELURUHAN -->
+                <div id="sectionStatusKeseluruhan" class="space-y-4">
+                    <h4 class="text-xs font-bold text-slate-700 uppercase">Rekapitulasi Status Jamaah Keseluruhan</h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div class="p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
+                            <span class="block text-[10px] font-bold text-slate-500 uppercase">Menikah</span>
+                            <span id="stMenikah" class="text-xl font-extrabold text-orange-600">0</span>
+                        </div>
+                        <div class="p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
+                            <span class="block text-[10px] font-bold text-slate-500 uppercase">Duda</span>
+                            <span id="stDuda" class="text-xl font-extrabold text-orange-600">0</span>
+                        </div>
+                        <div class="p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
+                            <span class="block text-[10px] font-bold text-slate-500 uppercase">Janda</span>
+                            <span id="stJanda" class="text-xl font-extrabold text-orange-600">0</span>
+                        </div>
+                        <div class="p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
+                            <span class="block text-[10px] font-bold text-slate-500 uppercase">Manula</span>
+                            <span id="stManula" class="text-xl font-extrabold text-orange-600">0</span>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-800 text-white rounded-xl flex justify-between items-center shadow-sm">
+                        <span class="text-xs font-bold uppercase">Total Keseluruhan Jamaah</span>
+                        <span id="stTotalAll" class="text-lg font-black text-orange-400">0 Jamaah</span>
+                    </div>
+                </div>
+
+                <!-- TAB 2: REKAPAN KELOMPOK -->
+                <div id="sectionRekapKelompok" class="hidden space-y-4">
+                    <div class="flex justify-between items-center flex-wrap gap-2">
+                        <h4 class="text-xs font-bold text-slate-700 uppercase">Rekap Data Jamaah & Sarpras Per Kelompok</h4>
+                        <div class="flex items-center gap-1.5 no-print">
+                            <span class="text-xs">🔻</span>
+                            <select id="filterDesaRekap" onchange="loadRekapKelompokLengkap()" class="text-xs px-2.5 py-1.5 rounded-lg border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
+                                <option value="">Semua Desa</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto border border-orange-100 rounded-xl">
+                        <table id="tableRekapKelompok" class="w-full text-xs text-left">
+                            <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
+                                <tr>
+                                    <th class="p-2">Kelompok</th>
+                                    <th class="p-2 text-center">Menikah</th>
+                                    <th class="p-2 text-center">Duda</th>
+                                    <th class="p-2 text-center">Janda</th>
+                                    <th class="p-2 text-center">Manula</th>
+                                    <th class="p-2 text-center bg-orange-100/50">Total Jamaah</th>
+                                    <th class="p-2 text-center border-l border-orange-200">Sub Klp</th>
+                                    <th class="p-2 text-center">Masjid</th>
+                                    <th class="p-2 text-center">Aula</th>
+                                    <th class="p-2 text-center">WC (L/P)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyRekapKelompok" class="divide-y divide-orange-50 text-slate-700"></tbody>
+                            <tfoot id="tfootRekapKelompok" class="bg-orange-100/60 font-bold text-orange-950 border-t border-orange-200"></tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 3: DAFTAR NAMA JAMAAH PER KELOMPOK -->
+                <div id="sectionDaftarJamaah" class="hidden space-y-4">
+                    <div class="bg-orange-50/60 p-3 rounded-xl border border-orange-200 no-print space-y-2">
+                        <h4 class="text-xs font-bold text-orange-900 uppercase"> Filter Jamaah Per Kelompok</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">Desa</label>
+                                <select id="filterDesaDaftarJamaah" onchange="loadDaftarJamaahPerKelompok()" class="w-full text-xs p-2 rounded-lg border border-orange-200 bg-white font-medium focus:outline-none focus:border-orange-500">
+                                    <option value="">-- Semua Desa --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">Kelompok</label>
+                                <select id="filterKelompokDaftarJamaah" onchange="loadDaftarJamaahPerKelompok()" class="w-full text-xs p-2 rounded-lg border border-orange-200 bg-white font-medium focus:outline-none focus:border-orange-500">
+                                    <option value="">-- Semua Kelompok --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">Cari Nama</label>
+                                <input type="text" id="searchNamaDaftarJamaah" oninput="loadDaftarJamaahPerKelompok()" placeholder="Ketik nama jamaah..." class="w-full text-xs p-2 rounded-lg border border-orange-200 bg-white font-medium focus:outline-none focus:border-orange-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center text-xs text-slate-600 font-medium px-1">
+                        <span id="summaryTextDaftarJamaah">Menampilkan 0 jamaah terdaftar</span>
+                        <span class="text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded border border-orange-200">Terurut Abjad</span>
+                    </div>
+
+                    <div class="overflow-x-auto border border-orange-100 rounded-xl">
+                        <table id="tableDaftarJamaah" class="w-full text-xs text-left">
+                            <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
+                                <tr>
+                                    <th class="p-2 text-center w-10">No</th>
+                                    <th class="p-2">Nama Jamaah</th>
+                                    <th class="p-2 text-center">L/P</th>
+                                    <th class="p-2">Kelompok / Desa</th>
+                                    <th class="p-2 text-center">Umur</th>
+                                    <th class="p-2 text-center">Status</th>
+                                    <th class="p-2 text-center no-print">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyDaftarJamaah" class="divide-y divide-orange-50 text-slate-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CUSTOM MODAL NOTIFICATION -->
+    <div id="customModal" class="modal-backdrop fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="modal-content-card bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center space-y-4 border border-orange-100">
+            <div id="modalIcon" class="w-14 h-14 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
+                💡
+            </div>
+            <div>
+                <h4 id="modalTitle" class="text-lg font-bold text-slate-800">Notifikasi</h4>
+                <p id="modalMessage" class="text-xs text-slate-600 mt-1 leading-relaxed"></p>
+            </div>
+            <div id="modalActions" class="flex gap-2 justify-center pt-2">
+                <button type="button" id="modalBtnOk" onclick="closeCustomModal()" class="w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold transition shadow-md">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://xijlyydfogbkcctlycsb.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhpamx5eWRmb2dia2NjdGx5Y3NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMzAxODYsImV4cCI6MjA5NzcwNjE4Nn0.JwqYXWEt2yiLioI1o9qZ3KRrak2rtzO1Tp0eN7AuAm4";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentMode = "DAFTAR";
+        let activeSectionId = null;
+
+        // Data Desa & Kelompok
+        const rawDataWilayah = {
+            "Bandardawung": ["Bandardawung Barat", "Bandardawung Timur", "Dawung Atas", "Dawung Bawah", "Dawung Tengah", "Gamping", "Gondang Barat", "Gondang Tengah", "Gondang Timur", "Ngasem", "Pelas Barat", "Pelas Timur"],
+            "Karanglo Selatan": ["Blimbing 1", "Blimbing 2", "Blimbing 3", "Jabal Kanil", "Karanglo", "Pedan Selatan", "Pedan Utara"],
+            "Karanglo Utara": ["Cepogo", "Dukuh", "Pandeyan", "Plombokan", "Sadakan Kidul 1", "Sadakan Kidul 2", "Sekuwung"],
+            "Krangean": ["Gondang Boma", "Gondosuli", "Krangean Selatan", "Krangean Utara", "Nglegok Atas", "Nglegok Bawah", "Ngreso", "Somokado", "Tawang 1", "Tawang 2", "Watusambang"]
+        };
+
+        const dataWilayah = {};
+        Object.keys(rawDataWilayah).sort().forEach(key => {
+            dataWilayah[key] = rawDataWilayah[key].sort();
+        });
+
+        // FUNGSI UTAMA BATCH FETCHING (DENGAN PAGINASI BERTAHAP)
+        async function fetchAllRows(tableName, selectColumns = '*') {
+            let allData = [];
+            let page = 0;
+            const pageSize = 1000;
+            let hasMore = true;
+
+            while (hasMore) {
+                const { data: pageData, error } = await supabaseClient
+                    .from(tableName)
+                    .select(selectColumns)
+                    .range(page * pageSize, (page + 1) * pageSize - 1);
+
+                if (error) throw error;
+
+                if (pageData && pageData.length > 0) {
+                    allData = allData.concat(pageData);
+                }
+
+                if (!pageData || pageData.length < pageSize) {
+                    hasMore = false;
+                } else {
+                    page++;
+                }
+            }
+            return allData;
+        }
+
+        // HELPER TITLE CASE
+        function toTitleCase(str) { 
+            if (!str) return '';
+            return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase()); 
+        }
+
+        function showSection(target) {
+            const sections = {
+                'home': document.getElementById('mainDashboard'),
+                'database': document.getElementById('sectionDatabase'),
+                'absensi': document.getElementById('sectionAbsensi'),
+                'sarpras': document.getElementById('sectionSarpras'),
+                'rekap': document.getElementById('sectionRekap')
+            };
+
+            const targetSection = sections[target];
+            if (!targetSection) return;
+
+            const previousSection = activeSectionId ? sections[activeSectionId] : null;
+
+            if (previousSection && previousSection !== targetSection) {
+                previousSection.classList.remove('section-active');
+                
+                setTimeout(() => {
+                    previousSection.classList.add('hidden');
+                    activateNewSection(target, targetSection);
+                }, 200);
+            } else {
+                activateNewSection(target, targetSection);
+            }
+        }
+
+        function activateNewSection(target, targetSection) {
+            targetSection.classList.remove('hidden');
+            
+            setTimeout(() => {
+                targetSection.classList.add('section-active');
+            }, 20);
+
+            activeSectionId = target;
+
+            if (target === 'database') {
+                if (currentMode !== 'UPDATE') {
+                    switchMode('DAFTAR');
+                }
+            } else if (target === 'absensi') {
+                switchTabAbsensi('INPUT');
+                setupYearFilter();
+                populateKegiatanFilter();
+            } else if (target === 'sarpras') {
+                switchTabSarpras('INPUT');
+            } else if (target === 'rekap') {
+                switchTabRekap('STATUS_KESELURUHAN');
+            }
+        }
+
+        function openModal(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.remove('hidden');
+            setTimeout(() => {
+                el.classList.add('active');
+            }, 10);
+        }
+
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.remove('active');
+            setTimeout(() => {
+                el.classList.add('hidden');
+            }, 250);
+        }
+
+        function autoCapitalize(inputElement) {
+            let start = inputElement.selectionStart;
+            let end = inputElement.selectionEnd;
+            let value = inputElement.value;
+            let capitalized = toTitleCase(value);
+            if (inputElement.value !== capitalized) {
+                inputElement.value = capitalized;
+                inputElement.setSelectionRange(start, end);
+            }
+        }
+
+        function hitungUmurOtomatis() {
+            const tgl = document.getElementById('tgl_lahir_tgl').value;
+            const bln = document.getElementById('tgl_lahir_bln').value;
+            const thn = document.getElementById('tgl_lahir_thn').value;
+            const badgeUmur = document.getElementById('displayUmur');
+            const valUmur = document.getElementById('umurVal');
+
+            if (tgl && bln && thn) {
+                const birthDate = new Date(`${thn}-${bln}-${tgl}`);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                if (!isNaN(age) && age >= 0) {
+                    valUmur.textContent = age;
+                    badgeUmur.classList.remove('hidden');
+                    return age;
+                }
+            }
+            badgeUmur.classList.add('hidden');
+            return null;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDateDropdowns();
+            initDesaDropdowns();
+            showSection('home');
+        });
+
+        function initDesaDropdowns() {
+            const desaSelects = ['desa', 'searchDesa', 'abs_desa', 'sarp_desa', 'sarp_desa_update', 'filterDesaRekap', 'filterDesaAbsensi', 'filterDesaDaftarJamaah'];
+            desaSelects.forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                if (id === 'filterDesaRekap' || id === 'sarp_desa_update' || id === 'filterDesaAbsensi' || id === 'filterDesaDaftarJamaah') {
+                    sel.innerHTML = '<option value="">Semua Desa</option>';
+                } else {
+                    sel.innerHTML = '<option value="">-- Pilih Desa --</option>';
+                }
+                Object.keys(dataWilayah).forEach(d => sel.add(new Option(d, d)));
+            });
+        }
+
+        function initDateDropdowns() {
+            const tglSel = document.getElementById('tgl_lahir_tgl');
+            const thnSel = document.getElementById('tgl_lahir_thn');
+
+            for (let i = 1; i <= 31; i++) {
+                const val = i < 10 ? `0${i}` : `${i}`;
+                if (tglSel) tglSel.add(new Option(val, val));
+            }
+
+            const currentYear = new Date().getFullYear();
+            for (let y = currentYear; y >= currentYear - 100; y--) {
+                if (thnSel) thnSel.add(new Option(y, y));
+            }
+        }
+
+        function bindDropdown(desaId, kelompokId) {
+            document.getElementById(desaId).addEventListener('change', function() {
+                const klp = document.getElementById(kelompokId);
+                klp.innerHTML = '<option value="">-- Pilih Kelompok --</option>';
+                if(this.value && dataWilayah[this.value]) {
+                    klp.disabled = false;
+                    klp.classList.remove('bg-slate-50');
+                    dataWilayah[this.value].forEach(k => klp.add(new Option(k, k)));
+                } else {
+                    klp.disabled = true;
+                    klp.classList.add('bg-slate-50');
+                }
+
+                if (desaId === 'searchDesa') {
+                    document.getElementById('autoJamaahListContainer').classList.add('hidden');
+                }
+            });
+        }
+
+        bindDropdown('desa', 'kelompok');
+        bindDropdown('searchDesa', 'searchKelompok');
+        bindDropdown('abs_desa', 'abs_kelompok');
+        bindDropdown('sarp_desa', 'sarp_kelompok');
+
+        document.getElementById('filterDesaDaftarJamaah').addEventListener('change', function() {
+            const klp = document.getElementById('filterKelompokDaftarJamaah');
+            klp.innerHTML = '<option value="">Semua Kelompok</option>';
+            if(this.value && dataWilayah[this.value]) {
+                dataWilayah[this.value].forEach(k => klp.add(new Option(k, k)));
+            }
+            loadDaftarJamaahPerKelompok();
+        });
+
+        function showCustomModal(title, message, icon = '💡', onOk = null, showCancel = false, onCancel = null) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('modalIcon').textContent = icon;
+            
+            const actionsDiv = document.getElementById('modalActions');
+            actionsDiv.innerHTML = '';
+
+            if (showCancel) {
+                const btnCancel = document.createElement('button');
+                btnCancel.type = 'button';
+                btnCancel.className = 'w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition';
+                btnCancel.textContent = 'Batal';
+                btnCancel.onclick = () => {
+                    closeCustomModal();
+                    if(onCancel) onCancel();
+                };
+                actionsDiv.appendChild(btnCancel);
+            }
+
+            const btnOk = document.createElement('button');
+            btnOk.type = 'button';
+            btnOk.className = showCancel ? 'w-1/2 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold transition shadow-md' : 'w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold transition shadow-md';
+            btnOk.textContent = showCancel ? 'Ya, Lanjutkan' : 'OK';
+            btnOk.onclick = () => {
+                closeCustomModal();
+                if(onOk) onOk();
+            };
+            actionsDiv.appendChild(btnOk);
+
+            openModal('customModal');
+        }
+
+        function closeCustomModal() {
+            closeModal('customModal');
+        }
+
+        function switchMode(mode, keepSearchFilters = false) {
+            currentMode = mode;
+            const searchSec = document.getElementById('searchSection');
+            const formJamaah = document.getElementById('formJamaah');
+            const btnSubmit = document.getElementById('submitJamaahBtn');
+            const statusSelect = document.getElementById('status');
+
+            formJamaah.reset();
+            document.getElementById('edit_jamaah_id').value = "";
+            document.getElementById('displayUmur').classList.add('hidden');
+
+            if (!keepSearchFilters) {
+                document.getElementById('autoJamaahListContainer').classList.add('hidden');
+                document.getElementById('searchDesa').value = "";
+                const searchKlp = document.getElementById('searchKelompok');
+                searchKlp.innerHTML = '<option value="">-- Pilih Desa Dulu --</option>';
+                searchKlp.disabled = true;
+                searchKlp.classList.add('bg-slate-50');
+            }
+
+            let mpOption = statusSelect.querySelector('option[value="Meninggal / Sambung Luar Daerah"]');
+            
+            if (mode === "UPDATE") {
+                document.getElementById('tabUpdate').className = "py-2 text-xs font-semibold rounded-lg bg-orange-500 text-white shadow-sm transition";
+                document.getElementById('tabDaftar').className = "py-2 text-xs font-semibold rounded-lg text-orange-800 hover:bg-orange-200/50 transition";
+                searchSec.classList.remove('hidden');
+                formJamaah.classList.remove('hidden');
+                btnSubmit.textContent = "Perbarui Data Jamaah";
+
+                if (!mpOption) {
+                    const opt = document.createElement('option');
+                    opt.value = "Meninggal / Sambung Luar Daerah";
+                    opt.textContent = "Meninggal / Sambung Luar Daerah";
+                    opt.className = "text-red-600 font-bold bg-red-50";
+                    statusSelect.appendChild(opt);
+                }
+            } else {
+                document.getElementById('tabDaftar').className = "py-2 text-xs font-semibold rounded-lg bg-orange-500 text-white shadow-sm transition";
+                document.getElementById('tabUpdate').className = "py-2 text-xs font-semibold rounded-lg text-orange-800 hover:bg-orange-200/50 transition";
+                searchSec.classList.add('hidden');
+                formJamaah.classList.remove('hidden');
+                btnSubmit.textContent = "Simpan Data Jamaah";
+
+                if (mpOption) {
+                    mpOption.remove();
+                }
+            }
+        }
+
+        async function fetchAutoJamaahList(desa, kelompok) {
+            const listContainer = document.getElementById('autoJamaahListContainer');
+            const listEl = document.getElementById('autoJamaahList');
+
+            if (!desa || !kelompok) {
+                listContainer.classList.add('hidden');
+                listContainer.classList.remove('animate-fade-in-up');
+                return;
+            }
+
+            listEl.innerHTML = `
+                <div class="flex items-center justify-center gap-2 py-4 text-xs font-semibold text-orange-600 bg-orange-50/50 rounded-xl border border-orange-100">
+                    <svg class="animate-spin h-4 w-4 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Memuat data jamaah...</span>
+                </div>
+            `;
+            listContainer.classList.remove('hidden');
+            listContainer.classList.add('animate-fade-in-up');
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('data_jamaah')
+                    .select('*')
+                    .eq('desa', desa)
+                    .eq('kelompok', kelompok)
+                    .order('nama', { ascending: true });
+
+                if(error || !data || data.length === 0) {
+                    listEl.innerHTML = `
+                        <div class="text-xs text-slate-500 bg-slate-50/80 p-3 rounded-xl text-center border border-slate-200/60">
+                            Belum ada jamaah terdaftar di kelompok ini.
+                        </div>
+                    `;
+                    return;
+                }
+
+                listEl.innerHTML = '';
+                
+                data.forEach((j, index) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    
+                    const animationDelay = Math.min(index * 0.04, 0.4); 
+                    btn.style.animationDelay = `${animationDelay}s`;
+
+                    btn.className = "w-full text-left p-3 rounded-xl border border-orange-200/80 hover:border-orange-400 bg-white hover:bg-orange-50/80 hover:shadow-md transition-all duration-200 flex justify-between items-center group cursor-pointer animate-fade-in-up opacity-0 active:scale-[0.98]";
+                    
+                    btn.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-orange-100/70 text-orange-600 font-bold text-xs flex items-center justify-center shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-200">
+                                ${j.jenis_kelamin === 'L' ? '👨' : '👩'}
+                            </div>
+                            <div>
+                                <div class="font-bold text-xs text-slate-800 group-hover:text-orange-700 transition-colors">${j.nama}</div>
+                                <div class="text-[10px] text-slate-500 mt-0.5">
+                                    Tgl Lahir: <span class="font-medium text-slate-600">${j.tanggal_lahir || '-'}</span> | Status: <span class="font-medium text-slate-600">${j.status || '-'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="text-[11px] font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-lg border border-orange-200 group-hover:bg-orange-500 group-hover:text-white group-hover:border-orange-500 transition-all duration-200 shrink-0">
+                            Edit &raquo;
+                        </span>
+                    `;
+                    
+                    btn.onclick = () => {
+                        selectJamaahToForm(j);
+                    };
+                    
+                    listEl.appendChild(btn);
+                });
+            } catch (err) {
+                listEl.innerHTML = `<div class="text-xs text-red-500 p-3 text-center">Gagal memuat data: ${err.message}</div>`;
+            }
+        }
+
+        document.getElementById('searchKelompok').addEventListener('change', function() {
+            const desa = document.getElementById('searchDesa').value;
+            const kelompok = this.value;
+            fetchAutoJamaahList(desa, kelompok);
+        });
+
+        function selectJamaahToForm(j) {
+            document.getElementById('edit_jamaah_id').value = j.id;
+            document.getElementById('nama').value = j.nama;
+            document.getElementById('jenis_kelamin').value = j.jenis_kelamin;
+            document.getElementById('tempat_lahir').value = j.tempat_lahir;
+
+            if(j.tanggal_lahir) {
+                const parts = j.tanggal_lahir.split('-');
+                if(parts.length === 3) {
+                    document.getElementById('tgl_lahir_thn').value = parts[0];
+                    document.getElementById('tgl_lahir_bln').value = parts[1];
+                    document.getElementById('tgl_lahir_tgl').value = parts[2];
+                    hitungUmurOtomatis();
+                }
+            }
+
+            document.getElementById('desa').value = j.desa;
+            
+            const elKlp = document.getElementById('kelompok');
+            elKlp.innerHTML = '<option value="">-- Pilih Kelompok --</option>';
+            if (dataWilayah[j.desa]) {
+                dataWilayah[j.desa].forEach(k => elKlp.add(new Option(k, k)));
+            }
+            elKlp.disabled = false;
+            elKlp.classList.remove('bg-slate-50');
+            elKlp.value = j.kelompok;
+
+            document.getElementById('status').value = j.status || "Menikah";
+            document.getElementById('formJamaah').classList.remove('hidden');
+
+            document.getElementById('formJamaah').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ================= PENULISAN DATA JAMAAH (OPTIMISTIC UI BACKGROUND PROCESS) =================
+        document.getElementById('formJamaah').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const editId = document.getElementById('edit_jamaah_id').value;
+            const statusValue = document.getElementById('status').value;
+
+            if (currentMode === "UPDATE" && statusValue === "Meninggal / Sambung Luar Daerah") {
+                if (!editId) {
+                    showCustomModal("Peringatan", "Silakan cari dan pilih data jamaah terlebih dahulu.", "⚠️");
+                    return;
+                }
+
+                showCustomModal(
+                    "Konfirmasi Penghapusan",
+                    "Jamaah dengan status 'Meninggal / Sambung Luar Daerah' akan dihapus permanen dari database Supabase. Lanjutkan?",
+                    "🗑️",
+                    () => {
+                        // Optimistic: Tutup dan reset UI
+                        const currentDesa = document.getElementById('searchDesa').value;
+                        const currentKelompok = document.getElementById('searchKelompok').value;
+                        switchMode('UPDATE', true);
+
+                        // Jalankan di Background
+                        (async () => {
+                            const { error } = await supabaseClient
+                                .from('data_jamaah')
+                                .delete()
+                                .eq('id', editId);
+
+                            if (error) {
+                                showCustomModal("Gagal Hapus", "Gagal menghapus data di server: " + error.message, "❌");
+                            } else if (currentDesa && currentKelompok) {
+                                fetchAutoJamaahList(currentDesa, currentKelompok);
+                            }
+                        })();
+                    },
+                    true
+                );
+                return;
+            }
+
+            const tgl = document.getElementById('tgl_lahir_tgl').value;
+            const bln = document.getElementById('tgl_lahir_bln').value;
+            const thn = document.getElementById('tgl_lahir_thn').value;
+            const fullDate = `${thn}-${bln}-${tgl}`;
+            const calculatedAge = hitungUmurOtomatis();
+
+            const payload = {
+                nama: toTitleCase(document.getElementById('nama').value.trim()),
+                jenis_kelamin: document.getElementById('jenis_kelamin').value,
+                tempat_lahir: toTitleCase(document.getElementById('tempat_lahir').value.trim()),
+                tanggal_lahir: fullDate,
+                umur: calculatedAge,
+                desa: document.getElementById('desa').value,
+                kelompok: document.getElementById('kelompok').value,
+                status: statusValue
+            };
+
+            // Notifikasi & UI Update Instan (Optimistic UI)
+            showCustomModal(
+                "Sukses", 
+                editId ? "Data Jamaah Berhasil Di-update!" : "Data Jamaah Berhasil Disimpan!", 
+                "🎉", 
+                () => {
+                    if (currentMode === "UPDATE") {
+                        const currentDesa = document.getElementById('searchDesa').value;
+                        const currentKelompok = document.getElementById('searchKelompok').value;
+
+                        switchMode('UPDATE', true);
+
+                        if (currentDesa && currentKelompok) {
+                            fetchAutoJamaahList(currentDesa, currentKelompok);
+                        }
+                    } else {
+                        const savedDesa = payload.desa;
+                        const savedKelompok = payload.kelompok;
+                        switchMode('DAFTAR');
+
+                        if (savedDesa) {
+                            const desaEl = document.getElementById('desa');
+                            desaEl.value = savedDesa;
+                            
+                            const klpEl = document.getElementById('kelompok');
+                            klpEl.innerHTML = '<option value="">-- Pilih Kelompok --</option>';
+                            if (dataWilayah[savedDesa]) {
+                                klpEl.disabled = false;
+                                klpEl.classList.remove('bg-slate-50');
+                                dataWilayah[savedDesa].forEach(k => klpEl.add(new Option(k, k)));
+                                klpEl.value = savedKelompok;
+                            }
+                        }
+                    }
+                }
+            );
+
+            // Pengiriman Data Latar Belakang (Background Task)
+            (async () => {
+                try {
+                    let err = null;
+                    if(editId) {
+                        const res = await supabaseClient.from('data_jamaah').update(payload).eq('id', editId);
+                        err = res.error;
+                    } else {
+                        const res = await supabaseClient.from('data_jamaah').insert([payload]);
+                        err = res.error;
+                    }
+
+                    if(err) {
+                        if (err.code === '23505') {
+                            showCustomModal("Peringatan Sinkronisasi", "Data jamaah ini sudah terdaftar sebelumnya di server.", "⚠️");
+                        } else {
+                            showCustomModal("Gagal Sinkronisasi", "Terjadi kesalahan di background: " + err.message, "❌");
+                        }
+                    }
+                } catch(errorNet) {
+                    showCustomModal("Masalah Koneksi", "Pengiriman di background terganggu. Periksa koneksi internet Anda.", "⚠️");
+                }
+            })();
+        });
+
+        // ================= DATA SARPRAS (OPTIMISTIC UI BACKGROUND PROCESS) =================
+        document.getElementById('formSarpras').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const editId = document.getElementById('edit_sarpras_id').value;
+
+            const payload = {
+                desa: document.getElementById('sarp_desa').value,
+                kelompok: document.getElementById('sarp_kelompok').value,
+                status_tanah: document.getElementById('sarp_status_tanah').value,
+                jumlah_sub_kelompok: parseInt(document.getElementById('sarp_sub').value) || 0,
+                jumlah_masjid: parseInt(document.getElementById('sarp_masjid').value) || 0,
+                jumlah_aula: parseInt(document.getElementById('sarp_aula').value) || 0,
+                km_pria: parseInt(document.getElementById('sarp_km_pria').value) || 0,
+                km_wanita: parseInt(document.getElementById('sarp_km_wanita').value) || 0
+            };
+
+            // Notifikasi Cepat
+            showCustomModal("Sukses", "Data Sarpras Berhasil Diperbarui!", "🏛️", () => {
+                e.target.reset();
+                document.getElementById('edit_sarpras_id').value = "";
+                switchTabSarpras('UPDATE');
+            });
+
+            // Latar Belakang
+            (async () => {
+                let res;
+                if(editId) {
+                    res = await supabaseClient.from('fasilitas_kelompok').update(payload).eq('id', editId);
+                } else {
+                    res = await supabaseClient.from('fasilitas_kelompok').upsert([payload], { onConflict: 'desa,kelompok' });
+                }
+
+                if(res.error) {
+                    showCustomModal("Gagal Sarpras", "Perubahan Sarpras gagal disimpan di server: " + res.error.message, "❌");
+                }
+            })();
+        });
+
+        // ================= ABSENSI KEGIATAN (OPTIMISTIC UI BACKGROUND PROCESS) =================
+        document.getElementById('formAbsensiKegiatan').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const editId = document.getElementById('edit_absensi_id').value;
+
+            const selectNama = document.getElementById('abs_nama').value;
+            const customNama = toTitleCase(document.getElementById('abs_nama_custom').value.trim());
+            const finalNamaKegiatan = selectNama === 'LAINNYA' ? customNama : selectNama;
+            
+            let tanggalKegiatan;
+            if (editId) {
+                tanggalKegiatan = document.getElementById('edit_tanggal_kegiatan').value;
+            } else {
+                const now = new Date();
+                const yyyy = now.getFullYear();
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const dd = String(now.getDate()).padStart(2, '0');
+                tanggalKegiatan = `${yyyy}-${mm}-${dd}`;
+            }
+
+            const desa = document.getElementById('abs_desa').value;
+            const kelompok = document.getElementById('abs_kelompok').value;
+
+            const payload = {
+                nama_kegiatan: finalNamaKegiatan,
+                tanggal_kegiatan: tanggalKegiatan,
+                desa: desa,
+                kelompok: kelompok,
+                jumlah_laki: parseInt(document.getElementById('abs_laki').value) || 0,
+                jumlah_perempuan: parseInt(document.getElementById('abs_perempuan').value) || 0,
+                jumlah_ijin: parseInt(document.getElementById('abs_ijin').value) || 0,
+                infaq: parseFloat(document.getElementById('abs_infaq').value) || 0
+            };
+
+            // UI Langsung Diperbarui
+            showCustomModal("Sukses", "Data Absensi Berhasil Diperbarui!", "📋", () => {
+                e.target.reset();
+                document.getElementById('abs_nama_custom').classList.add('hidden');
+                document.getElementById('edit_absensi_id').value = "";
+                document.getElementById('edit_tanggal_kegiatan').value = "";
+                switchTabAbsensi('REKAP');
+            });
+
+            // Pengiriman Latar Belakang
+            (async () => {
+                let res;
+                if(editId) {
+                    res = await supabaseClient.from('absensi_kegiatan').update(payload).eq('id', editId);
+                } else {
+                    res = await supabaseClient.from('absensi_kegiatan').insert([payload]);
+                }
+
+                if(res.error) {
+                    showCustomModal("Gagal Absensi", "Pengiriman absensi di background gagal: " + res.error.message, "❌");
+                }
+            })();
+        });
+
+        async function editAbsensi(id) {
+            const { data } = await supabaseClient.from('absensi_kegiatan').select('*').eq('id', id).single();
+            if(!data) return;
+
+            document.getElementById('edit_absensi_id').value = data.id;
+            document.getElementById('edit_tanggal_kegiatan').value = data.tanggal_kegiatan;
+
+            const selectNama = document.getElementById('abs_nama');
+            const customInput = document.getElementById('abs_nama_custom');
+
+            const standardOptions = [
+                "Penyampaian materi PPG pusat",
+                "Pengajian ibu-ibu daerah",
+                "Pengajian umum daerah",
+                "Pengajian remaja daerah",
+                "Penyampaian CAI"
+            ];
+
+            if (standardOptions.includes(data.nama_kegiatan)) {
+                selectNama.value = data.nama_kegiatan;
+                customInput.classList.add('hidden');
+                customInput.required = false;
+                customInput.value = '';
+            } else {
+                selectNama.value = "LAINNYA";
+                customInput.classList.remove('hidden');
+                customInput.required = true;
+                customInput.value = data.nama_kegiatan;
+            }
+
+            document.getElementById('abs_desa').value = data.desa;
+
+            const klp = document.getElementById('abs_kelompok');
+            klp.innerHTML = `<option value="${data.kelompok}">${data.kelompok}</option>`;
+            klp.disabled = false;
+
+            document.getElementById('abs_laki').value = data.jumlah_laki || 0;
+            document.getElementById('abs_perempuan').value = data.jumlah_perempuan || 0;
+            document.getElementById('abs_ijin').value = data.jumlah_ijin || 0;
+            document.getElementById('abs_infaq').value = data.infaq || 0;
+
+            document.getElementById('absBtn').textContent = "Update Absensi";
+            switchTabAbsensi('INPUT');
+        }
+
+        function switchTabSarpras(tab) {
+            const tabIn = document.getElementById('tabInputSarpras');
+            const tabUp = document.getElementById('tabUpdateSarpras');
+            const formSarp = document.getElementById('formSarpras');
+            const listSarp = document.getElementById('sectionListSarpras');
+
+            if (tab === 'INPUT') {
+                tabIn.className = "py-2 px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
+                tabUp.className = "py-2 px-4 text-xs font-bold text-slate-400";
+                formSarp.classList.remove('hidden');
+                listSarp.classList.add('hidden');
+            } else {
+                tabUp.className = "py-2 px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
+                tabIn.className = "py-2 px-4 text-xs font-bold text-slate-400";
+                formSarp.classList.add('hidden');
+                listSarp.classList.remove('hidden');
+                loadListSarpras();
+            }
+        }
+
+        async function loadListSarpras() {
+            const tbody = document.getElementById('tbodyListSarpras');
+            const selectedDesa = document.getElementById('sarp_desa_update').value;
+
+            tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center">Memuat sarpras...</td></tr>';
+
+            try {
+                let data = await fetchAllRows('fasilitas_kelompok', '*');
+                
+                if (selectedDesa) {
+                    data = data.filter(s => s.desa === selectedDesa);
+                }
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-400">Belum ada data sarpras.</td></tr>';
+                    return;
+                }
+
+                data.sort((a, b) => (a.desa || '').localeCompare(b.desa || ''));
+
+                tbody.innerHTML = '';
+                data.forEach(s => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="p-2 font-semibold text-slate-800">${s.kelompok}</td>
+                        <td class="p-2 text-center text-slate-700">${s.status_tanah || '-'}</td>
+                        <td class="p-2 text-center">${s.jumlah_masjid || 0} / ${s.jumlah_aula || 0}</td>
+                        <td class="p-2 text-center font-bold text-slate-700">${s.km_pria || 0}L / ${s.km_wanita || 0}P</td>
+                        <td class="p-2 text-center"><button type="button" onclick="editSarpras('${s.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-red-500">Gagal memuat: ${err.message}</td></tr>`;
+            }
+        }
+
+        async function editSarpras(id) {
+            const { data } = await supabaseClient.from('fasilitas_kelompok').select('*').eq('id', id).single();
+            if (!data) return;
+
+            document.getElementById('edit_sarpras_id').value = data.id;
+            document.getElementById('sarp_desa').value = data.desa;
+
+            const klp = document.getElementById('sarp_kelompok');
+            klp.innerHTML = `<option value="${data.kelompok}">${data.kelompok}</option>`;
+            klp.disabled = false;
+
+            document.getElementById('sarp_status_tanah').value = data.status_tanah || "";
+            document.getElementById('sarp_sub').value = data.jumlah_sub_kelompok || 0;
+            document.getElementById('sarp_masjid').value = data.jumlah_masjid || 0;
+            document.getElementById('sarp_aula').value = data.jumlah_aula || 0;
+            document.getElementById('sarp_km_pria').value = data.km_pria || 0;
+            document.getElementById('sarp_km_wanita').value = data.km_wanita || 0;
+
+            document.getElementById('sarpBtn').textContent = "Update Data Sarpras";
+            switchTabSarpras('INPUT');
+        }
+
+        function switchTabRekap(tab) {
+            const btnPrint = document.getElementById('btnPrintRekap');
+            const btnExport = document.getElementById('btnExportExcel');
+            const secStatus = document.getElementById('sectionStatusKeseluruhan');
+            const secRekapKlp = document.getElementById('sectionRekapKelompok');
+            const secDaftarJamaah = document.getElementById('sectionDaftarJamaah');
+
+            const tabStatus = document.getElementById('tabStatusKeseluruhan');
+            const tabKlp = document.getElementById('tabRekapKelompok');
+            const tabDaftarJamaah = document.getElementById('tabDaftarJamaah');
+
+            [tabStatus, tabKlp, tabDaftarJamaah].forEach(t => t.className = "py-2 px-3 text-xs font-bold text-slate-400 flex items-center gap-1.5");
+            [secStatus, secRekapKlp, secDaftarJamaah].forEach(s => s.classList.add('hidden'));
+
+            if (tab === 'STATUS_KESELURUHAN') {
+                secStatus.classList.remove('hidden');
+                tabStatus.className = "py-2 px-3 text-xs font-bold border-b-2 border-orange-500 text-orange-600 flex items-center gap-1.5";
+                if(btnPrint) btnPrint.classList.remove('hidden');
+                if(btnExport) btnExport.classList.add('hidden');
+                loadRekapStatusKeseluruhan();
+            } else if (tab === 'REKAP_KELOMPOK') {
+                secRekapKlp.classList.remove('hidden');
+                tabKlp.className = "py-2 px-3 text-xs font-bold border-b-2 border-orange-500 text-orange-600 flex items-center gap-1.5";
+                if(btnPrint) btnPrint.classList.remove('hidden');
+                if(btnExport) btnExport.classList.remove('hidden');
+                loadRekapKelompokLengkap();
+            } else if (tab === 'DAFTAR_JAMAAH') {
+                secDaftarJamaah.classList.remove('hidden');
+                tabDaftarJamaah.className = "py-2 px-3 text-xs font-bold border-b-2 border-orange-500 text-orange-600 flex items-center gap-1.5";
+                if(btnPrint) btnPrint.classList.remove('hidden');
+                if(btnExport) btnExport.classList.remove('hidden');
+                loadDaftarJamaahPerKelompok();
+            }
+        }
+
+        function switchTabAbsensi(tab) {
+            const btnPrint = document.getElementById('btnPrintAbsensi');
+            if(tab === 'INPUT') {
+                document.getElementById('formAbsensiKegiatan').classList.remove('hidden');
+                document.getElementById('printableAbsensi').classList.add('hidden');
+                document.getElementById('tabInputAbsensi').className = "py-2 px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
+                document.getElementById('tabRekapAbsensi').className = "py-2 px-4 text-xs font-bold text-slate-400";
+                if(btnPrint) btnPrint.classList.add('hidden');
+            } else {
+                document.getElementById('formAbsensiKegiatan').classList.add('hidden');
+                document.getElementById('printableAbsensi').classList.remove('hidden');
+                document.getElementById('tabRekapAbsensi').className = "py-2 px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
+                document.getElementById('tabInputAbsensi').className = "py-2 px-4 text-xs font-bold text-slate-400";
+                if(btnPrint) btnPrint.classList.remove('hidden');
+                populateKegiatanFilter();
+                loadRekapAbsensi();
+            }
+        }
+
+        async function loadRekapStatusKeseluruhan() {
+            try {
+                const data = await fetchAllRows('data_jamaah', 'status');
+
+                let menikah = 0, duda = 0, janda = 0, manula = 0;
+
+                data.forEach(item => {
+                    const st = (item.status || "").toLowerCase();
+                    if (st === "menikah") menikah++;
+                    else if (st === "duda") duda++;
+                    else if (st === "janda") janda++;
+                    else if (st === "manula") manula++;
+                });
+
+                document.getElementById('stMenikah').textContent = menikah;
+                document.getElementById('stDuda').textContent = duda;
+                document.getElementById('stJanda').textContent = janda;
+                document.getElementById('stManula').textContent = manula;
+                document.getElementById('stTotalAll').textContent = `${data.length} Jamaah`;
+            } catch (err) {
+                console.error("Gagal memuat status keseluruhan:", err);
+            }
+        }
+
+        async function loadRekapKelompokLengkap() {
+            const tbody = document.getElementById('tbodyRekapKelompok');
+            const tfoot = document.getElementById('tfootRekapKelompok');
+            const selectedFilterDesa = document.getElementById('filterDesaRekap').value;
+
+            tbody.innerHTML = '<tr><td colspan="10" class="p-3 text-center">Memuat data rekap kelompok...</td></tr>';
+            tfoot.innerHTML = '';
+
+            try {
+                const [jamaahData, sarprasData] = await Promise.all([
+                    fetchAllRows('data_jamaah', 'desa, kelompok, status'),
+                    fetchAllRows('fasilitas_kelompok', '*')
+                ]);
+
+                const rekapMap = {};
+
+                Object.keys(dataWilayah).forEach(desa => {
+                    if (!selectedFilterDesa || selectedFilterDesa === desa) {
+                        dataWilayah[desa].forEach(kelompok => {
+                            const key = `${desa}__${kelompok}`;
+                            rekapMap[key] = {
+                                desa, kelompok,
+                                menikah: 0, duda: 0, janda: 0, manula: 0, totalJamaah: 0,
+                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0
+                            };
+                        });
+                    }
+                });
+
+                jamaahData.forEach(j => {
+                    if (!selectedFilterDesa || selectedFilterDesa === j.desa) {
+                        const key = `${j.desa}__${j.kelompok}`;
+                        if (!rekapMap[key]) {
+                            rekapMap[key] = {
+                                desa: j.desa, kelompok: j.kelompok,
+                                menikah: 0, duda: 0, janda: 0, manula: 0, totalJamaah: 0,
+                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0
+                            };
+                        }
+                        const st = (j.status || "").toLowerCase();
+                        if (st === "menikah") rekapMap[key].menikah++;
+                        else if (st === "duda") rekapMap[key].duda++;
+                        else if (st === "janda") rekapMap[key].janda++;
+                        else if (st === "manula") rekapMap[key].manula++;
+                        rekapMap[key].totalJamaah++;
+                    }
+                });
+
+                sarprasData.forEach(s => {
+                    if (!selectedFilterDesa || selectedFilterDesa === s.desa) {
+                        const key = `${s.desa}__${s.kelompok}`;
+                        if (!rekapMap[key]) {
+                            rekapMap[key] = {
+                                desa: s.desa, kelompok: s.kelompok,
+                                menikah: 0, duda: 0, janda: 0, manula: 0, totalJamaah: 0,
+                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0
+                            };
+                        }
+                        rekapMap[key].subKlp = s.jumlah_sub_kelompok || 0;
+                        rekapMap[key].masjid = s.jumlah_masjid || 0;
+                        rekapMap[key].aula = s.jumlah_aula || 0;
+                        rekapMap[key].kmPria = s.km_pria || 0;
+                        rekapMap[key].kmWanita = s.km_wanita || 0;
+                    }
+                });
+
+                tbody.innerHTML = '';
+
+                let totMenikah = 0, totDuda = 0, totJanda = 0, totManula = 0, totAllJamaah = 0;
+                let totSub = 0, totMasjid = 0, totAula = 0, totKmL = 0, totKmP = 0;
+
+                const items = Object.values(rekapMap);
+
+                if (items.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="10" class="p-3 text-center text-slate-400">Tidak ada data untuk desa ini.</td></tr>';
+                    return;
+                }
+
+                items.forEach(item => {
+                    totMenikah += item.menikah;
+                    totDuda += item.duda;
+                    totJanda += item.janda;
+                    totManula += item.manula;
+                    totAllJamaah += item.totalJamaah;
+
+                    totSub += item.subKlp;
+                    totMasjid += item.masjid;
+                    totAula += item.aula;
+                    totKmL += item.kmPria;
+                    totKmP += item.kmWanita;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="p-2 font-bold text-slate-800">${item.kelompok}</td>
+                        <td class="p-2 text-center">${item.menikah}</td>
+                        <td class="p-2 text-center">${item.duda}</td>
+                        <td class="p-2 text-center">${item.janda}</td>
+                        <td class="p-2 text-center">${item.manula}</td>
+                        <td class="p-2 text-center font-bold text-orange-600 bg-orange-50/50">${item.totalJamaah}</td>
+                        <td class="p-2 text-center border-l border-orange-100">${item.subKlp}</td>
+                        <td class="p-2 text-center">${item.masjid}</td>
+                        <td class="p-2 text-center">${item.aula}</td>
+                        <td class="p-2 text-center font-semibold">${item.kmPria}L / ${item.kmWanita}P</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                tfoot.innerHTML = `
+                    <tr>
+                        <td class="p-2 text-left font-extrabold uppercase">TOTAL</td>
+                        <td class="p-2 text-center font-extrabold text-orange-950">${totMenikah}</td>
+                        <td class="p-2 text-center font-extrabold text-orange-950">${totDuda}</td>
+                        <td class="p-2 text-center font-extrabold text-orange-950">${totJanda}</td>
+                        <td class="p-2 text-center font-extrabold text-orange-950">${totManula}</td>
+                        <td class="p-2 text-center font-extrabold text-orange-600 bg-orange-200/50">${totAllJamaah}</td>
+                        <td class="p-2 text-center font-extrabold text-orange-950 border-l border-orange-200">${totSub}</td>
+                        <td class="p-2 text-center font-extrabold text-orange-950">${totMasjid}</td>
+                        <td class="p-2 text-center font-extrabold text-orange-950">${totAula}</td>
+                        <td class="p-2 text-center font-extrabold text-orange-950">${totKmL}L / ${totKmP}P</td>
+                    </tr>
+                `;
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="10" class="p-3 text-center text-red-500">Gagal memuat rekapitulasi: ${err.message}</td></tr>`;
+            }
+        }
+
+        async function loadDaftarJamaahPerKelompok() {
+            const tbody = document.getElementById('tbodyDaftarJamaah');
+            const summaryText = document.getElementById('summaryTextDaftarJamaah');
+            const selectedDesa = document.getElementById('filterDesaDaftarJamaah').value;
+            const selectedKelompok = document.getElementById('filterKelompokDaftarJamaah').value;
+            const searchQuery = document.getElementById('searchNamaDaftarJamaah').value.trim().toLowerCase();
+
+            tbody.innerHTML = '<tr><td colspan="7" class="p-3 text-center">Memuat daftar nama jamaah...</td></tr>';
+
+            try {
+                let data = await fetchAllRows('data_jamaah', '*');
+
+                if (selectedDesa) data = data.filter(j => j.desa === selectedDesa);
+                if (selectedKelompok) data = data.filter(j => j.kelompok === selectedKelompok);
+
+                data.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
+
+                let filtered = data;
+                if (searchQuery) {
+                    filtered = data.filter(j => j.nama && j.nama.toLowerCase().includes(searchQuery));
+                }
+
+                summaryText.textContent = `Menampilkan ${filtered.length} jamaah terdaftar`;
+
+                if (filtered.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="p-3 text-center text-slate-400">Tidak ada jamaah ditemukan.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                filtered.forEach((j, index) => {
+                    let calculatedUmur = j.umur || '-';
+                    if ((!j.umur || j.umur === 0) && j.tanggal_lahir) {
+                        const parts = j.tanggal_lahir.split('-');
+                        if (parts.length === 3) {
+                            const birthDate = new Date(`${parts[0]}-${parts[1]}-${parts[2]}`);
+                            const today = new Date();
+                            let age = today.getFullYear() - birthDate.getFullYear();
+                            const m = today.getMonth() - birthDate.getMonth();
+                            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+                            if (!isNaN(age) && age >= 0) calculatedUmur = age;
+                        }
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="p-2 text-center font-bold text-slate-400">${index + 1}</td>
+                        <td class="p-2 font-bold text-slate-800">${j.nama}</td>
+                        <td class="p-2 text-center font-semibold ${j.jenis_kelamin === 'L' ? 'text-blue-600' : 'text-pink-600'}">${j.jenis_kelamin || '-'}</td>
+                        <td class="p-2 text-slate-600">${j.kelompok} <span class="text-[10px] text-slate-400">(${j.desa})</span></td>
+                        <td class="p-2 text-center font-medium">${calculatedUmur} thn</td>
+                        <td class="p-2 text-center"><span class="bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full text-[10px] font-bold border border-orange-200">${j.status || 'Menikah'}</span></td>
+                        <td class="p-2 text-center no-print">
+                            <button type="button" onclick="editJamaahDirect('${j.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-red-500">Gagal memuat data jamaah: ${err.message}</td></tr>`;
+                summaryText.textContent = "Gagal memuat data";
+            }
+        }
+
+        async function editJamaahDirect(id) {
+            const { data } = await supabaseClient.from('data_jamaah').select('*').eq('id', id).single();
+            if(!data) return;
+
+            showSection('database');
+            switchMode('UPDATE');
+
+            const searchDesaEl = document.getElementById('searchDesa');
+            searchDesaEl.value = data.desa;
+
+            const searchKelompokEl = document.getElementById('searchKelompok');
+            searchKelompokEl.innerHTML = '<option value="">-- Kelompok --</option>';
+            if (dataWilayah[data.desa]) {
+                searchKelompokEl.disabled = false;
+                searchKelompokEl.classList.remove('bg-slate-50');
+                dataWilayah[data.desa].forEach(k => searchKelompokEl.add(new Option(k, k)));
+                searchKelompokEl.value = data.kelompok;
+            }
+
+            fetchAutoJamaahList(data.desa, data.kelompok);
+            selectJamaahToForm(data);
+        }
+
+        function setupYearFilter() {
+            const sel = document.getElementById('filterTahun');
+            const now = new Date().getFullYear();
+            sel.innerHTML = '';
+            for(let i = now; i >= now - 3; i--) {
+                sel.add(new Option(`Tahun ${i}`, i));
+            }
+        }
+
+        async function populateKegiatanFilter() {
+            const selKegiatan = document.getElementById('filterKegiatanAbsensi');
+            if (!selKegiatan) return;
+
+            const currentValue = selKegiatan.value;
+
+            try {
+                const data = await fetchAllRows('absensi_kegiatan', 'nama_kegiatan');
+
+                const uniqueKegiatan = [...new Set(data.map(item => item.nama_kegiatan))].filter(Boolean).sort();
+
+                selKegiatan.innerHTML = '<option value="">-- Semua Kegiatan --</option>';
+
+                uniqueKegiatan.forEach(nama => {
+                    selKegiatan.add(new Option(nama, nama));
+                });
+
+                if (currentValue && uniqueKegiatan.includes(currentValue)) {
+                    selKegiatan.value = currentValue;
+                }
+            } catch (err) {
+                console.error("Gagal memuat daftar filter kegiatan:", err);
+            }
+        }
+
+        async function loadRekapAbsensi() {
+            const desa = document.getElementById('filterDesaAbsensi') ? document.getElementById('filterDesaAbsensi').value : '';
+            const tahun = document.getElementById('filterTahun').value;
+            const bulan = document.getElementById('filterBulanAbsensi').value;
+            const kegiatan = document.getElementById('filterKegiatanAbsensi').value;
+
+            const tbody = document.getElementById('tbodyRekapAbsensi');
+            const tfoot = document.getElementById('tfootRekapAbsensi');
+            tbody.innerHTML = '<tr><td colspan="6" class="p-3 text-center">Memuat rekap...</td></tr>';
+            tfoot.innerHTML = '';
+
+            try {
+                let data = await fetchAllRows('absensi_kegiatan', '*');
+
+                if (kegiatan) {
+                    data = data.filter(item => item.nama_kegiatan === kegiatan);
+                }
+
+                data.sort((a, b) => (b.tanggal_kegiatan || '').localeCompare(a.tanggal_kegiatan || ''));
+
+                const filteredData = data.filter(item => {
+                    if (desa && item.desa !== desa) return false;
+
+                    if (!item.tanggal_kegiatan) return false;
+                    const parts = item.tanggal_kegiatan.split('-');
+                    if (parts.length < 2) return false;
+                    
+                    const itemTahun = parts[0];
+                    const itemBulan = parts[1];
+
+                    if (tahun && itemTahun !== tahun) return false;
+                    if (bulan && itemBulan !== bulan) return false;
+                    return true;
+                });
+
+                if (filteredData.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-slate-400">Tidak ada data untuk filter ini.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                let totalLaki = 0, totalPerempuan = 0, totalIjin = 0, totalInfaq = 0;
+
+                filteredData.forEach(item => {
+                    totalLaki += (item.jumlah_laki || 0);
+                    totalPerempuan += (item.jumlah_perempuan || 0);
+                    totalIjin += (item.jumlah_ijin || 0);
+                    totalInfaq += (item.infaq || 0);
+
+                    let tglFormatted = '-';
+                    if (item.tanggal_kegiatan) {
+                        const p = item.tanggal_kegiatan.split('-');
+                        if (p.length === 3) tglFormatted = `${p[2]}/${p[1]}/${p[0]}`;
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="p-2 font-semibold text-slate-800 whitespace-nowrap">${item.kelompok}</td>
+                        <td class="p-2 text-center whitespace-nowrap text-slate-600">${tglFormatted}</td>
+                        <td class="p-2 text-center whitespace-nowrap">${item.jumlah_laki}L / ${item.jumlah_perempuan}P</td>
+                        <td class="p-2 text-center whitespace-nowrap font-medium text-amber-700">${item.jumlah_ijin || 0} Orang</td>
+                        <td class="p-2 text-right font-medium whitespace-nowrap">Rp${(item.infaq || 0).toLocaleString('id-ID')}</td>
+                        <td class="p-2 text-center no-print whitespace-nowrap"><button onclick="editAbsensi('${item.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                tfoot.innerHTML = `
+                    <tr>
+                        <td class="p-2 text-left font-extrabold uppercase whitespace-nowrap" colspan="2">TOTAL KESELURUHAN</td>
+                        <td class="p-2 text-center font-extrabold text-orange-900 whitespace-nowrap">${totalLaki}L / ${totalPerempuan}P</td>
+                        <td class="p-2 text-center font-extrabold text-amber-900 whitespace-nowrap">${totalIjin} Orang</td>
+                        <td class="p-2 text-right font-extrabold text-orange-900 whitespace-nowrap">Rp${totalInfaq.toLocaleString('id-ID')}</td>
+                        <td class="p-2 text-center no-print"></td>
+                    </tr>
+                `;
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-red-500">Gagal memuat rekap absensi: ${err.message}</td></tr>`;
+            }
+        }
+
+        function toggleNamaKegiatanLainnya(selectEl) {
+            const customInput = document.getElementById('abs_nama_custom');
+            if (selectEl.value === 'LAINNYA') {
+                customInput.classList.remove('hidden');
+                customInput.required = true;
+            } else {
+                customInput.classList.add('hidden');
+                customInput.required = false;
+                customInput.value = '';
+            }
+        }
+
+        function exportTableToExcel(tbodyId, tfootId) {
+            const tbody = document.getElementById(tbodyId);
+
+            if (!tbody || tbody.rows.length === 0) {
+                showCustomModal("Export Gagal", "Tidak ada data untuk diexport ke Excel.", "⚠️");
+                return;
+            }
+
+            let table;
+            let fileName = `Rekap_Jamaah_Sarpras_${new Date().toISOString().slice(0,10)}.xlsx`;
+
+            if (tbodyId === 'tbodyDaftarJamaah') {
+                table = document.getElementById('tableDaftarJamaah');
+                fileName = `Daftar_Nama_Jamaah_${new Date().toISOString().slice(0,10)}.xlsx`;
+            } else {
+                table = document.getElementById('tableRekapKelompok');
+            }
+
+            const wb = XLSX.utils.table_to_book(table, { sheet: "Data Jamaah" });
+            XLSX.writeFile(wb, fileName);
+        }
+
+        function printData(elementId) {
+            const printElement = document.getElementById(elementId);
+            if (!printElement) return;
+
+            printElement.classList.add('printable-active');
+            window.print();
+
+            setTimeout(() => {
+                printElement.classList.remove('printable-active');
+            }, 500);
+        }
+    </script>
+</body>
+</html>
