@@ -48,7 +48,6 @@
             left: 0;
             background-color: #ffffff !important;
             z-index: 10;
-            /* Menggunakan cubic-bezier agar transisi mengecil/membesar sangat halus */
             transition: max-width 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s ease;
             box-shadow: none;
             white-space: nowrap;
@@ -1349,6 +1348,7 @@
             showCustomModal("Sukses", "Data Sarpras Berhasil Diperbarui!", "🏛️", () => {
                 e.target.reset();
                 document.getElementById('edit_sarpras_id').value = "";
+                document.getElementById('sarpBtn').textContent = "Simpan Sarpras";
                 switchTabSarpras('UPDATE');
             });
 
@@ -1366,6 +1366,49 @@
                 }
             })();
         });
+
+        // FUNGSI EDIT SARPRAS
+        async function editSarpras(id) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('fasilitas_kelompok')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (error || !data) {
+                    showCustomModal("Error", "Gagal mengambil data sarpras.", "❌");
+                    return;
+                }
+
+                document.getElementById('edit_sarpras_id').value = data.id;
+
+                const desaEl = document.getElementById('sarp_desa');
+                desaEl.value = data.desa;
+
+                const kelompokEl = document.getElementById('sarp_kelompok');
+                kelompokEl.innerHTML = '<option value="">-- Pilih Kelompok --</option>';
+                if (dataWilayah[data.desa]) {
+                    dataWilayah[data.desa].forEach(k => kelompokEl.add(new Option(k, k)));
+                }
+                kelompokEl.disabled = false;
+                kelompokEl.classList.remove('bg-slate-50');
+                kelompokEl.value = data.kelompok;
+
+                document.getElementById('sarp_status_tanah').value = data.status_tanah || '';
+                document.getElementById('sarp_sub').value = data.jumlah_sub_kelompok ?? 0;
+                document.getElementById('sarp_masjid').value = data.jumlah_masjid ?? 0;
+                document.getElementById('sarp_aula').value = data.jumlah_aula ?? 0;
+                document.getElementById('sarp_km_pria').value = data.km_pria ?? 0;
+                document.getElementById('sarp_km_wanita').value = data.km_wanita ?? 0;
+
+                document.getElementById('sarpBtn').textContent = "Update Sarpras";
+
+                switchTabSarpras('INPUT');
+            } catch (err) {
+                showCustomModal("Error", "Terjadi kesalahan: " + err.message, "❌");
+            }
+        }
 
         // ================= ABSENSI KEGIATAN (OPTIMISTIC UI BACKGROUND PROCESS) =================
         document.getElementById('formAbsensiKegiatan').addEventListener('submit', function(e) {
