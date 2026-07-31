@@ -42,28 +42,33 @@
             opacity: 1;
         }
 
-        /* STYLES STICKY COLUMN DIPERSEMPIT SEHINGGA KOLOM SAMPING LEBIH LEBAR */
+        /* STYLES STICKY COLUMN DINAMIS SAAT SCROLL */
         .sticky-col {
             position: sticky;
             left: 0;
             background-color: #ffffff !important;
             z-index: 10;
-            box-shadow: 2px 0 5px -1px rgba(0, 0, 0, 0.08);
-            min-width: 80px;
-            max-width: 105px;
-            width: 95px;
+            transition: max-width 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: none;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            max-width: 300px; /* Lebar default komplit/utuh saat pertama buka */
+        }
+
+        /* Efek saat pembungkus tabel di-scroll ke kanan */
+        .overflow-x-auto.is-scrolled .sticky-col {
+            max-width: 95px; /* Otomatis terpotong saat digeser ke kanan */
+            box-shadow: 3px 0 6px -2px rgba(0, 0, 0, 0.12); /* Menambahkan bayangan pembatas */
         }
 
         thead .sticky-col {
-            background-color: #fff7ed !important; /* Sama dengan bg header tabel */
+            background-color: #fff7ed !important;
             z-index: 11;
         }
 
         tfoot .sticky-col {
-            background-color: #ffedd5 !important; /* Sama dengan bg footer tabel */
+            background-color: #ffedd5 !important;
             z-index: 11;
         }
 
@@ -131,7 +136,6 @@
             .sticky-col {
                 position: static !important;
                 box-shadow: none !important;
-                width: auto !important;
                 max-width: none !important;
             }
         }
@@ -464,7 +468,7 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto border border-orange-100 rounded-xl">
+                <div class="overflow-x-auto border border-orange-100 rounded-xl scroll-container">
                     <table class="w-full text-xs text-left">
                         <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
                             <tr>
@@ -563,7 +567,7 @@
                     </select>
                 </div>
 
-                <div class="overflow-x-auto border border-orange-100 rounded-xl">
+                <div class="overflow-x-auto border border-orange-100 rounded-xl scroll-container">
                     <table class="w-full text-xs text-left">
                         <thead class="bg-orange-50 text-slate-900 font-bold border-b border-orange-100">
                             <tr>
@@ -661,7 +665,7 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto border border-orange-100 rounded-xl">
+                    <div class="overflow-x-auto border border-orange-100 rounded-xl scroll-container">
                         <table id="tableRekapKelompok" class="w-full text-xs text-left">
                             <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
                                 <tr>
@@ -712,7 +716,7 @@
                         <span class="text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded border border-orange-200">Terurut Abjad</span>
                     </div>
 
-                    <div class="overflow-x-auto border border-orange-100 rounded-xl">
+                    <div class="overflow-x-auto border border-orange-100 rounded-xl scroll-container">
                         <table id="tableDaftarJamaah" class="w-full text-xs text-left">
                             <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
                                 <tr>
@@ -759,6 +763,19 @@
 
         let currentMode = "DAFTAR";
         let activeSectionId = null;
+
+        // DETEKSI SCROLL UNTUK EFEK PEMOTONGAN TEKS DINAMIS ON-SCROLL
+        function initScrollDetectors() {
+            document.querySelectorAll('.overflow-x-auto').forEach(container => {
+                container.addEventListener('scroll', function() {
+                    if (this.scrollLeft > 5) {
+                        this.classList.add('is-scrolled');
+                    } else {
+                        this.classList.remove('is-scrolled');
+                    }
+                });
+            });
+        }
 
         // Data Desa & Kelompok
         const rawDataWilayah = {
@@ -914,6 +931,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             initDateDropdowns();
             initDesaDropdowns();
+            initScrollDetectors();
             showSection('home');
         });
 
@@ -1498,28 +1516,6 @@
             } catch (err) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-red-500">Gagal memuat: ${err.message}</td></tr>`;
             }
-        }
-
-        async function editSarpras(id) {
-            const { data } = await supabaseClient.from('fasilitas_kelompok').select('*').eq('id', id).single();
-            if (!data) return;
-
-            document.getElementById('edit_sarpras_id').value = data.id;
-            document.getElementById('sarp_desa').value = data.desa;
-
-            const klp = document.getElementById('sarp_kelompok');
-            klp.innerHTML = `<option value="${data.kelompok}">${data.kelompok}</option>`;
-            klp.disabled = false;
-
-            document.getElementById('sarp_status_tanah').value = data.status_tanah || "";
-            document.getElementById('sarp_sub').value = data.jumlah_sub_kelompok ?? '';
-            document.getElementById('sarp_masjid').value = data.jumlah_masjid ?? '';
-            document.getElementById('sarp_aula').value = data.jumlah_aula ?? '';
-            document.getElementById('sarp_km_pria').value = data.km_pria ?? '';
-            document.getElementById('sarp_km_wanita').value = data.km_wanita ?? '';
-
-            document.getElementById('sarpBtn').textContent = "Update Data Sarpras";
-            switchTabSarpras('INPUT');
         }
 
         function switchTabRekap(tab) {
