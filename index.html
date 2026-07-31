@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pendataan, Sarpras & Absensi Jamaah</title>
 
-    <link rel="icon" type="image/jpeg" href="logo insan qurany.png">
+    <link rel="icon" type="image/jpeg" href="logo sdc tw.png">
 	<link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ea580c">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,7 +16,7 @@
     <!-- Library SheetJS untuk Export Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #fff7ed; /* Orange 50 */
@@ -53,14 +53,14 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 280px; /* Lebar default komplit/utuh saat pertama buka */
-            will-change: max-width; /* Memanfaatkan GPU Rendering */
+            max-width: 280px;
+            will-change: max-width;
         }
 
         /* Efek saat pembungkus tabel di-scroll ke kanan */
         .overflow-x-auto.is-scrolled .sticky-col {
-            max-width: 95px; /* Otomatis terpotong saat digeser ke kanan */
-            box-shadow: 3px 0 6px -2px rgba(0, 0, 0, 0.12); /* Menambahkan bayangan pembatas */
+            max-width: 95px;
+            box-shadow: 3px 0 6px -2px rgba(0, 0, 0, 0.12);
         }
 
         thead .sticky-col {
@@ -172,9 +172,60 @@
 		#autoJamaahList::-webkit-scrollbar-thumb:hover {
 			background: #f97316;
 		}
+
+        /* ANIMASI LOADING SCREEN ELEGAN */
+        #loadingScreen {
+            transition: opacity 0.5s ease-out, visibility 0.5s;
+        }
+        #loadingScreen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.05); opacity: 1; box-shadow: 0 0 25px rgba(249, 115, 22, 0.4); }
+        }
+        .animate-pulse-glow {
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 sm:p-6 antialiased text-slate-800">
+
+    <!-- ANIMASI LOADING ELEGAN SAAT BUKA APLIKASI -->
+    <div id="loadingScreen" class="fixed inset-0 bg-amber-50/95 backdrop-blur-md z-[100] flex flex-col items-center justify-center p-4">
+        <div class="relative flex flex-col items-center">
+            <div class="w-28 h-28 rounded-full border-4 border-orange-500/30 p-1.5 bg-white shadow-2xl animate-pulse-glow flex items-center justify-center mb-6 overflow-hidden">
+                <img src="logo sdc tw.png" alt="Logo Insan Qur'any" class="w-full h-full object-contain">
+            </div>
+            <!-- Spinner Ring -->
+            <div class="w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mb-4"></div>
+            <h3 class="text-lg font-bold text-slate-800 tracking-wide">INSAN QUR'ANY TAWANGMANGU</h3>
+            <p class="text-xs text-slate-500 mt-1 font-medium">Memuat Sistem Informasi...</p>
+        </div>
+    </div>
+
+    <!-- MODAL OVERLAY AUTHENTICATION / PASSWORD LOG IN -->
+    <div id="authModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[90] flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl border border-orange-100 text-center space-y-5 animate-fade-in-up">
+            <div class="w-16 h-16 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-inner">
+                🔒
+            </div>
+            <div>
+                <h3 class="text-xl font-extrabold text-slate-800">Akses Terkunci</h3>
+                <p class="text-xs text-slate-500 mt-1">Masukkan kata sandi untuk mengakses aplikasi</p>
+            </div>
+            <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-3">
+                <div>
+                    <input type="password" id="appPasswordInput" required placeholder="Masukkan Password" class="rounded-box-input w-full p-3 text-center text-sm font-bold tracking-widest text-slate-800">
+                    <p id="authErrorMsg" class="text-[11px] text-red-500 font-semibold mt-2 hidden">⚠️ Password salah! Silakan coba lagi.</p>
+                </div>
+                <button type="submit" class="w-full py-3 bg-orange-500 hover:bg-orange-600 active:scale-[0.98] text-white rounded-xl text-xs font-bold transition duration-200 shadow-md hover:shadow-orange-200">
+                    Buka Aplikasi
+                </button>
+            </form>
+        </div>
+    </div>
 
     <!-- CONTAINER UTAMA -->
     <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-orange-100 w-full max-w-2xl my-4 relative">
@@ -182,7 +233,7 @@
         <!-- Header Logo (Selalu Tampil) -->
         <div class="flex justify-center mb-4">
             <div class="w-24 h-24 rounded-full border-2 border-orange-400 p-1 bg-white shadow-md flex items-center justify-center overflow-hidden">
-                <img src="logo insan qurany.png" alt="Logo Insan Qur'any Tawangmangu" class="w-full h-full object-contain">
+                <img src="logo sdc tw.png" alt="Logo Insan Qur'any Tawangmangu" class="w-full h-full object-contain">
             </div>
         </div>
 
@@ -758,12 +809,28 @@
     </div>
 
     <script>
+        const APP_PASSWORD_SECRET = "Ostw";
         const SUPABASE_URL = "https://xijlyydfogbkcctlycsb.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhpamx5eWRmb2dia2NjdGx5Y3NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMzAxODYsImV4cCI6MjA5NzcwNjE4Nn0.JwqYXWEt2yiLioI1o9qZ3KRrak2rtzO1Tp0eN7AuAm4";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentMode = "DAFTAR";
         let activeSectionId = null;
+
+        // FUNGSI LOG IN / VERIFIKASI PASSWORD
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const inputVal = document.getElementById('appPasswordInput').value;
+            const errEl = document.getElementById('authErrorMsg');
+
+            if (inputVal === APP_PASSWORD_SECRET) {
+                errEl.classList.add('hidden');
+                document.getElementById('authModal').classList.add('hidden');
+            } else {
+                errEl.classList.remove('hidden');
+                document.getElementById('appPasswordInput').focus();
+            }
+        }
 
         // DETEKSI SCROLL DENGAN DEBOUNCE / REQUESTANIMATIONFRAME UNTUK PERGERAKAN OLEH SMOOTH
         function initScrollDetectors() {
@@ -941,6 +1008,17 @@
             initDesaDropdowns();
             initScrollDetectors();
             showSection('home');
+
+            // SIMULASI ANIMASI LOADING ELEGAN SAAT BUKA APLIKASI
+            setTimeout(() => {
+                const loader = document.getElementById('loadingScreen');
+                if (loader) {
+                    loader.classList.add('fade-out');
+                    setTimeout(() => {
+                        document.getElementById('appPasswordInput').focus();
+                    }, 200);
+                }
+            }, 1800);
         });
 
         function initDesaDropdowns() {
