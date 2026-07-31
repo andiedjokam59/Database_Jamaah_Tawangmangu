@@ -42,15 +42,16 @@
             opacity: 1;
         }
 
-        /* STYLES STICKY COLUMN UNTUK TABEL REKAP SAAT DIGESER KE SAMPING */
+        /* STYLES STICKY COLUMN DIPERSEMPIT SEHINGGA KOLOM SAMPING LEBIH LEBAR */
         .sticky-col {
             position: sticky;
             left: 0;
             background-color: #ffffff !important;
             z-index: 10;
-            box-shadow: 3px 0 6px -2px rgba(0, 0, 0, 0.08);
-            min-width: 140px;
-            max-width: 180px;
+            box-shadow: 2px 0 5px -1px rgba(0, 0, 0, 0.08);
+            min-width: 80px;
+            max-width: 105px;
+            width: 95px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -130,6 +131,8 @@
             .sticky-col {
                 position: static !important;
                 box-shadow: none !important;
+                width: auto !important;
+                max-width: none !important;
             }
         }
 		
@@ -465,12 +468,12 @@
                     <table class="w-full text-xs text-left">
                         <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
                             <tr>
-                                <th class="p-2 whitespace-nowrap sticky-col">Kelompok</th>
-                                <th class="p-2 text-center whitespace-nowrap">Tanggal</th>
-                                <th class="p-2 text-center whitespace-nowrap">Hadir (L/P)</th>
-                                <th class="p-2 text-center whitespace-nowrap">Ijin</th>
-                                <th class="p-2 text-right whitespace-nowrap">Infaq</th>
-                                <th class="p-2 text-center no-print whitespace-nowrap">Aksi</th>
+                                <th class="px-1.5 py-2 whitespace-nowrap sticky-col">Kelompok</th>
+                                <th class="px-1.5 py-2 text-center whitespace-nowrap">Tanggal</th>
+                                <th class="px-1.5 py-2 text-center whitespace-nowrap">Hadir (L/P)</th>
+                                <th class="px-1.5 py-2 text-center whitespace-nowrap">Ijin</th>
+                                <th class="px-1.5 py-2 text-right whitespace-nowrap">Infaq</th>
+                                <th class="px-1.5 py-2 text-center no-print whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="tbodyRekapAbsensi" class="divide-y divide-orange-50 text-slate-600"></tbody>
@@ -564,11 +567,11 @@
                     <table class="w-full text-xs text-left">
                         <thead class="bg-orange-50 text-slate-900 font-bold border-b border-orange-100">
                             <tr>
-                                <th class="p-2 text-slate-900 sticky-col">Kelompok</th>
-                                <th class="p-2 text-center text-slate-900">Status Tanah</th>
-                                <th class="p-2 text-center text-slate-900">Masjid/Aula</th>
-                                <th class="p-2 text-center text-slate-900">WC (L/P)</th>
-                                <th class="p-2 text-center text-slate-900">Aksi</th>
+                                <th class="px-1.5 py-2 text-slate-900 sticky-col">Kelompok</th>
+                                <th class="px-1.5 py-2 text-center text-slate-900">Status Tanah</th>
+                                <th class="px-1.5 py-2 text-center text-slate-900">Masjid/Aula</th>
+                                <th class="px-1.5 py-2 text-center text-slate-900">WC (L/P)</th>
+                                <th class="px-1.5 py-2 text-center text-slate-900">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="tbodyListSarpras" class="divide-y divide-orange-50 text-slate-600"></tbody>
@@ -662,16 +665,16 @@
                         <table id="tableRekapKelompok" class="w-full text-xs text-left">
                             <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
                                 <tr>
-                                    <th class="p-2 sticky-col">Kelompok</th>
-                                    <th class="p-2 text-center">Menikah</th>
-                                    <th class="p-2 text-center">Duda</th>
-                                    <th class="p-2 text-center">Janda</th>
-                                    <th class="p-2 text-center">Manula</th>
-                                    <th class="p-2 text-center bg-orange-100/50">Total Jamaah</th>
-                                    <th class="p-2 text-center border-l border-orange-200">Sub Klp</th>
-                                    <th class="p-2 text-center">Masjid</th>
-                                    <th class="p-2 text-center">Aula</th>
-                                    <th class="p-2 text-center">WC (L/P)</th>
+                                    <th class="px-1.5 py-2 sticky-col">Kelompok</th>
+                                    <th class="px-1.5 py-2 text-center">Menikah</th>
+                                    <th class="px-1.5 py-2 text-center">Duda</th>
+                                    <th class="px-1.5 py-2 text-center">Janda</th>
+                                    <th class="px-1.5 py-2 text-center">Manula</th>
+                                    <th class="px-1.5 py-2 text-center bg-orange-100/50">Total Jamaah</th>
+                                    <th class="px-1.5 py-2 text-center border-l border-orange-200">Sub Klp</th>
+                                    <th class="px-1.5 py-2 text-center">Masjid</th>
+                                    <th class="px-1.5 py-2 text-center">Aula</th>
+                                    <th class="px-1.5 py-2 text-center">WC (L/P)</th>
                                 </tr>
                             </thead>
                             <tbody id="tbodyRekapKelompok" class="divide-y divide-orange-50 text-slate-700"></tbody>
@@ -713,13 +716,13 @@
                         <table id="tableDaftarJamaah" class="w-full text-xs text-left">
                             <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
                                 <tr>
-                                    <th class="p-2 text-center w-10">No</th>
-                                    <th class="p-2 sticky-col">Nama Jamaah</th>
-                                    <th class="p-2 text-center">L/P</th>
-                                    <th class="p-2">Kelompok / Desa</th>
-                                    <th class="p-2 text-center">Umur</th>
-                                    <th class="p-2 text-center">Status</th>
-                                    <th class="p-2 text-center no-print">Aksi</th>
+                                    <th class="px-1.5 py-2 text-center w-8">No</th>
+                                    <th class="px-1.5 py-2 sticky-col">Nama Jamaah</th>
+                                    <th class="px-1.5 py-2 text-center">L/P</th>
+                                    <th class="px-1.5 py-2">Kelompok / Desa</th>
+                                    <th class="px-1.5 py-2 text-center">Umur</th>
+                                    <th class="px-1.5 py-2 text-center">Status</th>
+                                    <th class="px-1.5 py-2 text-center no-print">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="tbodyDaftarJamaah" class="divide-y divide-orange-50 text-slate-700"></tbody>
@@ -1484,11 +1487,11 @@
                 data.forEach(s => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td class="p-2 font-semibold text-slate-800 sticky-col">${s.kelompok}</td>
-                        <td class="p-2 text-center text-slate-700">${s.status_tanah || '-'}</td>
-                        <td class="p-2 text-center">${s.jumlah_masjid || 0} / ${s.jumlah_aula || 0}</td>
-                        <td class="p-2 text-center font-bold text-slate-700">${s.km_pria || 0}L / ${s.km_wanita || 0}P</td>
-                        <td class="p-2 text-center"><button type="button" onclick="editSarpras('${s.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button></td>
+                        <td class="px-1.5 py-2 font-semibold text-slate-800 sticky-col" title="${s.kelompok}">${s.kelompok}</td>
+                        <td class="px-1.5 py-2 text-center text-slate-700">${s.status_tanah || '-'}</td>
+                        <td class="px-1.5 py-2 text-center">${s.jumlah_masjid || 0} / ${s.jumlah_aula || 0}</td>
+                        <td class="px-1.5 py-2 text-center font-bold text-slate-700">${s.km_pria || 0}L / ${s.km_wanita || 0}P</td>
+                        <td class="px-1.5 py-2 text-center"><button type="button" onclick="editSarpras('${s.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -1690,32 +1693,32 @@
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td class="p-2 font-bold text-slate-800 sticky-col" title="${item.kelompok}">${item.kelompok}</td>
-                        <td class="p-2 text-center">${item.menikah}</td>
-                        <td class="p-2 text-center">${item.duda}</td>
-                        <td class="p-2 text-center">${item.janda}</td>
-                        <td class="p-2 text-center">${item.manula}</td>
-                        <td class="p-2 text-center font-bold text-orange-600 bg-orange-50/50">${item.totalJamaah}</td>
-                        <td class="p-2 text-center border-l border-orange-100">${item.subKlp}</td>
-                        <td class="p-2 text-center">${item.masjid}</td>
-                        <td class="p-2 text-center">${item.aula}</td>
-                        <td class="p-2 text-center font-semibold">${item.kmPria}L / ${item.kmWanita}P</td>
+                        <td class="px-1.5 py-2 font-bold text-slate-800 sticky-col" title="${item.kelompok}">${item.kelompok}</td>
+                        <td class="px-1.5 py-2 text-center">${item.menikah}</td>
+                        <td class="px-1.5 py-2 text-center">${item.duda}</td>
+                        <td class="px-1.5 py-2 text-center">${item.janda}</td>
+                        <td class="px-1.5 py-2 text-center">${item.manula}</td>
+                        <td class="px-1.5 py-2 text-center font-bold text-orange-600 bg-orange-50/50">${item.totalJamaah}</td>
+                        <td class="px-1.5 py-2 text-center border-l border-orange-100">${item.subKlp}</td>
+                        <td class="px-1.5 py-2 text-center">${item.masjid}</td>
+                        <td class="px-1.5 py-2 text-center">${item.aula}</td>
+                        <td class="px-1.5 py-2 text-center font-semibold">${item.kmPria}L / ${item.kmWanita}P</td>
                     `;
                     tbody.appendChild(tr);
                 });
 
                 tfoot.innerHTML = `
                     <tr>
-                        <td class="p-2 text-left font-extrabold uppercase sticky-col">TOTAL</td>
-                        <td class="p-2 text-center font-extrabold text-orange-950">${totMenikah}</td>
-                        <td class="p-2 text-center font-extrabold text-orange-950">${totDuda}</td>
-                        <td class="p-2 text-center font-extrabold text-orange-950">${totJanda}</td>
-                        <td class="p-2 text-center font-extrabold text-orange-950">${totManula}</td>
-                        <td class="p-2 text-center font-extrabold text-orange-600 bg-orange-200/50">${totAllJamaah}</td>
-                        <td class="p-2 text-center font-extrabold text-orange-950 border-l border-orange-200">${totSub}</td>
-                        <td class="p-2 text-center font-extrabold text-orange-950">${totMasjid}</td>
-                        <td class="p-2 text-center font-extrabold text-orange-950">${totAula}</td>
-                        <td class="p-2 text-center font-extrabold text-orange-950">${totKmL}L / ${totKmP}P</td>
+                        <td class="px-1.5 py-2 text-left font-extrabold uppercase sticky-col">TOTAL</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totMenikah}</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totDuda}</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totJanda}</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totManula}</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-600 bg-orange-200/50">${totAllJamaah}</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950 border-l border-orange-200">${totSub}</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totMasjid}</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totAula}</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totKmL}L / ${totKmP}P</td>
                     </tr>
                 `;
             } catch (err) {
@@ -1769,13 +1772,13 @@
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td class="p-2 text-center font-bold text-slate-400">${index + 1}</td>
-                        <td class="p-2 font-bold text-slate-800 sticky-col" title="${j.nama}">${j.nama}</td>
-                        <td class="p-2 text-center font-semibold ${j.jenis_kelamin === 'L' ? 'text-blue-600' : 'text-pink-600'}">${j.jenis_kelamin || '-'}</td>
-                        <td class="p-2 text-slate-600">${j.kelompok} <span class="text-[10px] text-slate-400">(${j.desa})</span></td>
-                        <td class="p-2 text-center font-medium">${calculatedUmur} thn</td>
-                        <td class="p-2 text-center"><span class="bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full text-[10px] font-bold border border-orange-200">${j.status || 'Menikah'}</span></td>
-                        <td class="p-2 text-center no-print">
+                        <td class="px-1.5 py-2 text-center font-bold text-slate-400">${index + 1}</td>
+                        <td class="px-1.5 py-2 font-bold text-slate-800 sticky-col" title="${j.nama}">${j.nama}</td>
+                        <td class="px-1.5 py-2 text-center font-semibold ${j.jenis_kelamin === 'L' ? 'text-blue-600' : 'text-pink-600'}">${j.jenis_kelamin || '-'}</td>
+                        <td class="px-1.5 py-2 text-slate-600">${j.kelompok} <span class="text-[10px] text-slate-400">(${j.desa})</span></td>
+                        <td class="px-1.5 py-2 text-center font-medium">${calculatedUmur} thn</td>
+                        <td class="px-1.5 py-2 text-center"><span class="bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full text-[10px] font-bold border border-orange-200">${j.status || 'Menikah'}</span></td>
+                        <td class="px-1.5 py-2 text-center no-print">
                             <button type="button" onclick="editJamaahDirect('${j.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button>
                         </td>
                     `;
@@ -1901,23 +1904,23 @@
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td class="p-2 font-semibold text-slate-800 whitespace-nowrap sticky-col" title="${item.kelompok}">${item.kelompok}</td>
-                        <td class="p-2 text-center whitespace-nowrap text-slate-600">${tglFormatted}</td>
-                        <td class="p-2 text-center whitespace-nowrap">${item.jumlah_laki}L / ${item.jumlah_perempuan}P</td>
-                        <td class="p-2 text-center whitespace-nowrap font-medium text-amber-700">${item.jumlah_ijin || 0} Orang</td>
-                        <td class="p-2 text-right font-medium whitespace-nowrap">Rp${(item.infaq || 0).toLocaleString('id-ID')}</td>
-                        <td class="p-2 text-center no-print whitespace-nowrap"><button onclick="editAbsensi('${item.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button></td>
+                        <td class="px-1.5 py-2 font-semibold text-slate-800 whitespace-nowrap sticky-col" title="${item.kelompok}">${item.kelompok}</td>
+                        <td class="px-1.5 py-2 text-center whitespace-nowrap text-slate-600">${tglFormatted}</td>
+                        <td class="px-1.5 py-2 text-center whitespace-nowrap">${item.jumlah_laki}L / ${item.jumlah_perempuan}P</td>
+                        <td class="px-1.5 py-2 text-center whitespace-nowrap font-medium text-amber-700">${item.jumlah_ijin || 0} Orang</td>
+                        <td class="px-1.5 py-2 text-right font-medium whitespace-nowrap">Rp${(item.infaq || 0).toLocaleString('id-ID')}</td>
+                        <td class="px-1.5 py-2 text-center no-print whitespace-nowrap"><button onclick="editAbsensi('${item.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
 
                 tfoot.innerHTML = `
                     <tr>
-                        <td class="p-2 text-left font-extrabold uppercase whitespace-nowrap sticky-col" colspan="2">TOTAL KESELURUHAN</td>
-                        <td class="p-2 text-center font-extrabold text-orange-900 whitespace-nowrap">${totalLaki}L / ${totalPerempuan}P</td>
-                        <td class="p-2 text-center font-extrabold text-amber-900 whitespace-nowrap">${totalIjin} Orang</td>
-                        <td class="p-2 text-right font-extrabold text-orange-900 whitespace-nowrap">Rp${totalInfaq.toLocaleString('id-ID')}</td>
-                        <td class="p-2 text-center no-print"></td>
+                        <td class="px-1.5 py-2 text-left font-extrabold uppercase whitespace-nowrap sticky-col" colspan="2">TOTAL KESELURUHAN</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-900 whitespace-nowrap">${totalLaki}L / ${totalPerempuan}P</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-amber-900 whitespace-nowrap">${totalIjin} Orang</td>
+                        <td class="px-1.5 py-2 text-right font-extrabold text-orange-900 whitespace-nowrap">Rp${totalInfaq.toLocaleString('id-ID')}</td>
+                        <td class="px-1.5 py-2 text-center no-print"></td>
                     </tr>
                 `;
             } catch (err) {
