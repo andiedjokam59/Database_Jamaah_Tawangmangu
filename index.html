@@ -6,43 +6,39 @@
     <title>Pendataan, Sarpras & Absensi Jamaah</title>
 
     <link rel="icon" type="image/jpeg" href="logo sdc tw.png">
-	<link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ea580c">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Library SheetJS untuk Export Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #fff7ed; /* Orange 50 */
+            background-color: #fff7ed;
         }
         
-        /* Boks Round dan Border Jelas */
         .rounded-box-input {
             transition: all 0.2s ease-in-out;
             background-color: #ffffff;
-            border: 2px solid #fed7aa; /* Orange 200 */
+            border: 2px solid #fed7aa;
             border-radius: 0.75rem;
         }
         .rounded-box-input:focus {
             background-color: #ffffff;
-            border-color: #f97316; /* Orange 500 */
+            border-color: #f97316;
             box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
             outline: none;
         }
 
-        /* STYLES ANGKA 0 TRANSPARAN (PLACEHOLDER SAMAR) */
         input.input-transparent-zero::placeholder {
-            color: #cbd5e1; /* Slate 300 - Transparan/Samar */
+            color: #cbd5e1;
             opacity: 1;
         }
 
-        /* STYLES STICKY COLUMN SUPER SMOOTH ON SCROLL */
         .sticky-col {
             position: sticky;
             left: 0;
@@ -57,7 +53,6 @@
             will-change: max-width;
         }
 
-        /* Efek saat pembungkus tabel di-scroll ke kanan */
         .overflow-x-auto.is-scrolled .sticky-col {
             max-width: 95px;
             box-shadow: 3px 0 6px -2px rgba(0, 0, 0, 0.12);
@@ -73,7 +68,6 @@
             z-index: 11;
         }
 
-        /* CLASS ANIMASI MODAL SMOOTH */
         .modal-backdrop {
             transition: opacity 0.25s ease-out;
             opacity: 0;
@@ -94,7 +88,6 @@
             opacity: 1;
         }
 
-        /* STYLES TRANSISI KONTEN UTAMA (SECTION) LEBIH SMOOTH & MEMPERTAHANKAN GRID */
         .section-content {
             opacity: 0;
             transform: translateY(16px);
@@ -106,7 +99,6 @@
             transform: translateY(0);
         }
 
-        /* STYLES KHUSUS PRINT / CETAK */
         @media print {
             body * {
                 visibility: hidden !important;
@@ -141,7 +133,6 @@
             }
         }
 		
-		/* ANIMASI FADE & SLIDE DUA HALUS UNTUK LIST */
 		@keyframes fadeInUp {
 			from {
 				opacity: 0;
@@ -157,7 +148,6 @@
 			animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 		}
 
-		/* KUSTOM SCROLLBAR BAGUS & ELEGAN */
 		#autoJamaahList::-webkit-scrollbar {
 			width: 5px;
 		}
@@ -173,7 +163,6 @@
 			background: #f97316;
 		}
 
-        /* ANIMASI LOADING SCREEN ELEGAN */
         #loadingScreen {
             transition: opacity 0.5s ease-out, visibility 0.5s;
         }
@@ -192,20 +181,19 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 sm:p-6 antialiased text-slate-800">
 
-    <!-- ANIMASI LOADING ELEGAN SAAT BUKA APLIKASI -->
+    <!-- ANIMASI LOADING -->
     <div id="loadingScreen" class="fixed inset-0 bg-amber-50/95 backdrop-blur-md z-[100] flex flex-col items-center justify-center p-4">
         <div class="relative flex flex-col items-center">
             <div class="w-28 h-28 rounded-full border-4 border-orange-500/30 p-1.5 bg-white shadow-2xl animate-pulse-glow flex items-center justify-center mb-6 overflow-hidden">
                 <img src="logo sdc tw.png" alt="Logo Insan Qur'any" class="w-full h-full object-contain">
             </div>
-            <!-- Spinner Ring -->
             <div class="w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mb-4"></div>
             <h3 class="text-lg font-bold text-slate-800 tracking-wide">INSAN QUR'ANY TAWANGMANGU</h3>
             <p class="text-xs text-slate-500 mt-1 font-medium">Memuat Sistem Informasi...</p>
         </div>
     </div>
 
-    <!-- MODAL OVERLAY AUTHENTICATION / PASSWORD LOG IN -->
+    <!-- MODAL AUTHENTICATION -->
     <div id="authModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[90] flex items-center justify-center p-4 transition-all duration-300">
         <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl border border-orange-100 text-center space-y-5 animate-fade-in-up">
             <div id="authIconBox" class="w-16 h-16 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-inner transition-colors duration-300">
@@ -232,14 +220,12 @@
     <!-- CONTAINER UTAMA -->
     <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-orange-100 w-full max-w-2xl my-4 relative">
         
-        <!-- TOMBOL REFRESH POJOK KIRI ATAS DASBOR -->
         <button type="button" onclick="window.location.reload()" title="Refresh Halaman" aria-label="Refresh Halaman" class="absolute top-4 left-4 p-2 bg-orange-50 hover:bg-orange-100 active:scale-95 text-orange-600 border border-orange-200 rounded-xl transition duration-200 shadow-sm z-20 no-print flex items-center justify-center">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
         </button>
 
-        <!-- Header Logo (Selalu Tampil) -->
         <div class="flex justify-center mb-4">
             <div class="w-24 h-24 rounded-full border-2 border-orange-400 p-1 bg-white shadow-md flex items-center justify-center overflow-hidden">
                 <img src="logo sdc tw.png" alt="Logo Insan Qur'any Tawangmangu" class="w-full h-full object-contain">
@@ -252,9 +238,8 @@
             <div class="w-12 h-1 bg-orange-500 mx-auto mt-3 rounded-full"></div>
         </div>
 
-        <!-- ================= DASHBOARD DENGAN 4 IKON PILIHAN UTAMA ================= -->
+        <!-- MENU UTAMA -->
         <div id="mainDashboard" class="section-content grid grid-cols-2 gap-4 py-4">
-            <!-- 1. Database (Input / Edit Jamaah) -->
             <button type="button" onclick="showSection('database')" class="flex flex-col items-center justify-center p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
                 <div class="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -265,7 +250,6 @@
                 <span class="text-[10px] text-slate-500 text-center mt-1">Input & Edit Jamaah</span>
             </button>
 
-            <!-- 2. Absensi -->
             <button type="button" onclick="showSection('absensi')" class="flex flex-col items-center justify-center p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
                 <div class="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -276,7 +260,6 @@
                 <span class="text-[10px] text-slate-500 text-center mt-1">Absensi Kegiatan</span>
             </button>
 
-            <!-- 3. Sarpras -->
             <button type="button" onclick="showSection('sarpras')" class="flex flex-col items-center justify-center p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
                 <div class="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -289,7 +272,6 @@
                 <span class="text-[10px] text-slate-500 text-center mt-1">Fasilitas Kelompok</span>
             </button>
 
-            <!-- 4. Rekap -->
             <button type="button" onclick="showSection('rekap')" class="flex flex-col items-center justify-center p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
                 <div class="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -307,13 +289,11 @@
                 &larr; Kembali ke Menu Utama
             </button>
 
-            <!-- Mode Navigation -->
             <div class="bg-orange-100/70 p-1 rounded-xl grid grid-cols-2 gap-1 mb-6 max-w-xs mx-auto border border-orange-200">
                 <button type="button" id="tabDaftar" onclick="switchMode('DAFTAR')" class="py-2 text-xs font-semibold rounded-lg bg-orange-500 text-white shadow-sm transition">Daftar Baru</button>
                 <button type="button" id="tabUpdate" onclick="switchMode('UPDATE')" class="py-2 text-xs font-semibold rounded-lg text-orange-800 hover:bg-orange-200/50 transition">Update Data</button>
             </div>
 
-            <!-- FILTER DESA & KELOMPOK UNTUK UPDATE MODE -->
             <div id="searchSection" class="hidden bg-orange-50/50 p-4 rounded-xl border border-orange-200 mb-6 space-y-3">
                 <h3 class="text-xs font-bold text-orange-800 uppercase">Pilih Desa dan Kelompok Dulu</h3>
                 <div class="grid grid-cols-2 gap-2">
@@ -331,7 +311,6 @@
                     </div>
                 </div>
 
-                <!-- DAFTAR NAMA JAMAAH DARI KELOMPOK (OTOMATIS TAMPIL DI BAWAHNYA) -->
                 <div id="autoJamaahListContainer" class="hidden mt-3 pt-3 border-t border-orange-200/70">
                     <p class="text-[11px] font-semibold text-slate-600 mb-2">Pilih nama jamaah di bawah ini untuk mengedit data:</p>
                     <div id="autoJamaahList" class="max-h-48 overflow-y-auto space-y-1.5 pr-1"></div>
@@ -409,13 +388,21 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Status Jamaah</label>
-                    <select id="status" required class="rounded-box-input w-full p-2.5 text-sm font-semibold">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Status Jamaah / Pengguna</label>
+                    <select id="status" required onchange="toggleNoHpInput(this.value)" class="rounded-box-input w-full p-2.5 text-sm font-semibold">
                         <option value="Menikah">Menikah</option>
                         <option value="Duda">Duda</option>
                         <option value="Janda">Janda</option>
                         <option value="Manula">Manula</option>
+                        <option value="Operator" class="text-blue-600 font-bold bg-blue-50">Operator</option>
                     </select>
+                </div>
+
+                <!-- INPUT NOMOR HP OPERATOR -->
+                <div id="boxNoHpOperator" class="hidden animate-fade-in-up bg-blue-50/70 p-3 rounded-xl border border-blue-200">
+                    <label class="block text-xs font-bold text-blue-800 mb-1">Nomor HP / WhatsApp Operator</label>
+                    <input type="tel" id="no_hp" placeholder="Contoh: 081234567890" pattern="[0-9]{10,14}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="rounded-box-input w-full p-2.5 text-sm font-semibold text-blue-950 border-blue-300 focus:border-blue-500">
+                    <span class="text-[10px] text-blue-600 mt-1 block font-medium">*Khusus Operator untuk keperluan sistem & koordinasi</span>
                 </div>
 
                 <button type="submit" id="submitJamaahBtn" class="w-full py-3 mt-4 text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-xl shadow-md hover:shadow-lg transition">
@@ -424,7 +411,7 @@
             </form>
         </div>
 
-        <!-- ================= SECTION ABSENSI KEGIATAN (DASBOR UTAMA) ================= -->
+        <!-- ================= SECTION ABSENSI KEGIATAN ================= -->
         <div id="sectionAbsensi" class="section-content hidden">
             <button type="button" onclick="showSection('home')" class="mb-4 inline-flex items-center gap-1 text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-200 transition">
                 &larr; Kembali ke Menu Utama
@@ -444,7 +431,6 @@
                 </button>
             </div>
 
-            <!-- FORM ABSENSI (INPUT/UPDATE) -->
             <form id="formAbsensiKegiatan" class="space-y-3">
                 <input type="hidden" id="edit_absensi_id">
                 <input type="hidden" id="edit_tanggal_kegiatan">
@@ -497,7 +483,6 @@
                 <button type="submit" id="absBtn" class="w-full py-2.5 bg-orange-500 text-white rounded-xl font-semibold text-xs hover:bg-orange-600 transition shadow-sm">Simpan Absensi</button>
             </form>
 
-            <!-- REKAP ABSENSI -->
             <div id="printableAbsensi" class="hidden space-y-4">
                 <div class="space-y-2 no-print">
                     <div>
@@ -548,7 +533,7 @@
             </div>
         </div>
 
-        <!-- ================= SECTION SARPRAS (DASBOR UTAMA) ================= -->
+        <!-- ================= SECTION SARPRAS ================= -->
         <div id="sectionSarpras" class="section-content hidden">
             <button type="button" onclick="showSection('home')" class="mb-4 inline-flex items-center gap-1 text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-200 transition">
                 &larr; Kembali ke Menu Utama
@@ -563,7 +548,6 @@
                 <button onclick="switchTabSarpras('UPDATE')" id="tabUpdateSarpras" class="py-2 px-4 text-xs font-bold text-slate-400">Update Data Sarpras</button>
             </div>
 
-            <!-- FORM SARPRAS -->
             <form id="formSarpras" class="space-y-3">
                 <input type="hidden" id="edit_sarpras_id">
                 <div class="grid grid-cols-2 gap-2">
@@ -619,7 +603,6 @@
                 </button>
             </form>
 
-            <!-- TABEL LIST UPDATE SARPRAS -->
             <div id="sectionListSarpras" class="hidden space-y-3">
                 <div class="bg-orange-50/50 p-2.5 rounded-xl border border-orange-200">
                     <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Desa</label>
@@ -645,7 +628,7 @@
             </div>
         </div>
 
-        <!-- ================= SECTION REKAP (DASBOR UTAMA) ================= -->
+        <!-- ================= SECTION REKAP ================= -->
         <div id="sectionRekap" class="section-content hidden">
             <button type="button" onclick="showSection('home')" class="mb-4 inline-flex items-center gap-1 text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-200 transition">
                 &larr; Kembali ke Menu Utama
@@ -687,10 +670,10 @@
             </div>
 
             <div id="printableRekapContent">
-                <!-- TAB 1: REKAP STATUS JAMAAH KESELURUHAN -->
+                <!-- REKAP STATUS KESELURUHAN -->
                 <div id="sectionStatusKeseluruhan" class="space-y-4">
                     <h4 class="text-xs font-bold text-slate-700 uppercase">Rekapitulasi Status Jamaah Keseluruhan</h4>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                         <div class="p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
                             <span class="block text-[10px] font-bold text-slate-500 uppercase">Menikah</span>
                             <span id="stMenikah" class="text-xl font-extrabold text-orange-600">0</span>
@@ -707,14 +690,20 @@
                             <span class="block text-[10px] font-bold text-slate-500 uppercase">Manula</span>
                             <span id="stManula" class="text-xl font-extrabold text-orange-600">0</span>
                         </div>
+                        
+                        <!-- PERBAIKAN: CARD OPERATOR DIUBAH MENJADI TOMBOL DENGAN HOVER & EFEK KLIK -->
+                        <button type="button" onclick="showAllOperatorsModal()" class="p-3 bg-blue-50/80 hover:bg-blue-100 active:scale-95 border border-blue-200 hover:border-blue-300 rounded-xl text-center col-span-2 sm:col-span-1 transition cursor-pointer shadow-xs group">
+                            <span class="block text-[10px] font-bold text-blue-600 uppercase group-hover:text-blue-700">OPERATOR</span>
+                            <span id="stOperator" class="text-xl font-extrabold text-blue-600 group-hover:text-blue-700">0</span>
+                        </button>
                     </div>
                     <div class="p-3 bg-slate-800 text-white rounded-xl flex justify-between items-center shadow-sm">
-                        <span class="text-xs font-bold uppercase">Total Keseluruhan Jamaah</span>
-                        <span id="stTotalAll" class="text-lg font-black text-orange-400">0 Jamaah</span>
+                        <span class="text-xs font-bold uppercase">Total Keseluruhan Terdaftar</span>
+                        <span id="stTotalAll" class="text-lg font-black text-orange-400">0 Data</span>
                     </div>
                 </div>
 
-                <!-- TAB 2: REKAPAN KELOMPOK -->
+                <!-- REKAPAN KELOMPOK -->
                 <div id="sectionRekapKelompok" class="hidden space-y-4">
                     <div class="flex justify-between items-center flex-wrap gap-2">
                         <h4 class="text-xs font-bold text-slate-700 uppercase">Rekap Data Jamaah & Sarpras Per Kelompok</h4>
@@ -735,7 +724,8 @@
                                     <th class="px-1.5 py-2 text-center">Duda</th>
                                     <th class="px-1.5 py-2 text-center">Janda</th>
                                     <th class="px-1.5 py-2 text-center">Manula</th>
-                                    <th class="px-1.5 py-2 text-center bg-orange-100/50">Total Jamaah</th>
+                                    <th class="px-1.5 py-2 text-center text-blue-700 bg-blue-50/50">Operator</th>
+                                    <th class="px-1.5 py-2 text-center bg-orange-100/50">Total</th>
                                     <th class="px-1.5 py-2 text-center border-l border-orange-200">Sub Klp</th>
                                     <th class="px-1.5 py-2 text-center">Masjid</th>
                                     <th class="px-1.5 py-2 text-center">Aula</th>
@@ -748,7 +738,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 3: DAFTAR NAMA JAMAAH PER KELOMPOK -->
+                <!-- DAFTAR NAMA JAMAAH & OPERATOR -->
                 <div id="sectionDaftarJamaah" class="hidden space-y-4">
                     <div class="bg-orange-50/60 p-3 rounded-xl border border-orange-200 no-print space-y-2">
                         <h4 class="text-xs font-bold text-orange-900 uppercase"> Filter Jamaah Per Kelompok</h4>
@@ -767,7 +757,7 @@
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">Cari Nama</label>
-                                <input type="text" id="searchNamaDaftarJamaah" oninput="loadDaftarJamaahPerKelompok()" placeholder="Ketik nama jamaah..." class="w-full text-xs p-2 rounded-lg border border-orange-200 bg-white font-medium focus:outline-none focus:border-orange-500">
+                                <input type="text" id="searchNamaDaftarJamaah" oninput="loadDaftarJamaahPerKelompok()" placeholder="Ketik nama..." class="w-full text-xs p-2 rounded-lg border border-orange-200 bg-white font-medium focus:outline-none focus:border-orange-500">
                             </div>
                         </div>
                     </div>
@@ -782,7 +772,7 @@
                             <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
                                 <tr>
                                     <th class="px-1.5 py-2 text-center w-8">No</th>
-                                    <th class="px-1.5 py-2 sticky-col">Nama Jamaah</th>
+                                    <th class="px-1.5 py-2 sticky-col">Nama Lengkap</th>
                                     <th class="px-1.5 py-2 text-center">L/P</th>
                                     <th class="px-1.5 py-2">Kelompok / Desa</th>
                                     <th class="px-1.5 py-2 text-center">Umur</th>
@@ -817,6 +807,25 @@
         </div>
     </div>
 
+    <!-- MODAL DETAIL OPERATOR WA -->
+    <div id="operatorDetailModal" class="modal-backdrop fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="modal-content-card bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center space-y-4 border border-blue-100">
+            <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
+                🎧
+            </div>
+            <div>
+                <h4 id="opModalTitle" class="text-base font-bold text-slate-800">Detail Operator</h4>
+                <p id="opModalSubtitle" class="text-xs text-slate-500 mt-0.5">Daftar kontak operator kelompok</p>
+            </div>
+            
+            <div id="opModalList" class="max-h-60 overflow-y-auto space-y-2 text-left"></div>
+
+            <button type="button" onclick="closeModal('operatorDetailModal')" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">
+                Tutup
+            </button>
+        </div>
+    </div>
+
     <script>
         const APP_PASSWORD_SECRET = "Ostw";
         const SUPABASE_URL = "https://xijlyydfogbkcctlycsb.supabase.co";
@@ -826,7 +835,10 @@
         let currentMode = "DAFTAR";
         let activeSectionId = null;
 
-        // FUNGSI LOG IN DENGAN ANIMASI DETEKSI PASSWORD
+        // Cache data operator global
+        window.allOperatorsCache = [];
+        window.operatorCache = {};
+
         function handleAuthSubmit(e) {
             e.preventDefault();
             const inputEl = document.getElementById('appPasswordInput');
@@ -838,19 +850,16 @@
             const spinner = document.getElementById('authBtnSpinner');
             const iconBox = document.getElementById('authIconBox');
 
-            // Reset pesan
             errEl.classList.add('hidden');
             successEl.classList.add('hidden');
 
-            // Set UI Mode Loading (Mendeteksi Sandi)
             inputEl.disabled = true;
             btn.disabled = true;
             spinner.classList.remove('hidden');
-            btnText.textContent = "Mendeteksi Sandi...";
+            btnText.textContent = "Mndeteksi Sandi...";
 
             setTimeout(() => {
                 if (inputVal === APP_PASSWORD_SECRET) {
-                    // BERHASIL - Simpan status login di sessionStorage
                     sessionStorage.setItem('isAppLoggedIn', 'true');
 
                     spinner.classList.add('hidden');
@@ -869,7 +878,6 @@
                     }, 800);
 
                 } else {
-                    // GAGAL
                     inputEl.disabled = false;
                     btn.disabled = false;
                     spinner.classList.add('hidden');
@@ -878,10 +886,9 @@
                     inputEl.value = "";
                     inputEl.focus();
                 }
-            }, 1000); // Durasi simulasi deteksi sandi (1 detik)
+            }, 1000);
         }
 
-        // DETEKSI SCROLL DENGAN DEBOUNCE / REQUESTANIMATIONFRAME UNTUK PERGERAKAN OLEH SMOOTH
         function initScrollDetectors() {
             document.querySelectorAll('.overflow-x-auto').forEach(container => {
                 let ticking = false;
@@ -901,7 +908,6 @@
             });
         }
 
-        // Data Desa & Kelompok
         const rawDataWilayah = {
             "Bandardawung": ["Bandardawung Barat", "Bandardawung Timur", "Dawung Atas", "Dawung Bawah", "Dawung Tengah", "Gamping", "Gondang Barat", "Gondang Tengah", "Gondang Timur", "Ngasem", "Pelas Barat", "Pelas Timur"],
             "Karanglo Selatan": ["Blimbing 1", "Blimbing 2", "Blimbing 3", "Jabal Kanil", "Karanglo", "Pedan Selatan", "Pedan Utara"],
@@ -914,7 +920,6 @@
             dataWilayah[key] = rawDataWilayah[key].sort();
         });
 
-        // FUNGSI UTAMA BATCH FETCHING (DENGAN PAGINASI BERTAHAP)
         async function fetchAllRows(tableName, selectColumns = '*') {
             let allData = [];
             let page = 0;
@@ -942,10 +947,22 @@
             return allData;
         }
 
-        // HELPER TITLE CASE
         function toTitleCase(str) { 
             if (!str) return '';
             return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase()); 
+        }
+
+        function toggleNoHpInput(statusValue) {
+            const boxNoHp = document.getElementById('boxNoHpOperator');
+            const noHpInput = document.getElementById('no_hp');
+            if (statusValue === 'Operator') {
+                boxNoHp.classList.remove('hidden');
+                noHpInput.required = true;
+            } else {
+                boxNoHp.classList.add('hidden');
+                noHpInput.required = false;
+                noHpInput.value = '';
+            }
         }
 
         function showSection(target) {
@@ -1058,16 +1075,13 @@
             initScrollDetectors();
             showSection('home');
 
-            // Cek apakah pengguna sudah pernah memasukkan sandi sebelumnya di sesi ini
             const isLoggedIn = sessionStorage.getItem('isAppLoggedIn');
             const authModal = document.getElementById('authModal');
 
             if (isLoggedIn === 'true') {
-                // Jika sudah pernah login, langsung sembunyikan modal sandi
                 authModal.classList.add('hidden');
             }
 
-            // SIMULASI ANIMASI LOADING ELEGAN SAAT BUKA APLIKASI
             setTimeout(() => {
                 const loader = document.getElementById('loadingScreen');
                 if (loader) {
@@ -1190,6 +1204,7 @@
             formJamaah.reset();
             document.getElementById('edit_jamaah_id').value = "";
             document.getElementById('displayUmur').classList.add('hidden');
+            toggleNoHpInput(statusSelect.value);
 
             if (!keepSearchFilters) {
                 document.getElementById('autoJamaahListContainer').classList.add('hidden');
@@ -1235,7 +1250,6 @@
 
             if (!desa || !kelompok) {
                 listContainer.classList.add('hidden');
-                listContainer.classList.remove('animate-fade-in-up');
                 return;
             }
 
@@ -1245,11 +1259,10 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span>Memuat data jamaah...</span>
+                    <span>Memuat data...</span>
                 </div>
             `;
             listContainer.classList.remove('hidden');
-            listContainer.classList.add('animate-fade-in-up');
 
             try {
                 const { data, error } = await supabaseClient
@@ -1260,46 +1273,37 @@
                     .order('nama', { ascending: true });
 
                 if(error || !data || data.length === 0) {
-                    listEl.innerHTML = `
-                        <div class="text-xs text-slate-500 bg-slate-50/80 p-3 rounded-xl text-center border border-slate-200/60">
-                            Belum ada jamaah terdaftar di kelompok ini.
-                        </div>
-                    `;
+                    listEl.innerHTML = `<div class="text-xs text-slate-500 bg-slate-50/80 p-3 rounded-xl text-center border border-slate-200/60">Belum ada jamaah/operator terdaftar di kelompok ini.</div>`;
                     return;
                 }
 
                 listEl.innerHTML = '';
                 
-                data.forEach((j, index) => {
+                data.forEach((j) => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
+                    btn.className = "w-full text-left p-3 rounded-xl border border-orange-200/80 hover:border-orange-400 bg-white hover:bg-orange-50/80 transition-all duration-200 flex justify-between items-center group cursor-pointer animate-fade-in-up";
                     
-                    const animationDelay = Math.min(index * 0.04, 0.4); 
-                    btn.style.animationDelay = `${animationDelay}s`;
+                    const noHpText = j.no_hp ? ` | WA: <span class="text-blue-600 font-bold">${j.no_hp}</span>` : '';
 
-                    btn.className = "w-full text-left p-3 rounded-xl border border-orange-200/80 hover:border-orange-400 bg-white hover:bg-orange-50/80 hover:shadow-md transition-all duration-200 flex justify-between items-center group cursor-pointer animate-fade-in-up opacity-0 active:scale-[0.98]";
-                    
                     btn.innerHTML = `
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-orange-100/70 text-orange-600 font-bold text-xs flex items-center justify-center shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-200">
-                                ${j.jenis_kelamin === 'L' ? '👨' : '👩'}
+                            <div class="w-8 h-8 rounded-full ${j.status === 'Operator' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'} font-bold text-xs flex items-center justify-center shrink-0">
+                                ${j.status === 'Operator' ? '🎧' : (j.jenis_kelamin === 'L' ? '👨' : '👩')}
                             </div>
                             <div>
-                                <div class="font-bold text-xs text-slate-800 group-hover:text-orange-700 transition-colors">${j.nama}</div>
+                                <div class="font-bold text-xs text-slate-800 group-hover:text-orange-700">${j.nama}</div>
                                 <div class="text-[10px] text-slate-500 mt-0.5">
-                                    Tgl Lahir: <span class="font-medium text-slate-600">${j.tanggal_lahir || '-'}</span> | Status: <span class="font-medium text-slate-600">${j.status || '-'}</span>
+                                    Status: <span class="font-bold ${j.status === 'Operator' ? 'text-blue-600' : 'text-slate-600'}">${j.status || '-'}</span>${noHpText}
                                 </div>
                             </div>
                         </div>
-                        <span class="text-[11px] font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-lg border border-orange-200 group-hover:bg-orange-500 group-hover:text-white group-hover:border-orange-500 transition-all duration-200 shrink-0">
+                        <span class="text-[11px] font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-lg border border-orange-200 shrink-0">
                             Edit &raquo;
                         </span>
                     `;
                     
-                    btn.onclick = () => {
-                        selectJamaahToForm(j);
-                    };
-                    
+                    btn.onclick = () => selectJamaahToForm(j);
                     listEl.appendChild(btn);
                 });
             } catch (err) {
@@ -1309,8 +1313,7 @@
 
         document.getElementById('searchKelompok').addEventListener('change', function() {
             const desa = document.getElementById('searchDesa').value;
-            const kelompok = this.value;
-            fetchAutoJamaahList(desa, kelompok);
+            fetchAutoJamaahList(desa, this.value);
         });
 
         function selectJamaahToForm(j) {
@@ -1340,13 +1343,16 @@
             elKlp.classList.remove('bg-slate-50');
             elKlp.value = j.kelompok;
 
-            document.getElementById('status').value = j.status || "Menikah";
-            document.getElementById('formJamaah').classList.remove('hidden');
+            const stVal = j.status || "Menikah";
+            document.getElementById('status').value = stVal;
+            toggleNoHpInput(stVal);
+            document.getElementById('no_hp').value = j.no_hp || '';
 
+            document.getElementById('formJamaah').classList.remove('hidden');
             document.getElementById('formJamaah').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // ================= PENULISAN DATA JAMAAH (OPTIMISTIC UI BACKGROUND PROCESS) =================
+        // SIMPAN JAMAAH / OPERATOR
         document.getElementById('formJamaah').addEventListener('submit', function(e) {
             e.preventDefault();
             const editId = document.getElementById('edit_jamaah_id').value;
@@ -1354,29 +1360,23 @@
 
             if (currentMode === "UPDATE" && statusValue === "Meninggal / Sambung Luar Daerah") {
                 if (!editId) {
-                    showCustomModal("Peringatan", "Silakan cari dan pilih data jamaah terlebih dahulu.", "⚠️");
+                    showCustomModal("Peringatan", "Silakan cari dan pilih data terlebih dahulu.", "⚠️");
                     return;
                 }
 
                 showCustomModal(
                     "Konfirmasi Penghapusan",
-                    "Jamaah dengan status 'Meninggal / Sambung Luar Daerah' akan dihapus permanen dari database Supabase. Lanjutkan?",
+                    "Data ini akan dihapus permanen dari database. Lanjutkan?",
                     "🗑️",
                     () => {
-                        // Optimistic: Tutup dan reset UI
                         const currentDesa = document.getElementById('searchDesa').value;
                         const currentKelompok = document.getElementById('searchKelompok').value;
                         switchMode('UPDATE', true);
 
-                        // Jalankan di Background
                         (async () => {
-                            const { error } = await supabaseClient
-                                .from('data_jamaah')
-                                .delete()
-                                .eq('id', editId);
-
+                            const { error } = await supabaseClient.from('data_jamaah').delete().eq('id', editId);
                             if (error) {
-                                showCustomModal("Gagal Hapus", "Gagal menghapus data di server: " + error.message, "❌");
+                                showCustomModal("Gagal Hapus", error.message, "❌");
                             } else if (currentDesa && currentKelompok) {
                                 fetchAutoJamaahList(currentDesa, currentKelompok);
                             }
@@ -1395,6 +1395,7 @@
 
             const payload = {
                 nama: toTitleCase(document.getElementById('nama').value.trim()),
+                no_hp: statusValue === 'Operator' ? document.getElementById('no_hp').value.trim() : null,
                 jenis_kelamin: document.getElementById('jenis_kelamin').value,
                 tempat_lahir: toTitleCase(document.getElementById('tempat_lahir').value.trim()),
                 tanggal_lahir: fullDate,
@@ -1404,73 +1405,126 @@
                 status: statusValue
             };
 
-            // Notifikasi & UI Update Instan (Optimistic UI)
-            showCustomModal(
-                "Sukses", 
-                editId ? "Data Jamaah Berhasil Di-update!" : "Data Jamaah Berhasil Disimpan!", 
-                "🎉", 
-                () => {
-                    if (currentMode === "UPDATE") {
-                        const currentDesa = document.getElementById('searchDesa').value;
-                        const currentKelompok = document.getElementById('searchKelompok').value;
-
-                        switchMode('UPDATE', true);
-
-                        if (currentDesa && currentKelompok) {
-                            fetchAutoJamaahList(currentDesa, currentKelompok);
-                        }
-                    } else {
-                        const savedDesa = payload.desa;
-                        const savedKelompok = payload.kelompok;
-                        switchMode('DAFTAR');
-
-                        if (savedDesa) {
-                            const desaEl = document.getElementById('desa');
-                            desaEl.value = savedDesa;
-                            
-                            const klpEl = document.getElementById('kelompok');
-                            klpEl.innerHTML = '<option value="">-- Pilih Kelompok --</option>';
-                            if (dataWilayah[savedDesa]) {
-                                klpEl.disabled = false;
-                                klpEl.classList.remove('bg-slate-50');
-                                dataWilayah[savedDesa].forEach(k => klpEl.add(new Option(k, k)));
-                                klpEl.value = savedKelompok;
-                            }
-                        }
-                    }
+            showCustomModal("Sukses", editId ? "Data Berhasil Di-update!" : "Data Berhasil Disimpan!", "🎉", () => {
+                if (currentMode === "UPDATE") {
+                    const currentDesa = document.getElementById('searchDesa').value;
+                    const currentKelompok = document.getElementById('searchKelompok').value;
+                    switchMode('UPDATE', true);
+                    if (currentDesa && currentKelompok) fetchAutoJamaahList(currentDesa, currentKelompok);
+                } else {
+                    switchMode('DAFTAR');
                 }
-            );
+            });
 
-            // Pengiriman Data Latar Belakang (Background Task)
             (async () => {
                 try {
-                    let err = null;
-                    if(editId) {
-                        const res = await supabaseClient.from('data_jamaah').update(payload).eq('id', editId);
-                        err = res.error;
-                    } else {
-                        const res = await supabaseClient.from('data_jamaah').insert([payload]);
-                        err = res.error;
-                    }
+                    let err = editId 
+                        ? (await supabaseClient.from('data_jamaah').update(payload).eq('id', editId)).error
+                        : (await supabaseClient.from('data_jamaah').insert([payload])).error;
 
-                    if(err) {
-                        if (err.code === '23505') {
-                            showCustomModal("Peringatan Sinkronisasi", "Data jamaah ini sudah terdaftar sebelumnya di server.", "⚠️");
-                        } else {
-                            showCustomModal("Gagal Sinkronisasi", "Terjadi kesalahan di background: " + err.message, "❌");
-                        }
-                    }
-                } catch(errorNet) {
-                    showCustomModal("Masalah Koneksi", "Pengiriman di background terganggu. Periksa koneksi internet Anda.", "⚠️");
+                    if(err) showCustomModal("Gagal", err.message, "❌");
+                } catch(e) {
+                    showCustomModal("Masalah Koneksi", "Gagal menyimpan data ke server.", "⚠️");
                 }
             })();
         });
 
-        // ================= DATA SARPRAS (OPTIMISTIC UI BACKGROUND PROCESS) =================
+        async function loadDaftarJamaahPerKelompok() {
+            const tbody = document.getElementById('tbodyDaftarJamaah');
+            const summaryText = document.getElementById('summaryTextDaftarJamaah');
+            const selectedDesa = document.getElementById('filterDesaDaftarJamaah').value;
+            const selectedKelompok = document.getElementById('filterKelompokDaftarJamaah').value;
+            const searchQuery = document.getElementById('searchNamaDaftarJamaah').value.trim().toLowerCase();
+
+            tbody.innerHTML = '<tr><td colspan="7" class="p-3 text-center">Memuat data...</td></tr>';
+
+            try {
+                let data = await fetchAllRows('data_jamaah', '*');
+
+                if (selectedDesa) data = data.filter(j => j.desa === selectedDesa);
+                if (selectedKelompok) data = data.filter(j => j.kelompok === selectedKelompok);
+
+                data.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
+
+                let filtered = data;
+                if (searchQuery) {
+                    filtered = data.filter(j => 
+                        (j.nama && j.nama.toLowerCase().includes(searchQuery))
+                    );
+                }
+
+                summaryText.textContent = `Menampilkan ${filtered.length} data terdaftar`;
+
+                if (filtered.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="p-3 text-center text-slate-400">Tidak ada data ditemukan.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                filtered.forEach((j, index) => {
+                    let calculatedUmur = j.umur || '-';
+                    if ((!j.umur || j.umur === 0) && j.tanggal_lahir) {
+                        const parts = j.tanggal_lahir.split('-');
+                        if (parts.length === 3) {
+                            const birthDate = new Date(`${parts[0]}-${parts[1]}-${parts[2]}`);
+                            const today = new Date();
+                            let age = today.getFullYear() - birthDate.getFullYear();
+                            const m = today.getMonth() - birthDate.getMonth();
+                            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+                            if (!isNaN(age) && age >= 0) calculatedUmur = age;
+                        }
+                    }
+
+                    const isOperator = j.status === 'Operator';
+                    let statusBadgeHTML = isOperator 
+                        ? `<span class="bg-blue-50 text-blue-700 border-blue-200 px-2.5 py-1 rounded-full text-[10px] font-bold border inline-block">Operator</span>`
+                        : `<span class="bg-orange-50 text-orange-700 border-orange-200 px-2.5 py-1 rounded-full text-[10px] font-bold border inline-block">${j.status || 'Menikah'}</span>`;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="px-1.5 py-2 text-center font-bold text-slate-400">${index + 1}</td>
+                        <td class="px-1.5 py-2 font-bold text-slate-800 sticky-col" title="${j.nama}">${j.nama}</td>
+                        <td class="px-1.5 py-2 text-center font-semibold ${j.jenis_kelamin === 'L' ? 'text-blue-600' : 'text-pink-600'}">${j.jenis_kelamin || '-'}</td>
+                        <td class="px-1.5 py-2 text-slate-600">${j.kelompok} <span class="text-[10px] text-slate-400">(${j.desa})</span></td>
+                        <td class="px-1.5 py-2 text-center font-medium">${calculatedUmur} thn</td>
+                        <td class="px-1.5 py-2 text-center">${statusBadgeHTML}</td>
+                        <td class="px-1.5 py-2 text-center no-print">
+                            <button type="button" onclick="editJamaahDirect('${j.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-red-500">Gagal memuat data: ${err.message}</td></tr>`;
+            }
+        }
+
+        async function editJamaahDirect(id) {
+            const { data } = await supabaseClient.from('data_jamaah').select('*').eq('id', id).single();
+            if(!data) return;
+
+            showSection('database');
+            switchMode('UPDATE');
+
+            const searchDesaEl = document.getElementById('searchDesa');
+            searchDesaEl.value = data.desa;
+
+            const searchKelompokEl = document.getElementById('searchKelompok');
+            searchKelompokEl.innerHTML = '<option value="">-- Kelompok --</option>';
+            if (dataWilayah[data.desa]) {
+                searchKelompokEl.disabled = false;
+                searchKelompokEl.classList.remove('bg-slate-50');
+                dataWilayah[data.desa].forEach(k => searchKelompokEl.add(new Option(k, k)));
+                searchKelompokEl.value = data.kelompok;
+            }
+
+            fetchAutoJamaahList(data.desa, data.kelompok);
+            selectJamaahToForm(data);
+        }
+
         document.getElementById('formSarpras').addEventListener('submit', function(e) {
             e.preventDefault();
             const editId = document.getElementById('edit_sarpras_id').value;
-
             const payload = {
                 desa: document.getElementById('sarp_desa').value,
                 kelompok: document.getElementById('sarp_kelompok').value,
@@ -1482,7 +1536,6 @@
                 km_wanita: parseInt(document.getElementById('sarp_km_wanita').value) || 0
             };
 
-            // Notifikasi Cepat
             showCustomModal("Sukses", "Data Sarpras Berhasil Diperbarui!", "🏛️", () => {
                 e.target.reset();
                 document.getElementById('edit_sarpras_id').value = "";
@@ -1490,118 +1543,72 @@
                 switchTabSarpras('UPDATE');
             });
 
-            // Latar Belakang
             (async () => {
-                let res;
                 if(editId) {
-                    res = await supabaseClient.from('fasilitas_kelompok').update(payload).eq('id', editId);
+                    await supabaseClient.from('fasilitas_kelompok').update(payload).eq('id', editId);
                 } else {
-                    res = await supabaseClient.from('fasilitas_kelompok').upsert([payload], { onConflict: 'desa,kelompok' });
-                }
-
-                if(res.error) {
-                    showCustomModal("Gagal Sarpras", "Perubahan Sarpras gagal disimpan di server: " + res.error.message, "❌");
+                    await supabaseClient.from('fasilitas_kelompok').upsert([payload], { onConflict: 'desa,kelompok' });
                 }
             })();
         });
 
-        // FUNGSI EDIT SARPRAS
         async function editSarpras(id) {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('fasilitas_kelompok')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
+            const { data } = await supabaseClient.from('fasilitas_kelompok').select('*').eq('id', id).single();
+            if (!data) return;
 
-                if (error || !data) {
-                    showCustomModal("Error", "Gagal mengambil data sarpras.", "❌");
-                    return;
-                }
+            document.getElementById('edit_sarpras_id').value = data.id;
+            document.getElementById('sarp_desa').value = data.desa;
 
-                document.getElementById('edit_sarpras_id').value = data.id;
+            const kelompokEl = document.getElementById('sarp_kelompok');
+            kelompokEl.innerHTML = '<option value="">-- Pilih Kelompok --</option>';
+            if (dataWilayah[data.desa]) dataWilayah[data.desa].forEach(k => kelompokEl.add(new Option(k, k)));
+            kelompokEl.disabled = false;
+            kelompokEl.classList.remove('bg-slate-50');
+            kelompokEl.value = data.kelompok;
 
-                const desaEl = document.getElementById('sarp_desa');
-                desaEl.value = data.desa;
+            document.getElementById('sarp_status_tanah').value = data.status_tanah || '';
+            document.getElementById('sarp_sub').value = data.jumlah_sub_kelompok ?? 0;
+            document.getElementById('sarp_masjid').value = data.jumlah_masjid ?? 0;
+            document.getElementById('sarp_aula').value = data.jumlah_aula ?? 0;
+            document.getElementById('sarp_km_pria').value = data.km_pria ?? 0;
+            document.getElementById('sarp_km_wanita').value = data.km_wanita ?? 0;
 
-                const kelompokEl = document.getElementById('sarp_kelompok');
-                kelompokEl.innerHTML = '<option value="">-- Pilih Kelompok --</option>';
-                if (dataWilayah[data.desa]) {
-                    dataWilayah[data.desa].forEach(k => kelompokEl.add(new Option(k, k)));
-                }
-                kelompokEl.disabled = false;
-                kelompokEl.classList.remove('bg-slate-50');
-                kelompokEl.value = data.kelompok;
-
-                document.getElementById('sarp_status_tanah').value = data.status_tanah || '';
-                document.getElementById('sarp_sub').value = data.jumlah_sub_kelompok ?? 0;
-                document.getElementById('sarp_masjid').value = data.jumlah_masjid ?? 0;
-                document.getElementById('sarp_aula').value = data.jumlah_aula ?? 0;
-                document.getElementById('sarp_km_pria').value = data.km_pria ?? 0;
-                document.getElementById('sarp_km_wanita').value = data.km_wanita ?? 0;
-
-                document.getElementById('sarpBtn').textContent = "Update Sarpras";
-
-                switchTabSarpras('INPUT');
-            } catch (err) {
-                showCustomModal("Error", "Terjadi kesalahan: " + err.message, "❌");
-            }
+            document.getElementById('sarpBtn').textContent = "Update Sarpras";
+            switchTabSarpras('INPUT');
         }
 
-        // ================= ABSENSI KEGIATAN (OPTIMISTIC UI BACKGROUND PROCESS) =================
         document.getElementById('formAbsensiKegiatan').addEventListener('submit', function(e) {
             e.preventDefault();
             const editId = document.getElementById('edit_absensi_id').value;
-
             const selectNama = document.getElementById('abs_nama').value;
             const customNama = toTitleCase(document.getElementById('abs_nama_custom').value.trim());
             const finalNamaKegiatan = selectNama === 'LAINNYA' ? customNama : selectNama;
             
-            let tanggalKegiatan;
-            if (editId) {
-                tanggalKegiatan = document.getElementById('edit_tanggal_kegiatan').value;
-            } else {
-                const now = new Date();
-                const yyyy = now.getFullYear();
-                const mm = String(now.getMonth() + 1).padStart(2, '0');
-                const dd = String(now.getDate()).padStart(2, '0');
-                tanggalKegiatan = `${yyyy}-${mm}-${dd}`;
-            }
-
-            const desa = document.getElementById('abs_desa').value;
-            const kelompok = document.getElementById('abs_kelompok').value;
+            let tanggalKegiatan = editId ? document.getElementById('edit_tanggal_kegiatan').value : new Date().toISOString().slice(0, 10);
 
             const payload = {
                 nama_kegiatan: finalNamaKegiatan,
                 tanggal_kegiatan: tanggalKegiatan,
-                desa: desa,
-                kelompok: kelompok,
+                desa: document.getElementById('abs_desa').value,
+                kelompok: document.getElementById('abs_kelompok').value,
                 jumlah_laki: parseInt(document.getElementById('abs_laki').value) || 0,
                 jumlah_perempuan: parseInt(document.getElementById('abs_perempuan').value) || 0,
                 jumlah_ijin: parseInt(document.getElementById('abs_ijin').value) || 0,
                 infaq: parseFloat(document.getElementById('abs_infaq').value) || 0
             };
 
-            // UI Langsung Diperbarui
             showCustomModal("Sukses", "Data Absensi Berhasil Diperbarui!", "📋", () => {
                 e.target.reset();
                 document.getElementById('abs_nama_custom').classList.add('hidden');
                 document.getElementById('edit_absensi_id').value = "";
-                document.getElementById('edit_tanggal_kegiatan').value = "";
                 switchTabAbsensi('REKAP');
             });
 
-            // Pengiriman Latar Belakang
             (async () => {
-                let res;
                 if(editId) {
-                    res = await supabaseClient.from('absensi_kegiatan').update(payload).eq('id', editId);
+                    await supabaseClient.from('absensi_kegiatan').update(payload).eq('id', editId);
                 } else {
-                    res = await supabaseClient.from('absensi_kegiatan').insert([payload]);
-                }
-
-                if(res.error) {
-                    showCustomModal("Gagal Absensi", "Pengiriman absensi di background gagal: " + res.error.message, "❌");
+                    await supabaseClient.from('absensi_kegiatan').insert([payload]);
                 }
             })();
         });
@@ -1616,28 +1623,19 @@
             const selectNama = document.getElementById('abs_nama');
             const customInput = document.getElementById('abs_nama_custom');
 
-            const standardOptions = [
-                "Penyampaian materi PPG pusat",
-                "Pengajian ibu-ibu daerah",
-                "Pengajian umum daerah",
-                "Pengajian remaja daerah",
-                "Penyampaian CAI"
-            ];
+            const standardOptions = ["Penyampaian materi PPG pusat", "Pengajian ibu-ibu daerah", "Pengajian umum daerah", "Pengajian remaja daerah", "Penyampaian CAI"];
 
             if (standardOptions.includes(data.nama_kegiatan)) {
                 selectNama.value = data.nama_kegiatan;
                 customInput.classList.add('hidden');
-                customInput.required = false;
                 customInput.value = '';
             } else {
                 selectNama.value = "LAINNYA";
                 customInput.classList.remove('hidden');
-                customInput.required = true;
                 customInput.value = data.nama_kegiatan;
             }
 
             document.getElementById('abs_desa').value = data.desa;
-
             const klp = document.getElementById('abs_kelompok');
             klp.innerHTML = `<option value="${data.kelompok}">${data.kelompok}</option>`;
             klp.disabled = false;
@@ -1674,15 +1672,11 @@
         async function loadListSarpras() {
             const tbody = document.getElementById('tbodyListSarpras');
             const selectedDesa = document.getElementById('sarp_desa_update').value;
-
             tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center">Memuat sarpras...</td></tr>';
 
             try {
                 let data = await fetchAllRows('fasilitas_kelompok', '*');
-                
-                if (selectedDesa) {
-                    data = data.filter(s => s.desa === selectedDesa);
-                }
+                if (selectedDesa) data = data.filter(s => s.desa === selectedDesa);
 
                 if (!data || data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-400">Belum ada data sarpras.</td></tr>';
@@ -1690,7 +1684,6 @@
                 }
 
                 data.sort((a, b) => (a.desa || '').localeCompare(b.desa || ''));
-
                 tbody.innerHTML = '';
                 data.forEach(s => {
                     const tr = document.createElement('tr');
@@ -1762,11 +1755,13 @@
             }
         }
 
+        // LOAD STATUS KESELURUHAN & SIMPAN DATA OPERATOR KE CACHE GLOBAL
         async function loadRekapStatusKeseluruhan() {
             try {
-                const data = await fetchAllRows('data_jamaah', 'status');
-
-                let menikah = 0, duda = 0, janda = 0, manula = 0;
+                const data = await fetchAllRows('data_jamaah', 'status, nama, no_hp, desa, kelompok');
+                let menikah = 0, duda = 0, janda = 0, manula = 0, operator = 0;
+                
+                window.allOperatorsCache = [];
 
                 data.forEach(item => {
                     const st = (item.status || "").toLowerCase();
@@ -1774,16 +1769,69 @@
                     else if (st === "duda") duda++;
                     else if (st === "janda") janda++;
                     else if (st === "manula") manula++;
+                    else if (st === "operator") {
+                        operator++;
+                        window.allOperatorsCache.push({
+                            nama: item.nama,
+                            no_hp: item.no_hp,
+                            desa: item.desa,
+                            kelompok: item.kelompok
+                        });
+                    }
                 });
 
                 document.getElementById('stMenikah').textContent = menikah;
                 document.getElementById('stDuda').textContent = duda;
                 document.getElementById('stJanda').textContent = janda;
                 document.getElementById('stManula').textContent = manula;
-                document.getElementById('stTotalAll').textContent = `${data.length} Jamaah`;
+                document.getElementById('stOperator').textContent = operator;
+                document.getElementById('stTotalAll').textContent = `${data.length} Data Terdaftar`;
             } catch (err) {
-                console.error("Gagal memuat status keseluruhan:", err);
+                console.error(err);
             }
+        }
+
+        // FUNGSI MEMUNCULKAN POPUP DAFTAR SEMUA OPERATOR
+        function showAllOperatorsModal() {
+            const listEl = document.getElementById('opModalList');
+            document.getElementById('opModalTitle').textContent = "Semua Operator Terdaftar";
+
+            listEl.innerHTML = '';
+
+            if (!window.allOperatorsCache || window.allOperatorsCache.length === 0) {
+                listEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Belum ada data operator terdaftar.</p>`;
+            } else {
+                // Urutkan berdasarkan Nama Operator
+                window.allOperatorsCache.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
+
+                window.allOperatorsCache.forEach(op => {
+                    const item = document.createElement('div');
+                    item.className = "p-3 bg-blue-50/70 border border-blue-200 rounded-xl flex items-center justify-between gap-2 animate-fade-in-up";
+
+                    const cleanHp = (op.no_hp || '').replace(/[^0-9]/g, '');
+                    const waLink = cleanHp.startsWith('0') ? `62${cleanHp.slice(1)}` : cleanHp;
+
+                    item.innerHTML = `
+                        <div>
+                            <div class="font-bold text-xs text-slate-800">${op.nama}</div>
+                            <div class="text-[10px] font-semibold text-slate-500 mt-0.5">
+                                Klp. <span class="text-slate-700 font-bold">${op.kelompok || '-'}</span> (${op.desa || '-'})
+                            </div>
+                            <div class="text-[11px] font-semibold text-blue-600 mt-0.5">${op.no_hp || 'No HP belum diisi'}</div>
+                        </div>
+                        ${op.no_hp ? `
+                            <a href="https://wa.me/${waLink}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-lg shadow-sm transition flex items-center gap-1 shrink-0">
+                                💬 WA
+                            </a>
+                        ` : `
+                            <span class="text-[10px] text-slate-400 italic shrink-0">No HP kosong</span>
+                        `}
+                    `;
+                    listEl.appendChild(item);
+                });
+            }
+
+            openModal('operatorDetailModal');
         }
 
         async function loadRekapKelompokLengkap() {
@@ -1791,12 +1839,14 @@
             const tfoot = document.getElementById('tfootRekapKelompok');
             const selectedFilterDesa = document.getElementById('filterDesaRekap').value;
 
-            tbody.innerHTML = '<tr><td colspan="10" class="p-3 text-center">Memuat data rekap kelompok...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="11" class="p-3 text-center">Memuat rekap...</td></tr>';
             tfoot.innerHTML = '';
+            
+            window.operatorCache = {};
 
             try {
                 const [jamaahData, sarprasData] = await Promise.all([
-                    fetchAllRows('data_jamaah', 'desa, kelompok, status'),
+                    fetchAllRows('data_jamaah', 'desa, kelompok, status, nama, no_hp'),
                     fetchAllRows('fasilitas_kelompok', '*')
                 ]);
 
@@ -1808,8 +1858,9 @@
                             const key = `${desa}__${kelompok}`;
                             rekapMap[key] = {
                                 desa, kelompok,
-                                menikah: 0, duda: 0, janda: 0, manula: 0, totalJamaah: 0,
-                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0
+                                menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJamaah: 0,
+                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0,
+                                operatorsList: []
                             };
                         });
                     }
@@ -1821,8 +1872,9 @@
                         if (!rekapMap[key]) {
                             rekapMap[key] = {
                                 desa: j.desa, kelompok: j.kelompok,
-                                menikah: 0, duda: 0, janda: 0, manula: 0, totalJamaah: 0,
-                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0
+                                menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJamaah: 0,
+                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0,
+                                operatorsList: []
                             };
                         }
                         const st = (j.status || "").toLowerCase();
@@ -1830,6 +1882,11 @@
                         else if (st === "duda") rekapMap[key].duda++;
                         else if (st === "janda") rekapMap[key].janda++;
                         else if (st === "manula") rekapMap[key].manula++;
+                        else if (st === "operator") {
+                            rekapMap[key].operator++;
+                            rekapMap[key].operatorsList.push({ nama: j.nama, no_hp: j.no_hp, desa: j.desa, kelompok: j.kelompok });
+                        }
+                        
                         rekapMap[key].totalJamaah++;
                     }
                 });
@@ -1840,8 +1897,9 @@
                         if (!rekapMap[key]) {
                             rekapMap[key] = {
                                 desa: s.desa, kelompok: s.kelompok,
-                                menikah: 0, duda: 0, janda: 0, manula: 0, totalJamaah: 0,
-                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0
+                                menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJamaah: 0,
+                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0,
+                                operatorsList: []
                             };
                         }
                         rekapMap[key].subKlp = s.jumlah_sub_kelompok || 0;
@@ -1853,22 +1911,17 @@
                 });
 
                 tbody.innerHTML = '';
-
-                let totMenikah = 0, totDuda = 0, totJanda = 0, totManula = 0, totAllJamaah = 0;
+                let totMenikah = 0, totDuda = 0, totJanda = 0, totManula = 0, totOperator = 0, totAllJamaah = 0;
                 let totSub = 0, totMasjid = 0, totAula = 0, totKmL = 0, totKmP = 0;
 
                 const items = Object.values(rekapMap);
 
-                if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="10" class="p-3 text-center text-slate-400">Tidak ada data untuk desa ini.</td></tr>';
-                    return;
-                }
-
-                items.forEach(item => {
+                items.forEach((item, index) => {
                     totMenikah += item.menikah;
                     totDuda += item.duda;
                     totJanda += item.janda;
                     totManula += item.manula;
+                    totOperator += item.operator;
                     totAllJamaah += item.totalJamaah;
 
                     totSub += item.subKlp;
@@ -1877,6 +1930,18 @@
                     totKmL += item.kmPria;
                     totKmP += item.kmWanita;
 
+                    const cacheKey = `op_${index}`;
+                    window.operatorCache[cacheKey] = {
+                        kelompok: item.kelompok,
+                        list: item.operatorsList
+                    };
+
+                    let operatorBtnHTML = item.operator > 0 
+                        ? `<button type="button" onclick="showOperatorDetailModal('${cacheKey}')" class="w-full h-full font-bold text-blue-700 bg-blue-100 hover:bg-blue-200 active:scale-95 transition rounded py-1 px-2 border border-blue-300 flex items-center justify-center gap-1 shadow-xs cursor-pointer" title="Klik untuk lihat no WA operator">
+                            <span>${item.operator}</span> 
+                           </button>`
+                        : `<span class="text-slate-400 font-semibold">0</span>`;
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td class="px-1.5 py-2 font-bold text-slate-800 sticky-col" title="${item.kelompok}">${item.kelompok}</td>
@@ -1884,6 +1949,7 @@
                         <td class="px-1.5 py-2 text-center">${item.duda}</td>
                         <td class="px-1.5 py-2 text-center">${item.janda}</td>
                         <td class="px-1.5 py-2 text-center">${item.manula}</td>
+                        <td class="px-1 py-1 text-center bg-blue-50/40">${operatorBtnHTML}</td>
                         <td class="px-1.5 py-2 text-center font-bold text-orange-600 bg-orange-50/50">${item.totalJamaah}</td>
                         <td class="px-1.5 py-2 text-center border-l border-orange-100">${item.subKlp}</td>
                         <td class="px-1.5 py-2 text-center">${item.masjid}</td>
@@ -1900,6 +1966,7 @@
                         <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totDuda}</td>
                         <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totJanda}</td>
                         <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totManula}</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-blue-700 bg-blue-100/50">${totOperator}</td>
                         <td class="px-1.5 py-2 text-center font-extrabold text-orange-600 bg-orange-200/50">${totAllJamaah}</td>
                         <td class="px-1.5 py-2 text-center font-extrabold text-orange-950 border-l border-orange-200">${totSub}</td>
                         <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totMasjid}</td>
@@ -1908,104 +1975,57 @@
                     </tr>
                 `;
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="10" class="p-3 text-center text-red-500">Gagal memuat rekapitulasi: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="11" class="p-3 text-center text-red-500">Gagal memuat rekap: ${err.message}</td></tr>`;
             }
         }
 
-        async function loadDaftarJamaahPerKelompok() {
-            const tbody = document.getElementById('tbodyDaftarJamaah');
-            const summaryText = document.getElementById('summaryTextDaftarJamaah');
-            const selectedDesa = document.getElementById('filterDesaDaftarJamaah').value;
-            const selectedKelompok = document.getElementById('filterKelompokDaftarJamaah').value;
-            const searchQuery = document.getElementById('searchNamaDaftarJamaah').value.trim().toLowerCase();
+        function showOperatorDetailModal(cacheKey) {
+            const data = window.operatorCache[cacheKey];
+            if (!data) return;
 
-            tbody.innerHTML = '<tr><td colspan="7" class="p-3 text-center">Memuat daftar nama jamaah...</td></tr>';
+            const listEl = document.getElementById('opModalList');
+            document.getElementById('opModalTitle').textContent = `Operator Klp. ${data.kelompok}`;
 
-            try {
-                let data = await fetchAllRows('data_jamaah', '*');
+            listEl.innerHTML = '';
 
-                if (selectedDesa) data = data.filter(j => j.desa === selectedDesa);
-                if (selectedKelompok) data = data.filter(j => j.kelompok === selectedKelompok);
+            if (!data.list || data.list.length === 0) {
+                listEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Tidak ada data kontak operator.</p>`;
+            } else {
+                data.list.forEach(op => {
+                    const item = document.createElement('div');
+                    item.className = "p-3 bg-blue-50/70 border border-blue-200 rounded-xl flex items-center justify-between gap-2";
 
-                data.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
+                    const cleanHp = (op.no_hp || '').replace(/[^0-9]/g, '');
+                    const waLink = cleanHp.startsWith('0') ? `62${cleanHp.slice(1)}` : cleanHp;
 
-                let filtered = data;
-                if (searchQuery) {
-                    filtered = data.filter(j => j.nama && j.nama.toLowerCase().includes(searchQuery));
-                }
-
-                summaryText.textContent = `Menampilkan ${filtered.length} jamaah terdaftar`;
-
-                if (filtered.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="p-3 text-center text-slate-400">Tidak ada jamaah ditemukan.</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = '';
-                filtered.forEach((j, index) => {
-                    let calculatedUmur = j.umur || '-';
-                    if ((!j.umur || j.umur === 0) && j.tanggal_lahir) {
-                        const parts = j.tanggal_lahir.split('-');
-                        if (parts.length === 3) {
-                            const birthDate = new Date(`${parts[0]}-${parts[1]}-${parts[2]}`);
-                            const today = new Date();
-                            let age = today.getFullYear() - birthDate.getFullYear();
-                            const m = today.getMonth() - birthDate.getMonth();
-                            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-                            if (!isNaN(age) && age >= 0) calculatedUmur = age;
-                        }
-                    }
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="px-1.5 py-2 text-center font-bold text-slate-400">${index + 1}</td>
-                        <td class="px-1.5 py-2 font-bold text-slate-800 sticky-col" title="${j.nama}">${j.nama}</td>
-                        <td class="px-1.5 py-2 text-center font-semibold ${j.jenis_kelamin === 'L' ? 'text-blue-600' : 'text-pink-600'}">${j.jenis_kelamin || '-'}</td>
-                        <td class="px-1.5 py-2 text-slate-600">${j.kelompok} <span class="text-[10px] text-slate-400">(${j.desa})</span></td>
-                        <td class="px-1.5 py-2 text-center font-medium">${calculatedUmur} thn</td>
-                        <td class="px-1.5 py-2 text-center"><span class="bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full text-[10px] font-bold border border-orange-200">${j.status || 'Menikah'}</span></td>
-                        <td class="px-1.5 py-2 text-center no-print">
-                            <button type="button" onclick="editJamaahDirect('${j.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button>
-                        </td>
+                    item.innerHTML = `
+                        <div>
+                            <div class="font-bold text-xs text-slate-800">${op.nama}</div>
+                            <div class="text-[10px] font-semibold text-slate-500 mt-0.5">
+                                Klp. <span class="text-slate-700 font-bold">${op.kelompok || '-'}</span> (${op.desa || '-'})
+                            </div>
+                            <div class="text-[11px] font-semibold text-blue-600 mt-0.5">${op.no_hp || 'No HP belum diisi'}</div>
+                        </div>
+                        ${op.no_hp ? `
+                            <a href="https://wa.me/${waLink}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-lg shadow-sm transition flex items-center gap-1 shrink-0">
+                                💬 WA
+                            </a>
+                        ` : `
+                            <span class="text-[10px] text-slate-400 italic">No HP kosong</span>
+                        `}
                     `;
-                    tbody.appendChild(tr);
+                    listEl.appendChild(item);
                 });
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-red-500">Gagal memuat data jamaah: ${err.message}</td></tr>`;
-                summaryText.textContent = "Gagal memuat data";
-            }
-        }
-
-        async function editJamaahDirect(id) {
-            const { data } = await supabaseClient.from('data_jamaah').select('*').eq('id', id).single();
-            if(!data) return;
-
-            showSection('database');
-            switchMode('UPDATE');
-
-            const searchDesaEl = document.getElementById('searchDesa');
-            searchDesaEl.value = data.desa;
-
-            const searchKelompokEl = document.getElementById('searchKelompok');
-            searchKelompokEl.innerHTML = '<option value="">-- Kelompok --</option>';
-            if (dataWilayah[data.desa]) {
-                searchKelompokEl.disabled = false;
-                searchKelompokEl.classList.remove('bg-slate-50');
-                dataWilayah[data.desa].forEach(k => searchKelompokEl.add(new Option(k, k)));
-                searchKelompokEl.value = data.kelompok;
             }
 
-            fetchAutoJamaahList(data.desa, data.kelompok);
-            selectJamaahToForm(data);
+            openModal('operatorDetailModal');
         }
 
         function setupYearFilter() {
             const sel = document.getElementById('filterTahun');
             const now = new Date().getFullYear();
             sel.innerHTML = '';
-            for(let i = now; i >= now - 3; i--) {
-                sel.add(new Option(`Tahun ${i}`, i));
-            }
+            for(let i = now; i >= now - 3; i--) sel.add(new Option(`Tahun ${i}`, i));
         }
 
         async function populateKegiatanFilter() {
@@ -2013,28 +2033,19 @@
             if (!selKegiatan) return;
 
             const currentValue = selKegiatan.value;
-
             try {
                 const data = await fetchAllRows('absensi_kegiatan', 'nama_kegiatan');
-
                 const uniqueKegiatan = [...new Set(data.map(item => item.nama_kegiatan))].filter(Boolean).sort();
-
                 selKegiatan.innerHTML = '<option value="">-- Semua Kegiatan --</option>';
-
-                uniqueKegiatan.forEach(nama => {
-                    selKegiatan.add(new Option(nama, nama));
-                });
-
-                if (currentValue && uniqueKegiatan.includes(currentValue)) {
-                    selKegiatan.value = currentValue;
-                }
+                uniqueKegiatan.forEach(nama => selKegiatan.add(new Option(nama, nama)));
+                if (currentValue && uniqueKegiatan.includes(currentValue)) selKegiatan.value = currentValue;
             } catch (err) {
-                console.error("Gagal memuat daftar filter kegiatan:", err);
+                console.error(err);
             }
         }
 
         async function loadRekapAbsensi() {
-            const desa = document.getElementById('filterDesaAbsensi') ? document.getElementById('filterDesaAbsensi').value : '';
+            const desa = document.getElementById('filterDesaAbsensi')?.value || '';
             const tahun = document.getElementById('filterTahun').value;
             const bulan = document.getElementById('filterBulanAbsensi').value;
             const kegiatan = document.getElementById('filterKegiatanAbsensi').value;
@@ -2046,30 +2057,21 @@
 
             try {
                 let data = await fetchAllRows('absensi_kegiatan', '*');
-
-                if (kegiatan) {
-                    data = data.filter(item => item.nama_kegiatan === kegiatan);
-                }
-
+                if (kegiatan) data = data.filter(item => item.nama_kegiatan === kegiatan);
                 data.sort((a, b) => (b.tanggal_kegiatan || '').localeCompare(a.tanggal_kegiatan || ''));
 
                 const filteredData = data.filter(item => {
                     if (desa && item.desa !== desa) return false;
-
                     if (!item.tanggal_kegiatan) return false;
                     const parts = item.tanggal_kegiatan.split('-');
                     if (parts.length < 2) return false;
-                    
-                    const itemTahun = parts[0];
-                    const itemBulan = parts[1];
-
-                    if (tahun && itemTahun !== tahun) return false;
-                    if (bulan && itemBulan !== bulan) return false;
+                    if (tahun && parts[0] !== tahun) return false;
+                    if (bulan && parts[1] !== bulan) return false;
                     return true;
                 });
 
                 if (filteredData.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-slate-400">Tidak ada data untuk filter ini.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-slate-400">Tidak ada data.</td></tr>';
                     return;
                 }
 
@@ -2134,15 +2136,8 @@
                 return;
             }
 
-            let table;
-            let fileName = `Rekap_Jamaah_Sarpras_${new Date().toISOString().slice(0,10)}.xlsx`;
-
-            if (tbodyId === 'tbodyDaftarJamaah') {
-                table = document.getElementById('tableDaftarJamaah');
-                fileName = `Daftar_Nama_Jamaah_${new Date().toISOString().slice(0,10)}.xlsx`;
-            } else {
-                table = document.getElementById('tableRekapKelompok');
-            }
+            let table = tbodyId === 'tbodyDaftarJamaah' ? document.getElementById('tableDaftarJamaah') : document.getElementById('tableRekapKelompok');
+            let fileName = tbodyId === 'tbodyDaftarJamaah' ? `Daftar_Nama_Jamaah_${new Date().toISOString().slice(0,10)}.xlsx` : `Rekap_Jamaah_Sarpras_${new Date().toISOString().slice(0,10)}.xlsx`;
 
             const wb = XLSX.utils.table_to_book(table, { sheet: "Data Jamaah" });
             XLSX.writeFile(wb, fileName);
