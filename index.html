@@ -232,6 +232,13 @@
     <!-- CONTAINER UTAMA -->
     <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-orange-100 w-full max-w-2xl my-4 relative">
         
+        <!-- TOMBOL REFRESH POJOK KIRI ATAS DASBOR -->
+        <button type="button" onclick="window.location.reload()" title="Refresh Halaman" aria-label="Refresh Halaman" class="absolute top-4 left-4 p-2 bg-orange-50 hover:bg-orange-100 active:scale-95 text-orange-600 border border-orange-200 rounded-xl transition duration-200 shadow-sm z-20 no-print flex items-center justify-center">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+        </button>
+
         <!-- Header Logo (Selalu Tampil) -->
         <div class="flex justify-center mb-4">
             <div class="w-24 h-24 rounded-full border-2 border-orange-400 p-1 bg-white shadow-md flex items-center justify-center overflow-hidden">
@@ -843,7 +850,9 @@
 
             setTimeout(() => {
                 if (inputVal === APP_PASSWORD_SECRET) {
-                    // BERHASIL
+                    // BERHASIL - Simpan status login di sessionStorage
+                    sessionStorage.setItem('isAppLoggedIn', 'true');
+
                     spinner.classList.add('hidden');
                     btnText.textContent = "Akses Diterima";
                     btn.className = "w-full py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition duration-200";
@@ -1049,13 +1058,24 @@
             initScrollDetectors();
             showSection('home');
 
+            // Cek apakah pengguna sudah pernah memasukkan sandi sebelumnya di sesi ini
+            const isLoggedIn = sessionStorage.getItem('isAppLoggedIn');
+            const authModal = document.getElementById('authModal');
+
+            if (isLoggedIn === 'true') {
+                // Jika sudah pernah login, langsung sembunyikan modal sandi
+                authModal.classList.add('hidden');
+            }
+
             // SIMULASI ANIMASI LOADING ELEGAN SAAT BUKA APLIKASI
             setTimeout(() => {
                 const loader = document.getElementById('loadingScreen');
                 if (loader) {
                     loader.classList.add('fade-out');
                     setTimeout(() => {
-                        document.getElementById('appPasswordInput').focus();
+                        if (isLoggedIn !== 'true') {
+                            document.getElementById('appPasswordInput').focus();
+                        }
                     }, 200);
                 }
             }, 1800);
