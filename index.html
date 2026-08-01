@@ -691,7 +691,7 @@
                             <span id="stManula" class="text-xl font-extrabold text-orange-600">0</span>
                         </div>
                         
-                        <!-- PERBAIKAN: CARD OPERATOR DIUBAH MENJADI TOMBOL DENGAN HOVER & EFEK KLIK -->
+                        <!-- CARD OPERATOR MENJADI TOMBOL UTAMA POPUP ALL OPERATORS -->
                         <button type="button" onclick="showAllOperatorsModal()" class="p-3 bg-blue-50/80 hover:bg-blue-100 active:scale-95 border border-blue-200 hover:border-blue-300 rounded-xl text-center col-span-2 sm:col-span-1 transition cursor-pointer shadow-xs group">
                             <span class="block text-[10px] font-bold text-blue-600 uppercase group-hover:text-blue-700">OPERATOR</span>
                             <span id="stOperator" class="text-xl font-extrabold text-blue-600 group-hover:text-blue-700">0</span>
@@ -807,10 +807,10 @@
         </div>
     </div>
 
-    <!-- MODAL DETAIL OPERATOR WA -->
+    <!-- MODAL DETAIL OPERATOR WA (LENGKAP DENGAN INPUT CARI OPERATOR) -->
     <div id="operatorDetailModal" class="modal-backdrop fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="modal-content-card bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center space-y-4 border border-blue-100">
-            <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
+        <div class="modal-content-card bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center space-y-3 border border-blue-100">
+            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
                 🎧
             </div>
             <div>
@@ -818,9 +818,14 @@
                 <p id="opModalSubtitle" class="text-xs text-slate-500 mt-0.5">Daftar kontak operator kelompok</p>
             </div>
             
-            <div id="opModalList" class="max-h-60 overflow-y-auto space-y-2 text-left"></div>
+            <!-- INPUT SEARCH UNTUK CARI OPERATOR -->
+            <div class="relative text-left pt-1">
+                <input type="text" id="opSearchInput" oninput="filterOperatorList()" placeholder="🔍 Cari nama / kelompok / no. HP..." class="w-full text-xs p-2.5 pl-3 rounded-xl border border-blue-200 bg-blue-50/40 text-slate-800 font-medium focus:outline-none focus:border-blue-500 focus:bg-white transition shadow-inner">
+            </div>
 
-            <button type="button" onclick="closeModal('operatorDetailModal')" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">
+            <div id="opModalList" class="max-h-60 overflow-y-auto space-y-2 text-left pr-0.5"></div>
+
+            <button type="button" onclick="closeModal('operatorDetailModal')" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition mt-2">
                 Tutup
             </button>
         </div>
@@ -838,6 +843,7 @@
         // Cache data operator global
         window.allOperatorsCache = [];
         window.operatorCache = {};
+        window.activeOperatorDataset = []; // Digunakan untuk pencarian realtime
 
         function handleAuthSubmit(e) {
             e.preventDefault();
@@ -1791,47 +1797,97 @@
             }
         }
 
-        // FUNGSI MEMUNCULKAN POPUP DAFTAR SEMUA OPERATOR
+        // POPUP SEMUA OPERATOR
         function showAllOperatorsModal() {
-            const listEl = document.getElementById('opModalList');
             document.getElementById('opModalTitle').textContent = "Semua Operator Terdaftar";
+            
+            // Set dataset aktif ke semua operator
+            window.activeOperatorDataset = window.allOperatorsCache ? [...window.allOperatorsCache] : [];
+            window.activeOperatorDataset.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
 
+            // Reset Input Search
+            const searchInput = document.getElementById('opSearchInput');
+            if (searchInput) searchInput.value = '';
+
+            renderOperatorModalList(window.activeOperatorDataset);
+            openModal('operatorDetailModal');
+        }
+
+        // POPUP OPERATOR PER KELOMPOK
+        function showOperatorDetailModal(cacheKey) {
+            const data = window.operatorCache[cacheKey];
+            if (!data) return;
+
+            document.getElementById('opModalTitle').textContent = `Operator Klp. ${data.kelompok}`;
+
+            // Set dataset aktif ke kelompok ini
+            window.activeOperatorDataset = data.list ? [...data.list] : [];
+            window.activeOperatorDataset.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
+
+            // Reset Input Search
+            const searchInput = document.getElementById('opSearchInput');
+            if (searchInput) searchInput.value = '';
+
+            renderOperatorModalList(window.activeOperatorDataset);
+            openModal('operatorDetailModal');
+        }
+
+        // FUNGSI UNTUK MERENDER DAFTAR OPERATOR KE DALAM MODAL
+        function renderOperatorModalList(listData) {
+            const listEl = document.getElementById('opModalList');
             listEl.innerHTML = '';
 
-            if (!window.allOperatorsCache || window.allOperatorsCache.length === 0) {
-                listEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Belum ada data operator terdaftar.</p>`;
-            } else {
-                // Urutkan berdasarkan Nama Operator
-                window.allOperatorsCache.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
-
-                window.allOperatorsCache.forEach(op => {
-                    const item = document.createElement('div');
-                    item.className = "p-3 bg-blue-50/70 border border-blue-200 rounded-xl flex items-center justify-between gap-2 animate-fade-in-up";
-
-                    const cleanHp = (op.no_hp || '').replace(/[^0-9]/g, '');
-                    const waLink = cleanHp.startsWith('0') ? `62${cleanHp.slice(1)}` : cleanHp;
-
-                    item.innerHTML = `
-                        <div>
-                            <div class="font-bold text-xs text-slate-800">${op.nama}</div>
-                            <div class="text-[10px] font-semibold text-slate-500 mt-0.5">
-                                Klp. <span class="text-slate-700 font-bold">${op.kelompok || '-'}</span> (${op.desa || '-'})
-                            </div>
-                            <div class="text-[11px] font-semibold text-blue-600 mt-0.5">${op.no_hp || 'No HP belum diisi'}</div>
-                        </div>
-                        ${op.no_hp ? `
-                            <a href="https://wa.me/${waLink}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-lg shadow-sm transition flex items-center gap-1 shrink-0">
-                                💬 WA
-                            </a>
-                        ` : `
-                            <span class="text-[10px] text-slate-400 italic shrink-0">No HP kosong</span>
-                        `}
-                    `;
-                    listEl.appendChild(item);
-                });
+            if (!listData || listData.length === 0) {
+                listEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Tidak ada data operator ditemukan.</p>`;
+                return;
             }
 
-            openModal('operatorDetailModal');
+            listData.forEach(op => {
+                const item = document.createElement('div');
+                item.className = "p-3 bg-blue-50/70 border border-blue-200 rounded-xl flex items-center justify-between gap-2 animate-fade-in-up";
+
+                const cleanHp = (op.no_hp || '').replace(/[^0-9]/g, '');
+                const waLink = cleanHp.startsWith('0') ? `62${cleanHp.slice(1)}` : cleanHp;
+
+                item.innerHTML = `
+                    <div>
+                        <div class="font-bold text-xs text-slate-800">${op.nama}</div>
+                        <div class="text-[10px] font-semibold text-slate-500 mt-0.5">
+                            Klp. <span class="text-slate-700 font-bold">${op.kelompok || '-'}</span> (${op.desa || '-'})
+                        </div>
+                        <div class="text-[11px] font-semibold text-blue-600 mt-0.5">${op.no_hp || 'No HP belum diisi'}</div>
+                    </div>
+                    ${op.no_hp ? `
+                        <a href="https://wa.me/${waLink}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-lg shadow-sm transition flex items-center gap-1 shrink-0">
+                            💬 WA
+                        </a>
+                    ` : `
+                        <span class="text-[10px] text-slate-400 italic shrink-0">No HP kosong</span>
+                    `}
+                `;
+                listEl.appendChild(item);
+            });
+        }
+
+        // FUNGSI PENCARIAN OPERATOR REALTIME
+        function filterOperatorList() {
+            const query = (document.getElementById('opSearchInput').value || '').toLowerCase().trim();
+            
+            if (!query) {
+                renderOperatorModalList(window.activeOperatorDataset);
+                return;
+            }
+
+            const filtered = window.activeOperatorDataset.filter(op => {
+                const namaMatch = (op.nama || '').toLowerCase().includes(query);
+                const kelompokMatch = (op.kelompok || '').toLowerCase().includes(query);
+                const desaMatch = (op.desa || '').toLowerCase().includes(query);
+                const hpMatch = (op.no_hp || '').toLowerCase().includes(query);
+
+                return namaMatch || kelompokMatch || desaMatch || hpMatch;
+            });
+
+            renderOperatorModalList(filtered);
         }
 
         async function loadRekapKelompokLengkap() {
@@ -1938,7 +1994,7 @@
 
                     let operatorBtnHTML = item.operator > 0 
                         ? `<button type="button" onclick="showOperatorDetailModal('${cacheKey}')" class="w-full h-full font-bold text-blue-700 bg-blue-100 hover:bg-blue-200 active:scale-95 transition rounded py-1 px-2 border border-blue-300 flex items-center justify-center gap-1 shadow-xs cursor-pointer" title="Klik untuk lihat no WA operator">
-                            <span>${item.operator}</span> 
+                            <span>${item.operator}</span> 📱
                            </button>`
                         : `<span class="text-slate-400 font-semibold">0</span>`;
 
@@ -1977,48 +2033,6 @@
             } catch (err) {
                 tbody.innerHTML = `<tr><td colspan="11" class="p-3 text-center text-red-500">Gagal memuat rekap: ${err.message}</td></tr>`;
             }
-        }
-
-        function showOperatorDetailModal(cacheKey) {
-            const data = window.operatorCache[cacheKey];
-            if (!data) return;
-
-            const listEl = document.getElementById('opModalList');
-            document.getElementById('opModalTitle').textContent = `Operator Klp. ${data.kelompok}`;
-
-            listEl.innerHTML = '';
-
-            if (!data.list || data.list.length === 0) {
-                listEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Tidak ada data kontak operator.</p>`;
-            } else {
-                data.list.forEach(op => {
-                    const item = document.createElement('div');
-                    item.className = "p-3 bg-blue-50/70 border border-blue-200 rounded-xl flex items-center justify-between gap-2";
-
-                    const cleanHp = (op.no_hp || '').replace(/[^0-9]/g, '');
-                    const waLink = cleanHp.startsWith('0') ? `62${cleanHp.slice(1)}` : cleanHp;
-
-                    item.innerHTML = `
-                        <div>
-                            <div class="font-bold text-xs text-slate-800">${op.nama}</div>
-                            <div class="text-[10px] font-semibold text-slate-500 mt-0.5">
-                                Klp. <span class="text-slate-700 font-bold">${op.kelompok || '-'}</span> (${op.desa || '-'})
-                            </div>
-                            <div class="text-[11px] font-semibold text-blue-600 mt-0.5">${op.no_hp || 'No HP belum diisi'}</div>
-                        </div>
-                        ${op.no_hp ? `
-                            <a href="https://wa.me/${waLink}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-lg shadow-sm transition flex items-center gap-1 shrink-0">
-                                💬 WA
-                            </a>
-                        ` : `
-                            <span class="text-[10px] text-slate-400 italic">No HP kosong</span>
-                        `}
-                    `;
-                    listEl.appendChild(item);
-                });
-            }
-
-            openModal('operatorDetailModal');
         }
 
         function setupYearFilter() {
