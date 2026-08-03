@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pendataan, Sarpras & Absensi Jamaah</title>
 
     <link rel="icon" type="image/jpeg" href="logo sdc tw.png">
@@ -19,6 +19,7 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #fff7ed;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .rounded-box-input {
@@ -39,6 +40,10 @@
             opacity: 1;
         }
 
+        .scroll-container {
+            -webkit-overflow-scrolling: touch;
+        }
+
         .sticky-col {
             position: sticky;
             left: 0;
@@ -49,12 +54,18 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 280px;
+            max-width: 130px;
             will-change: max-width;
         }
 
+        @media (min-width: 640px) {
+            .sticky-col {
+                max-width: 280px;
+            }
+        }
+
         .overflow-x-auto.is-scrolled .sticky-col {
-            max-width: 95px;
+            max-width: 85px;
             box-shadow: 3px 0 6px -2px rgba(0, 0, 0, 0.12);
         }
 
@@ -179,16 +190,16 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 sm:p-6 antialiased text-slate-800">
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-6 antialiased text-slate-800">
 
     <!-- ANIMASI LOADING -->
     <div id="loadingScreen" class="fixed inset-0 bg-amber-50/95 backdrop-blur-md z-[100] flex flex-col items-center justify-center p-4">
         <div class="relative flex flex-col items-center">
-            <div class="w-28 h-28 rounded-full border-4 border-orange-500/30 p-1.5 bg-white shadow-2xl animate-pulse-glow flex items-center justify-center mb-6 overflow-hidden">
+            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-orange-500/30 p-1.5 bg-white shadow-2xl animate-pulse-glow flex items-center justify-center mb-6 overflow-hidden">
                 <img src="logo sdc tw.png" alt="Logo Insan Qur'any" class="w-full h-full object-contain">
             </div>
-            <div class="w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mb-4"></div>
-            <h3 class="text-lg font-bold text-slate-800 tracking-wide">INSAN QUR'ANY TAWANGMANGU</h3>
+            <div class="w-10 h-10 sm:w-12 sm:h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mb-4"></div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-800 tracking-wide text-center">INSAN QUR'ANY TAWANGMANGU</h3>
             <p class="text-xs text-slate-500 mt-1 font-medium">Memuat Sistem Informasi...</p>
         </div>
     </div>
@@ -218,68 +229,68 @@
     </div>
 
     <!-- CONTAINER UTAMA -->
-    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-orange-100 w-full max-w-2xl my-4 relative">
+    <div class="bg-white p-4 sm:p-8 rounded-2xl shadow-xl border border-orange-100 w-full max-w-2xl my-2 sm:my-4 relative">
         
-        <button type="button" onclick="window.location.reload()" title="Refresh Halaman" aria-label="Refresh Halaman" class="absolute top-4 left-4 p-2 bg-orange-50 hover:bg-orange-100 active:scale-95 text-orange-600 border border-orange-200 rounded-xl transition duration-200 shadow-sm z-20 no-print flex items-center justify-center">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <button type="button" onclick="window.location.reload()" title="Refresh Halaman" aria-label="Refresh Halaman" class="absolute top-3 left-3 sm:top-4 sm:left-4 p-2 bg-orange-50 hover:bg-orange-100 active:scale-95 text-orange-600 border border-orange-200 rounded-xl transition duration-200 shadow-sm z-20 no-print flex items-center justify-center">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
         </button>
 
-        <div class="flex justify-center mb-4">
-            <div class="w-24 h-24 rounded-full border-2 border-orange-400 p-1 bg-white shadow-md flex items-center justify-center overflow-hidden">
+        <div class="flex justify-center mb-3 sm:mb-4">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-orange-400 p-1 bg-white shadow-md flex items-center justify-center overflow-hidden">
                 <img src="logo sdc tw.png" alt="Logo Insan Qur'any Tawangmangu" class="w-full h-full object-contain">
             </div>
         </div>
 
-        <div class="text-center mb-6">
-            <h2 id="mainTitle" class="text-2xl font-bold text-slate-800">INSAN QUR'ANY<br>TAWANGMANGU</h2>
-            <p id="mainSubtitle" class="text-xs text-slate-500 mt-1">Sistem Informasi Jamaah & Sarana Prasarana</p>
-            <div class="w-12 h-1 bg-orange-500 mx-auto mt-3 rounded-full"></div>
+        <div class="text-center mb-5 sm:mb-6">
+            <h2 id="mainTitle" class="text-xl sm:text-2xl font-bold text-slate-800 leading-tight">INSAN QUR'ANY<br>TAWANGMANGU</h2>
+            <p id="mainSubtitle" class="text-[11px] sm:text-xs text-slate-500 mt-1">Sistem Informasi Jamaah & Sarana Prasarana</p>
+            <div class="w-10 sm:w-12 h-1 bg-orange-500 mx-auto mt-2.5 rounded-full"></div>
         </div>
 
         <!-- MENU UTAMA -->
-        <div id="mainDashboard" class="section-content grid grid-cols-2 gap-4 py-4">
-            <button type="button" onclick="showSection('database')" class="flex flex-col items-center justify-center p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
-                <div class="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <div id="mainDashboard" class="section-content grid grid-cols-2 gap-3 sm:gap-4 py-2 sm:py-4">
+            <button type="button" onclick="showSection('database')" class="flex flex-col items-center justify-center p-3.5 sm:p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
+                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                     </svg>
                 </div>
-                <span class="text-xs font-bold text-slate-800 group-hover:text-orange-600">DATABASE</span>
-                <span class="text-[10px] text-slate-500 text-center mt-1">Input & Edit Jamaah</span>
+                <span class="text-[11px] sm:text-xs font-bold text-slate-800 group-hover:text-orange-600">DATABASE</span>
+                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-0.5">Input & Edit Jamaah</span>
             </button>
 
-            <button type="button" onclick="showSection('absensi')" class="flex flex-col items-center justify-center p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
-                <div class="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <button type="button" onclick="showSection('absensi')" class="flex flex-col items-center justify-center p-3.5 sm:p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
+                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
-                <span class="text-xs font-bold text-slate-800 group-hover:text-orange-600">ABSENSI</span>
-                <span class="text-[10px] text-slate-500 text-center mt-1">Absensi Kegiatan</span>
+                <span class="text-[11px] sm:text-xs font-bold text-slate-800 group-hover:text-orange-600">ABSENSI</span>
+                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-0.5">Absensi Kegiatan</span>
             </button>
 
-            <button type="button" onclick="showSection('sarpras')" class="flex flex-col items-center justify-center p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
-                <div class="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <button type="button" onclick="showSection('sarpras')" class="flex flex-col items-center justify-center p-3.5 sm:p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
+                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3 21h13V9L9.5 4 3 9v12z"></path>
                         <path d="M7 13h5v8H7z"></path>
                         <path d="M16 21h5v-6l-2.5-2L16 15v6z"></path>
                     </svg>
                 </div>
-                <span class="text-xs font-bold text-slate-800 group-hover:text-orange-600">SARPRAS</span>
-                <span class="text-[10px] text-slate-500 text-center mt-1">Fasilitas Kelompok</span>
+                <span class="text-[11px] sm:text-xs font-bold text-slate-800 group-hover:text-orange-600">SARPRAS</span>
+                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-0.5">Fasilitas Kelompok</span>
             </button>
 
-            <button type="button" onclick="showSection('rekap')" class="flex flex-col items-center justify-center p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
-                <div class="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <button type="button" onclick="showSection('rekap')" class="flex flex-col items-center justify-center p-3.5 sm:p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
+                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                 </div>
-                <span class="text-xs font-bold text-slate-800 group-hover:text-orange-600">REKAP</span>
-                <span class="text-[10px] text-slate-500 text-center mt-1">Data & Laporan</span>
+                <span class="text-[11px] sm:text-xs font-bold text-slate-800 group-hover:text-orange-600">REKAP</span>
+                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-0.5">Data & Laporan</span>
             </button>
         </div>
 
@@ -289,12 +300,12 @@
                 &larr; Kembali ke Menu Utama
             </button>
 
-            <div class="bg-orange-100/70 p-1 rounded-xl grid grid-cols-2 gap-1 mb-6 max-w-xs mx-auto border border-orange-200">
+            <div class="bg-orange-100/70 p-1 rounded-xl grid grid-cols-2 gap-1 mb-5 max-w-xs mx-auto border border-orange-200">
                 <button type="button" id="tabDaftar" onclick="switchMode('DAFTAR')" class="py-2 text-xs font-semibold rounded-lg bg-orange-500 text-white shadow-sm transition">Daftar Baru</button>
                 <button type="button" id="tabUpdate" onclick="switchMode('UPDATE')" class="py-2 text-xs font-semibold rounded-lg text-orange-800 hover:bg-orange-200/50 transition">Update Data</button>
             </div>
 
-            <div id="searchSection" class="hidden bg-orange-50/50 p-4 rounded-xl border border-orange-200 mb-6 space-y-3">
+            <div id="searchSection" class="hidden bg-orange-50/50 p-3.5 sm:p-4 rounded-xl border border-orange-200 mb-5 space-y-3">
                 <h3 class="text-xs font-bold text-orange-800 uppercase">Pilih Desa dan Kelompok Dulu</h3>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -318,17 +329,17 @@
             </div>
 
             <!-- Form Main Jamaah -->
-            <form id="formJamaah" class="space-y-4 pt-2">
+            <form id="formJamaah" class="space-y-3.5 sm:space-y-4 pt-1">
                 <input type="hidden" id="edit_jamaah_id">
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap</label>
-                    <input type="text" id="nama" required placeholder="Sesuai KTP/KK" oninput="autoCapitalize(this)" class="rounded-box-input w-full p-2.5 text-sm">
+                    <input type="text" id="nama" required placeholder="Sesuai KTP/KK" oninput="autoCapitalize(this)" class="rounded-box-input w-full p-2.5 text-xs sm:text-sm">
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Kelamin</label>
-                    <select id="jenis_kelamin" required class="rounded-box-input w-full p-2.5 text-sm">
+                    <select id="jenis_kelamin" required class="rounded-box-input w-full p-2.5 text-xs sm:text-sm">
                         <option value="">-- Pilih --</option>
                         <option value="L">Laki-laki</option>
                         <option value="P">Perempuan</option>
@@ -337,7 +348,7 @@
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Tempat Lahir</label>
-                    <input type="text" id="tempat_lahir" required placeholder="Kota/Kab" oninput="autoCapitalize(this)" class="rounded-box-input w-full p-2.5 text-sm">
+                    <input type="text" id="tempat_lahir" required placeholder="Kota/Kab" oninput="autoCapitalize(this)" class="rounded-box-input w-full p-2.5 text-xs sm:text-sm">
                 </div>
 
                 <div>
@@ -347,11 +358,11 @@
                             Umur: <span id="umurVal">0</span> thn
                         </span>
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <select id="tgl_lahir_tgl" required onchange="hitungUmurOtomatis()" class="rounded-box-input w-full p-2.5 text-sm">
+                    <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
+                        <select id="tgl_lahir_tgl" required onchange="hitungUmurOtomatis()" class="rounded-box-input w-full p-2 sm:p-2.5 text-xs sm:text-sm">
                             <option value="">Tanggal</option>
                         </select>
-                        <select id="tgl_lahir_bln" required onchange="hitungUmurOtomatis()" class="rounded-box-input w-full p-2.5 text-sm">
+                        <select id="tgl_lahir_bln" required onchange="hitungUmurOtomatis()" class="rounded-box-input w-full p-2 sm:p-2.5 text-xs sm:text-sm">
                             <option value="">Bulan</option>
                             <option value="01">Januari</option>
                             <option value="02">Februari</option>
@@ -366,22 +377,22 @@
                             <option value="11">November</option>
                             <option value="12">Desember</option>
                         </select>
-                        <select id="tgl_lahir_thn" required onchange="hitungUmurOtomatis()" class="rounded-box-input w-full p-2.5 text-sm">
+                        <select id="tgl_lahir_thn" required onchange="hitungUmurOtomatis()" class="rounded-box-input w-full p-2 sm:p-2.5 text-xs sm:text-sm">
                             <option value="">Tahun</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Desa</label>
-                        <select id="desa" required class="rounded-box-input w-full p-2.5 text-sm">
+                        <select id="desa" required class="rounded-box-input w-full p-2.5 text-xs sm:text-sm">
                             <option value="">-- Pilih Desa --</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Kelompok</label>
-                        <select id="kelompok" required disabled class="rounded-box-input w-full p-2.5 text-sm bg-slate-50">
+                        <select id="kelompok" required disabled class="rounded-box-input w-full p-2.5 text-xs sm:text-sm bg-slate-50">
                             <option value="">-- Pilih Desa Dulu --</option>
                         </select>
                     </div>
@@ -389,7 +400,7 @@
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Status Jamaah / Pengguna</label>
-                    <select id="status" required onchange="toggleNoHpInput(this.value)" class="rounded-box-input w-full p-2.5 text-sm font-semibold">
+                    <select id="status" required onchange="toggleNoHpInput(this.value)" class="rounded-box-input w-full p-2.5 text-xs sm:text-sm font-semibold">
                         <option value="Menikah">Menikah</option>
                         <option value="Duda">Duda</option>
                         <option value="Janda">Janda</option>
@@ -401,11 +412,11 @@
                 <!-- INPUT NOMOR HP OPERATOR -->
                 <div id="boxNoHpOperator" class="hidden animate-fade-in-up bg-blue-50/70 p-3 rounded-xl border border-blue-200">
                     <label class="block text-xs font-bold text-blue-800 mb-1">Nomor HP / WhatsApp Operator</label>
-                    <input type="tel" id="no_hp" placeholder="Contoh: 081234567890" pattern="[0-9]{10,14}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="rounded-box-input w-full p-2.5 text-sm font-semibold text-blue-950 border-blue-300 focus:border-blue-500">
+                    <input type="tel" id="no_hp" placeholder="Contoh: 081234567890" pattern="[0-9]{10,14}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="rounded-box-input w-full p-2.5 text-xs sm:text-sm font-semibold text-blue-950 border-blue-300 focus:border-blue-500">
                     <span class="text-[10px] text-blue-600 mt-1 block font-medium">*Khusus Operator untuk keperluan sistem & koordinasi</span>
                 </div>
 
-                <button type="submit" id="submitJamaahBtn" class="w-full py-3 mt-4 text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-xl shadow-md hover:shadow-lg transition">
+                <button type="submit" id="submitJamaahBtn" class="w-full py-3 mt-4 text-xs sm:text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-xl shadow-md hover:shadow-lg transition">
                     Simpan Data Jamaah
                 </button>
             </form>
@@ -418,15 +429,15 @@
             </button>
 
             <div class="flex justify-between items-center border-b border-orange-100 pb-3 mb-4">
-                <h3 class="font-bold text-orange-600 text-base">Absensi Kegiatan Jamaah</h3>
+                <h3 class="font-bold text-orange-600 text-sm sm:text-base">Absensi Kegiatan Jamaah</h3>
             </div>
 
             <div class="flex justify-between items-center border-b border-orange-100 mb-4">
                 <div class="flex">
-                    <button onclick="switchTabAbsensi('INPUT')" id="tabInputAbsensi" class="py-2 px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600">Form Absensi</button>
-                    <button onclick="switchTabAbsensi('REKAP')" id="tabRekapAbsensi" class="py-2 px-4 text-xs font-bold text-slate-400">Rekapan</button>
+                    <button onclick="switchTabAbsensi('INPUT')" id="tabInputAbsensi" class="py-2 px-3 sm:px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600">Form Absensi</button>
+                    <button onclick="switchTabAbsensi('REKAP')" id="tabRekapAbsensi" class="py-2 px-3 sm:px-4 text-xs font-bold text-slate-400">Rekapan</button>
                 </div>
-                <button type="button" id="btnPrintAbsensi" onclick="printData('printableAbsensi')" class="hidden px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-lg transition flex items-center gap-1 shadow-sm">
+                <button type="button" id="btnPrintAbsensi" onclick="printData('printableAbsensi')" class="hidden px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-[11px] rounded-lg transition flex items-center gap-1 shadow-sm">
                     🖨️ Print
                 </button>
             </div>
@@ -436,7 +447,7 @@
                 <input type="hidden" id="edit_tanggal_kegiatan">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Kegiatan</label>
-                    <select id="abs_nama" required onchange="toggleNamaKegiatanLainnya(this)" class="rounded-box-input w-full p-2.5 text-sm">
+                    <select id="abs_nama" required onchange="toggleNamaKegiatanLainnya(this)" class="rounded-box-input w-full p-2.5 text-xs sm:text-sm">
                         <option value="">-- Pilih Nama Kegiatan --</option>
                         <option value="Penyampaian materi PPG pusat">Penyampaian materi PPG pusat</option>
                         <option value="Pengajian ibu-ibu daerah">Pengajian ibu-ibu daerah</option>
@@ -445,7 +456,7 @@
                         <option value="Penyampaian CAI">Penyampaian CAI</option>
                         <option value="LAINNYA">-- Ketik Lainnya --</option>
                     </select>
-                    <input type="text" id="abs_nama_custom" placeholder="Ketik nama kegiatan lainnya..." oninput="autoCapitalize(this)" class="hidden rounded-box-input w-full p-2.5 text-sm mt-2">
+                    <input type="text" id="abs_nama_custom" placeholder="Ketik nama kegiatan lainnya..." oninput="autoCapitalize(this)" class="hidden rounded-box-input w-full p-2.5 text-xs sm:text-sm mt-2">
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
@@ -478,7 +489,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Infaq (Rp)</label>
-                    <input type="number" id="abs_infaq" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2.5 text-sm">
+                    <input type="number" id="abs_infaq" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2.5 text-xs sm:text-sm">
                 </div>
                 <button type="submit" id="absBtn" class="w-full py-2.5 bg-orange-500 text-white rounded-xl font-semibold text-xs hover:bg-orange-600 transition shadow-sm">Simpan Absensi</button>
             </form>
@@ -491,11 +502,11 @@
                         </select>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-2">
-                        <select id="filterDesaAbsensi" onchange="loadRekapAbsensi()" class="w-full text-xs p-2 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
+                    <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
+                        <select id="filterDesaAbsensi" onchange="loadRekapAbsensi()" class="w-full text-[11px] sm:text-xs p-2 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
                             <option value="">Semua Desa</option>
                         </select>
-                        <select id="filterBulanAbsensi" onchange="loadRekapAbsensi()" class="w-full text-xs p-2 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
+                        <select id="filterBulanAbsensi" onchange="loadRekapAbsensi()" class="w-full text-[11px] sm:text-xs p-2 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
                             <option value="">Semua Bulan</option>
                             <option value="01">Januari</option>
                             <option value="02">Februari</option>
@@ -510,12 +521,12 @@
                             <option value="11">November</option>
                             <option value="12">Desember</option>
                         </select>
-                        <select id="filterTahun" onchange="loadRekapAbsensi()" class="w-full text-xs p-2 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm"></select>
+                        <select id="filterTahun" onchange="loadRekapAbsensi()" class="w-full text-[11px] sm:text-xs p-2 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm"></select>
                     </div>
                 </div>
 
                 <div class="overflow-x-auto border border-orange-100 rounded-xl scroll-container">
-                    <table class="w-full text-xs text-left">
+                    <table class="w-full text-[11px] sm:text-xs text-left">
                         <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
                             <tr>
                                 <th class="px-1.5 py-2 whitespace-nowrap sticky-col">Kelompok</th>
@@ -540,12 +551,12 @@
             </button>
 
             <div class="flex justify-between items-center border-b border-orange-100 pb-3 mb-4">
-                <h3 class="font-bold text-orange-600 text-base">Kelola Sarpras Kelompok</h3>
+                <h3 class="font-bold text-orange-600 text-sm sm:text-base">Kelola Sarpras Kelompok</h3>
             </div>
 
             <div class="flex border-b border-orange-100 mb-4">
-                <button onclick="switchTabSarpras('INPUT')" id="tabInputSarpras" class="py-2 px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600">Form Sarpras</button>
-                <button onclick="switchTabSarpras('UPDATE')" id="tabUpdateSarpras" class="py-2 px-4 text-xs font-bold text-slate-400">Update Data Sarpras</button>
+                <button onclick="switchTabSarpras('INPUT')" id="tabInputSarpras" class="py-2 px-3 sm:px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600">Form Sarpras</button>
+                <button onclick="switchTabSarpras('UPDATE')" id="tabUpdateSarpras" class="py-2 px-3 sm:px-4 text-xs font-bold text-slate-400">Update Data Sarpras</button>
             </div>
 
             <form id="formSarpras" class="space-y-3">
@@ -574,30 +585,42 @@
                         <option value="Numpang">Numpang</option>
                     </select>
                 </div>
-                <div class="grid grid-cols-3 gap-2">
+                <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Sub Kelompok</label>
+                        <label class="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Sub Klp</label>
                         <input type="number" id="sarp_sub" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Jumlah Masjid</label>
+                        <label class="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Masjid</label>
                         <input type="number" id="sarp_masjid" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Jumlah Aula</label>
+                        <label class="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Aula</label>
                         <input type="number" id="sarp_aula" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">WC Pria</label>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Toilet Pria</label>
                         <input type="number" id="sarp_km_pria" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">WC Wanita</label>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Toilet Wanita</label>
                         <input type="number" id="sarp_km_wanita" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
                     </div>
                 </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Kamar MT</label>
+                        <input type="number" id="sarp_km_mt" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Kamar Tamu</label>
+                        <input type="number" id="sarp_km_tamu" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
+                    </div>
+                </div>
+
                 <button type="submit" id="sarpBtn" class="w-full py-2.5 bg-orange-500 text-white rounded-xl font-semibold text-xs hover:bg-orange-600 transition shadow-sm mt-2">
                     Simpan Sarpras
                 </button>
@@ -612,13 +635,14 @@
                 </div>
 
                 <div class="overflow-x-auto border border-orange-100 rounded-xl scroll-container">
-                    <table class="w-full text-xs text-left">
+                    <table class="w-full text-[11px] sm:text-xs text-left">
                         <thead class="bg-orange-50 text-slate-900 font-bold border-b border-orange-100">
                             <tr>
                                 <th class="px-1.5 py-2 text-slate-900 sticky-col">Kelompok</th>
                                 <th class="px-1.5 py-2 text-center text-slate-900">Status Tanah</th>
                                 <th class="px-1.5 py-2 text-center text-slate-900">Masjid/Aula</th>
-                                <th class="px-1.5 py-2 text-center text-slate-900">WC (L/P)</th>
+                                <th class="px-1.5 py-2 text-center text-slate-900">Toilet (L/P)</th>
+                                <th class="px-1.5 py-2 text-center text-slate-900">Kamar MT/Tamu</th>
                                 <th class="px-1.5 py-2 text-center text-slate-900">Aksi</th>
                             </tr>
                         </thead>
@@ -635,35 +659,38 @@
             </button>
 
             <div class="flex justify-between items-center border-b border-orange-100 pb-3 mb-4">
-                <h3 class="font-bold text-orange-600 text-base">Rekapan Data Jamaah & Sarpras</h3>
+                <h3 class="font-bold text-orange-600 text-sm sm:text-base">Rekapan Data Jamaah & Sarpras</h3>
             </div>
 
             <div class="flex justify-between items-center border-b border-orange-100 mb-4 overflow-x-auto gap-2">
                 <div class="flex whitespace-nowrap gap-1">
-                    <button onclick="switchTabRekap('STATUS_KESELURUHAN')" id="tabStatusKeseluruhan" class="py-2 px-3 text-xs font-bold border-b-2 border-orange-500 text-orange-600 flex items-center gap-1.5">
-                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <button onclick="switchTabRekap('STATUS_KESELURUHAN')" id="tabStatusKeseluruhan" class="py-2 px-2.5 sm:px-3 text-xs font-bold border-b-2 border-orange-500 text-orange-600 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path>
                         </svg>
                         Status Jamaah
                     </button>
-                    <button onclick="switchTabRekap('REKAP_KELOMPOK')" id="tabRekapKelompok" class="py-2 px-3 text-xs font-bold text-slate-400 flex items-center gap-1.5">
-                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <button onclick="switchTabRekap('REKAP_KELOMPOK')" id="tabRekapKelompok" class="py-2 px-2.5 sm:px-3 text-xs font-bold text-slate-400 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                         </svg>
                         Rekap Per Klp
                     </button>
-                    <button onclick="switchTabRekap('DAFTAR_JAMAAH')" id="tabDaftarJamaah" class="py-2 px-3 text-xs font-bold text-slate-400 flex items-center gap-1.5">
-                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <button onclick="switchTabRekap('DAFTAR_JAMAAH')" id="tabDaftarJamaah" class="py-2 px-2.5 sm:px-3 text-xs font-bold text-slate-400 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                         </svg>
                         Daftar Nama
                     </button>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button type="button" id="btnExportExcel" onclick="exportTableToExcel('tbodyRekapKelompok', 'tfootRekapKelompok')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-lg transition flex items-center gap-1 shadow-sm shrink-0">
-                        🟢 Export Excel
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button type="button" id="btnExportExcel" onclick="exportTableToExcel('tbodyRekapKelompok', 'tfootRekapKelompok')" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold text-[11px] rounded-lg transition flex items-center gap-1 shadow-sm">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM6 20V4h7v5h5v11H6zm11.5-6l-2-2 2-2h-2.1l-1 1.2-1-1.2h-2.1l2 2-2 2h2.1l1-1.2 1 1.2h2.1z"/>
+                        </svg>
+                        <span>Excel</span>
                     </button>
-                    <button type="button" id="btnPrintRekap" onclick="printData('printableRekapContent')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-lg transition flex items-center gap-1 shadow-sm shrink-0">
+                    <button type="button" id="btnPrintRekap" onclick="printData('printableRekapContent')" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-semibold text-[11px] rounded-lg transition flex items-center gap-1 shadow-sm">
                         🖨️ Print
                     </button>
                 </div>
@@ -673,33 +700,63 @@
                 <!-- REKAP STATUS KESELURUHAN -->
                 <div id="sectionStatusKeseluruhan" class="space-y-4">
                     <h4 class="text-xs font-bold text-slate-700 uppercase">Rekapitulasi Status Jamaah Keseluruhan</h4>
-                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-                        <div class="p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
-                            <span class="block text-[10px] font-bold text-slate-500 uppercase">Menikah</span>
-                            <span id="stMenikah" class="text-xl font-extrabold text-orange-600">0</span>
+                    
+                    <!-- REKAP STATUS JAMAAH UTAMA -->
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        <div class="p-2.5 sm:p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase">Menikah</span>
+                            <span id="stMenikah" class="text-lg sm:text-xl font-extrabold text-orange-600">0</span>
                         </div>
-                        <div class="p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
-                            <span class="block text-[10px] font-bold text-slate-500 uppercase">Duda</span>
-                            <span id="stDuda" class="text-xl font-extrabold text-orange-600">0</span>
+                        <div class="p-2.5 sm:p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase">Duda</span>
+                            <span id="stDuda" class="text-lg sm:text-xl font-extrabold text-orange-600">0</span>
                         </div>
-                        <div class="p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
-                            <span class="block text-[10px] font-bold text-slate-500 uppercase">Janda</span>
-                            <span id="stJanda" class="text-xl font-extrabold text-orange-600">0</span>
+                        <div class="p-2.5 sm:p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase">Janda</span>
+                            <span id="stJanda" class="text-lg sm:text-xl font-extrabold text-orange-600">0</span>
                         </div>
-                        <div class="p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
-                            <span class="block text-[10px] font-bold text-slate-500 uppercase">Manula</span>
-                            <span id="stManula" class="text-xl font-extrabold text-orange-600">0</span>
+                        <div class="p-2.5 sm:p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase">Manula</span>
+                            <span id="stManula" class="text-lg sm:text-xl font-extrabold text-orange-600">0</span>
                         </div>
                         
-                        <!-- CARD OPERATOR MENJADI TOMBOL UTAMA POPUP ALL OPERATORS -->
-                        <button type="button" onclick="showAllOperatorsModal()" class="p-3 bg-blue-50/80 hover:bg-blue-100 active:scale-95 border border-blue-200 hover:border-blue-300 rounded-xl text-center col-span-2 sm:col-span-1 transition cursor-pointer shadow-xs group">
-                            <span class="block text-[10px] font-bold text-blue-600 uppercase group-hover:text-blue-700">OPERATOR</span>
-                            <span id="stOperator" class="text-xl font-extrabold text-blue-600 group-hover:text-blue-700">0</span>
+                        <button type="button" onclick="showAllOperatorsModal()" class="p-2.5 sm:p-3 bg-blue-50/80 hover:bg-blue-100 active:scale-95 border border-blue-200 hover:border-blue-300 rounded-xl text-center col-span-2 sm:col-span-1 transition cursor-pointer shadow-xs group">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-blue-600 uppercase group-hover:text-blue-700">OPERATOR</span>
+                            <span id="stOperator" class="text-lg sm:text-xl font-extrabold text-blue-600 group-hover:text-blue-700">0</span>
                         </button>
                     </div>
+
+                    <h4 class="text-xs font-bold text-slate-700 uppercase pt-2">Rekapitulasi Data Generus</h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        <div class="p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-amber-800 uppercase">PAUD</span>
+                            <span id="genPaud" class="text-lg sm:text-xl font-extrabold text-amber-600">0</span>
+                        </div>
+                        <div class="p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-amber-800 uppercase">TK</span>
+                            <span id="genTk" class="text-lg sm:text-xl font-extrabold text-amber-600">0</span>
+                        </div>
+                        <div class="p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-amber-800 uppercase">Caberawit</span>
+                            <span id="genCaberawit" class="text-lg sm:text-xl font-extrabold text-amber-600">0</span>
+                        </div>
+                        <div class="p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-amber-800 uppercase">Pra Remaja</span>
+                            <span id="genPraRemaja" class="text-lg sm:text-xl font-extrabold text-amber-600">0</span>
+                        </div>
+                        <div class="p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-amber-800 uppercase">Remaja</span>
+                            <span id="genRemaja" class="text-lg sm:text-xl font-extrabold text-amber-600">0</span>
+                        </div>
+                        <div class="p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-xl text-center col-span-2 sm:col-span-1">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-amber-800 uppercase">Usia Mandiri</span>
+                            <span id="genUsiaMandiri" class="text-lg sm:text-xl font-extrabold text-amber-600">0</span>
+                        </div>
+                    </div>
+
                     <div class="p-3 bg-slate-800 text-white rounded-xl flex justify-between items-center shadow-sm">
-                        <span class="text-xs font-bold uppercase">Total Keseluruhan Terdaftar</span>
-                        <span id="stTotalAll" class="text-lg font-black text-orange-400">0 Data</span>
+                        <span class="text-[11px] sm:text-xs font-bold uppercase">Total Keseluruhan Terdaftar</span>
+                        <span id="stTotalAll" class="text-base sm:text-lg font-black text-orange-400">0 Data</span>
                     </div>
                 </div>
 
@@ -709,14 +766,14 @@
                         <h4 class="text-xs font-bold text-slate-700 uppercase">Rekap Data Jamaah & Sarpras Per Kelompok</h4>
                         <div class="flex items-center gap-1.5 no-print">
                             <span class="text-xs">🔻</span>
-                            <select id="filterDesaRekap" onchange="loadRekapKelompokLengkap()" class="text-xs px-2.5 py-1.5 rounded-lg border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
+                            <select id="filterDesaRekap" onchange="loadRekapKelompokLengkap()" class="text-[11px] sm:text-xs px-2 py-1 rounded-lg border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
                                 <option value="">Semua Desa</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="overflow-x-auto border border-orange-100 rounded-xl scroll-container">
-                        <table id="tableRekapKelompok" class="w-full text-xs text-left">
+                        <table id="tableRekapKelompok" class="w-full text-[11px] sm:text-xs text-left">
                             <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
                                 <tr>
                                     <th class="px-1.5 py-2 sticky-col">Kelompok</th>
@@ -729,7 +786,9 @@
                                     <th class="px-1.5 py-2 text-center border-l border-orange-200">Sub Klp</th>
                                     <th class="px-1.5 py-2 text-center">Masjid</th>
                                     <th class="px-1.5 py-2 text-center">Aula</th>
-                                    <th class="px-1.5 py-2 text-center">WC (L/P)</th>
+                                    <th class="px-1.5 py-2 text-center">Toilet (L/P)</th>
+                                    <th class="px-1.5 py-2 text-center">Kmr MT</th>
+                                    <th class="px-1.5 py-2 text-center">Kmr Tamu</th>
                                 </tr>
                             </thead>
                             <tbody id="tbodyRekapKelompok" class="divide-y divide-orange-50 text-slate-700"></tbody>
@@ -739,8 +798,8 @@
                 </div>
 
                 <!-- DAFTAR NAMA JAMAAH & OPERATOR -->
-                <div id="sectionDaftarJamaah" class="hidden space-y-4">
-                    <div class="bg-orange-50/60 p-3 rounded-xl border border-orange-200 no-print space-y-2">
+                <div id="sectionDaftarJamaah" class="hidden space-y-3 sm:space-y-4">
+                    <div class="bg-orange-50/60 p-2.5 sm:p-3 rounded-xl border border-orange-200 no-print space-y-2">
                         <h4 class="text-xs font-bold text-orange-900 uppercase"> Filter Jamaah Per Kelompok</h4>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             <div>
@@ -762,16 +821,16 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-between items-center text-xs text-slate-600 font-medium px-1">
+                    <div class="flex justify-between items-center text-[11px] sm:text-xs text-slate-600 font-medium px-1">
                         <span id="summaryTextDaftarJamaah">Menampilkan 0 jamaah terdaftar</span>
-                        <span class="text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded border border-orange-200">Terurut Abjad</span>
+                        <span class="text-[9px] sm:text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded border border-orange-200">Terurut Abjad</span>
                     </div>
 
                     <div class="overflow-x-auto border border-orange-100 rounded-xl scroll-container">
-                        <table id="tableDaftarJamaah" class="w-full text-xs text-left">
+                        <table id="tableDaftarJamaah" class="w-full text-[11px] sm:text-xs text-left">
                             <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
                                 <tr>
-                                    <th class="px-1.5 py-2 text-center w-8">No</th>
+                                    <th class="px-1.5 py-2 text-center w-6">No</th>
                                     <th class="px-1.5 py-2 sticky-col">Nama Lengkap</th>
                                     <th class="px-1.5 py-2 text-center">L/P</th>
                                     <th class="px-1.5 py-2">Kelompok / Desa</th>
@@ -791,12 +850,12 @@
 
     <!-- CUSTOM MODAL NOTIFICATION -->
     <div id="customModal" class="modal-backdrop fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="modal-content-card bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center space-y-4 border border-orange-100">
-            <div id="modalIcon" class="w-14 h-14 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
+        <div class="modal-content-card bg-white rounded-2xl p-5 sm:p-6 max-w-sm w-full shadow-2xl text-center space-y-4 border border-orange-100">
+            <div id="modalIcon" class="w-12 h-12 sm:w-14 sm:h-14 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto text-xl sm:text-2xl font-bold">
                 💡
             </div>
             <div>
-                <h4 id="modalTitle" class="text-lg font-bold text-slate-800">Notifikasi</h4>
+                <h4 id="modalTitle" class="text-base sm:text-lg font-bold text-slate-800">Notifikasi</h4>
                 <p id="modalMessage" class="text-xs text-slate-600 mt-1 leading-relaxed"></p>
             </div>
             <div id="modalActions" class="flex gap-2 justify-center pt-2">
@@ -807,10 +866,10 @@
         </div>
     </div>
 
-    <!-- MODAL DETAIL OPERATOR WA (LENGKAP DENGAN INPUT CARI OPERATOR) -->
+    <!-- MODAL DETAIL OPERATOR WA -->
     <div id="operatorDetailModal" class="modal-backdrop fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="modal-content-card bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center space-y-3 border border-blue-100">
-            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+        <div class="modal-content-card bg-white rounded-2xl p-5 sm:p-6 max-w-sm w-full shadow-2xl text-center space-y-3 border border-blue-100">
+            <div class="w-11 h-11 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-lg font-bold">
                 🎧
             </div>
             <div>
@@ -818,12 +877,11 @@
                 <p id="opModalSubtitle" class="text-xs text-slate-500 mt-0.5">Daftar kontak operator kelompok</p>
             </div>
             
-            <!-- INPUT SEARCH UNTUK CARI OPERATOR -->
             <div class="relative text-left pt-1">
                 <input type="text" id="opSearchInput" oninput="filterOperatorList()" placeholder="🔍 Cari nama / kelompok / no. HP..." class="w-full text-xs p-2.5 pl-3 rounded-xl border border-blue-200 bg-blue-50/40 text-slate-800 font-medium focus:outline-none focus:border-blue-500 focus:bg-white transition shadow-inner">
             </div>
 
-            <div id="opModalList" class="max-h-60 overflow-y-auto space-y-2 text-left pr-0.5"></div>
+            <div id="opModalList" class="max-h-60 overflow-y-auto space-y-2 text-left pr-0.5 scroll-container"></div>
 
             <button type="button" onclick="closeModal('operatorDetailModal')" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition mt-2">
                 Tutup
@@ -842,8 +900,7 @@
 
         // Cache data operator global
         window.allOperatorsCache = [];
-        window.operatorCache = {};
-        window.activeOperatorDataset = []; // Digunakan untuk pencarian realtime
+        window.activeOperatorDataset = [];
 
         function handleAuthSubmit(e) {
             e.preventDefault();
@@ -1288,13 +1345,13 @@
                 data.forEach((j) => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
-                    btn.className = "w-full text-left p-3 rounded-xl border border-orange-200/80 hover:border-orange-400 bg-white hover:bg-orange-50/80 transition-all duration-200 flex justify-between items-center group cursor-pointer animate-fade-in-up";
+                    btn.className = "w-full text-left p-2.5 sm:p-3 rounded-xl border border-orange-200/80 hover:border-orange-400 bg-white hover:bg-orange-50/80 transition-all duration-200 flex justify-between items-center group cursor-pointer animate-fade-in-up";
                     
                     const noHpText = j.no_hp ? ` | WA: <span class="text-blue-600 font-bold">${j.no_hp}</span>` : '';
 
                     btn.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full ${j.status === 'Operator' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'} font-bold text-xs flex items-center justify-center shrink-0">
+                        <div class="flex items-center gap-2.5 sm:gap-3">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full ${j.status === 'Operator' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'} font-bold text-xs flex items-center justify-center shrink-0">
                                 ${j.status === 'Operator' ? '🎧' : (j.jenis_kelamin === 'L' ? '👨' : '👩')}
                             </div>
                             <div>
@@ -1304,7 +1361,7 @@
                                 </div>
                             </div>
                         </div>
-                        <span class="text-[11px] font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-lg border border-orange-200 shrink-0">
+                        <span class="text-[10px] sm:text-[11px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border border-orange-200 shrink-0">
                             Edit &raquo;
                         </span>
                     `;
@@ -1483,15 +1540,15 @@
 
                     const isOperator = j.status === 'Operator';
                     let statusBadgeHTML = isOperator 
-                        ? `<span class="bg-blue-50 text-blue-700 border-blue-200 px-2.5 py-1 rounded-full text-[10px] font-bold border inline-block">Operator</span>`
-                        : `<span class="bg-orange-50 text-orange-700 border-orange-200 px-2.5 py-1 rounded-full text-[10px] font-bold border inline-block">${j.status || 'Menikah'}</span>`;
+                        ? `<span class="bg-blue-50 text-blue-700 border-blue-200 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-bold border inline-block">Operator</span>`
+                        : `<span class="bg-orange-50 text-orange-700 border-orange-200 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-bold border inline-block">${j.status || 'Menikah'}</span>`;
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td class="px-1.5 py-2 text-center font-bold text-slate-400">${index + 1}</td>
                         <td class="px-1.5 py-2 font-bold text-slate-800 sticky-col" title="${j.nama}">${j.nama}</td>
                         <td class="px-1.5 py-2 text-center font-semibold ${j.jenis_kelamin === 'L' ? 'text-blue-600' : 'text-pink-600'}">${j.jenis_kelamin || '-'}</td>
-                        <td class="px-1.5 py-2 text-slate-600">${j.kelompok} <span class="text-[10px] text-slate-400">(${j.desa})</span></td>
+                        <td class="px-1.5 py-2 text-slate-600">${j.kelompok} <span class="text-[9px] sm:text-[10px] text-slate-400">(${j.desa})</span></td>
                         <td class="px-1.5 py-2 text-center font-medium">${calculatedUmur} thn</td>
                         <td class="px-1.5 py-2 text-center">${statusBadgeHTML}</td>
                         <td class="px-1.5 py-2 text-center no-print">
@@ -1539,7 +1596,9 @@
                 jumlah_masjid: parseInt(document.getElementById('sarp_masjid').value) || 0,
                 jumlah_aula: parseInt(document.getElementById('sarp_aula').value) || 0,
                 km_pria: parseInt(document.getElementById('sarp_km_pria').value) || 0,
-                km_wanita: parseInt(document.getElementById('sarp_km_wanita').value) || 0
+                km_wanita: parseInt(document.getElementById('sarp_km_wanita').value) || 0,
+                km_mt: parseInt(document.getElementById('sarp_km_mt').value) || 0,
+                km_tamu: parseInt(document.getElementById('sarp_km_tamu').value) || 0
             };
 
             showCustomModal("Sukses", "Data Sarpras Berhasil Diperbarui!", "🏛️", () => {
@@ -1578,6 +1637,8 @@
             document.getElementById('sarp_aula').value = data.jumlah_aula ?? 0;
             document.getElementById('sarp_km_pria').value = data.km_pria ?? 0;
             document.getElementById('sarp_km_wanita').value = data.km_wanita ?? 0;
+            document.getElementById('sarp_km_mt').value = data.km_mt ?? 0;
+            document.getElementById('sarp_km_tamu').value = data.km_tamu ?? 0;
 
             document.getElementById('sarpBtn').textContent = "Update Sarpras";
             switchTabSarpras('INPUT');
@@ -1662,13 +1723,13 @@
             const listSarp = document.getElementById('sectionListSarpras');
 
             if (tab === 'INPUT') {
-                tabIn.className = "py-2 px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
-                tabUp.className = "py-2 px-4 text-xs font-bold text-slate-400";
+                tabIn.className = "py-2 px-3 sm:px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
+                tabUp.className = "py-2 px-3 sm:px-4 text-xs font-bold text-slate-400";
                 formSarp.classList.remove('hidden');
                 listSarp.classList.add('hidden');
             } else {
-                tabUp.className = "py-2 px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
-                tabIn.className = "py-2 px-4 text-xs font-bold text-slate-400";
+                tabUp.className = "py-2 px-3 sm:px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
+                tabIn.className = "py-2 px-3 sm:px-4 text-xs font-bold text-slate-400";
                 formSarp.classList.add('hidden');
                 listSarp.classList.remove('hidden');
                 loadListSarpras();
@@ -1678,14 +1739,14 @@
         async function loadListSarpras() {
             const tbody = document.getElementById('tbodyListSarpras');
             const selectedDesa = document.getElementById('sarp_desa_update').value;
-            tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center">Memuat sarpras...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="p-3 text-center">Memuat sarpras...</td></tr>';
 
             try {
                 let data = await fetchAllRows('fasilitas_kelompok', '*');
                 if (selectedDesa) data = data.filter(s => s.desa === selectedDesa);
 
                 if (!data || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-400">Belum ada data sarpras.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-slate-400">Belum ada data sarpras.</td></tr>';
                     return;
                 }
 
@@ -1698,12 +1759,13 @@
                         <td class="px-1.5 py-2 text-center text-slate-700">${s.status_tanah || '-'}</td>
                         <td class="px-1.5 py-2 text-center">${s.jumlah_masjid || 0} / ${s.jumlah_aula || 0}</td>
                         <td class="px-1.5 py-2 text-center font-bold text-slate-700">${s.km_pria || 0}L / ${s.km_wanita || 0}P</td>
+                        <td class="px-1.5 py-2 text-center text-slate-700">${s.km_mt || 0} MT / ${s.km_tamu || 0} Tamu</td>
                         <td class="px-1.5 py-2 text-center"><button type="button" onclick="editSarpras('${s.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-red-500">Gagal memuat: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-red-500">Gagal memuat: ${err.message}</td></tr>`;
             }
         }
 
@@ -1718,24 +1780,24 @@
             const tabKlp = document.getElementById('tabRekapKelompok');
             const tabDaftarJamaah = document.getElementById('tabDaftarJamaah');
 
-            [tabStatus, tabKlp, tabDaftarJamaah].forEach(t => t.className = "py-2 px-3 text-xs font-bold text-slate-400 flex items-center gap-1.5");
+            [tabStatus, tabKlp, tabDaftarJamaah].forEach(t => t.className = "py-2 px-2.5 sm:px-3 text-xs font-bold text-slate-400 flex items-center gap-1");
             [secStatus, secRekapKlp, secDaftarJamaah].forEach(s => s.classList.add('hidden'));
 
             if (tab === 'STATUS_KESELURUHAN') {
                 secStatus.classList.remove('hidden');
-                tabStatus.className = "py-2 px-3 text-xs font-bold border-b-2 border-orange-500 text-orange-600 flex items-center gap-1.5";
+                tabStatus.className = "py-2 px-2.5 sm:px-3 text-xs font-bold border-b-2 border-orange-500 text-orange-600 flex items-center gap-1";
                 if(btnPrint) btnPrint.classList.remove('hidden');
                 if(btnExport) btnExport.classList.add('hidden');
                 loadRekapStatusKeseluruhan();
             } else if (tab === 'REKAP_KELOMPOK') {
                 secRekapKlp.classList.remove('hidden');
-                tabKlp.className = "py-2 px-3 text-xs font-bold border-b-2 border-orange-500 text-orange-600 flex items-center gap-1.5";
+                tabKlp.className = "py-2 px-2.5 sm:px-3 text-xs font-bold border-b-2 border-orange-500 text-orange-600 flex items-center gap-1";
                 if(btnPrint) btnPrint.classList.remove('hidden');
                 if(btnExport) btnExport.classList.remove('hidden');
                 loadRekapKelompokLengkap();
             } else if (tab === 'DAFTAR_JAMAAH') {
                 secDaftarJamaah.classList.remove('hidden');
-                tabDaftarJamaah.className = "py-2 px-3 text-xs font-bold border-b-2 border-orange-500 text-orange-600 flex items-center gap-1.5";
+                tabDaftarJamaah.className = "py-2 px-2.5 sm:px-3 text-xs font-bold border-b-2 border-orange-500 text-orange-600 flex items-center gap-1";
                 if(btnPrint) btnPrint.classList.remove('hidden');
                 if(btnExport) btnExport.classList.remove('hidden');
                 loadDaftarJamaahPerKelompok();
@@ -1747,29 +1809,29 @@
             if(tab === 'INPUT') {
                 document.getElementById('formAbsensiKegiatan').classList.remove('hidden');
                 document.getElementById('printableAbsensi').classList.add('hidden');
-                document.getElementById('tabInputAbsensi').className = "py-2 px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
-                document.getElementById('tabRekapAbsensi').className = "py-2 px-4 text-xs font-bold text-slate-400";
+                document.getElementById('tabInputAbsensi').className = "py-2 px-3 sm:px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
+                document.getElementById('tabRekapAbsensi').className = "py-2 px-3 sm:px-4 text-xs font-bold text-slate-400";
                 if(btnPrint) btnPrint.classList.add('hidden');
             } else {
                 document.getElementById('formAbsensiKegiatan').classList.add('hidden');
                 document.getElementById('printableAbsensi').classList.remove('hidden');
-                document.getElementById('tabRekapAbsensi').className = "py-2 px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
-                document.getElementById('tabInputAbsensi').className = "py-2 px-4 text-xs font-bold text-slate-400";
+                document.getElementById('tabRekapAbsensi').className = "py-2 px-3 sm:px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
+                document.getElementById('tabInputAbsensi').className = "py-2 px-3 sm:px-4 text-xs font-bold text-slate-400";
                 if(btnPrint) btnPrint.classList.remove('hidden');
                 populateKegiatanFilter();
                 loadRekapAbsensi();
             }
         }
 
-        // LOAD STATUS KESELURUHAN & SIMPAN DATA OPERATOR KE CACHE GLOBAL
+        // PERBAIKAN: MEMUAT REKAP STATUS KESELURUHAN DENGAN KOLOM 'kategori_usia'
         async function loadRekapStatusKeseluruhan() {
             try {
-                const data = await fetchAllRows('data_jamaah', 'status, nama, no_hp, desa, kelompok');
+                const dataJamaah = await fetchAllRows('data_jamaah', 'status, nama, no_hp, desa, kelompok');
                 let menikah = 0, duda = 0, janda = 0, manula = 0, operator = 0;
                 
                 window.allOperatorsCache = [];
 
-                data.forEach(item => {
+                dataJamaah.forEach(item => {
                     const st = (item.status || "").toLowerCase();
                     if (st === "menikah") menikah++;
                     else if (st === "duda") duda++;
@@ -1791,21 +1853,54 @@
                 document.getElementById('stJanda').textContent = janda;
                 document.getElementById('stManula').textContent = manula;
                 document.getElementById('stOperator').textContent = operator;
-                document.getElementById('stTotalAll').textContent = `${data.length} Data Terdaftar`;
+
+                let totalGenerus = 0;
+                try {
+                    // Ambil khusus dari kolom 'kategori_usia'
+                    const dataGenerus = await fetchAllRows('data_generus', 'kategori_usia');
+                    let paud = 0, tk = 0, caberawit = 0, praRemaja = 0, remaja = 0, usiaMandiri = 0;
+
+                    dataGenerus.forEach(g => {
+                        const val = (g.kategori_usia || "").toLowerCase().trim();
+                        
+                        if (val.includes('paud')) {
+                            paud++;
+                        } else if (val.includes('tk')) {
+                            tk++;
+                        } else if (val.includes('caberawit') || val.includes('cabe rawit')) {
+                            caberawit++;
+                        } else if (val.includes('pra remaja') || val.includes('pra-remaja') || val.includes('praremaja')) {
+                            praRemaja++;
+                        } else if (val.includes('remaja') && !val.includes('pra')) {
+                            remaja++;
+                        } else if (val.includes('usia mandiri') || val.includes('usiamandiri') || val.includes('mandiri')) {
+                            usiaMandiri++;
+                        }
+                    });
+
+                    document.getElementById('genPaud').textContent = paud;
+                    document.getElementById('genTk').textContent = tk;
+                    document.getElementById('genCaberawit').textContent = caberawit;
+                    document.getElementById('genPraRemaja').textContent = praRemaja;
+                    document.getElementById('genRemaja').textContent = remaja;
+                    document.getElementById('genUsiaMandiri').textContent = usiaMandiri;
+
+                    totalGenerus = dataGenerus.length;
+                } catch (gErr) {
+                    console.warn("Gagal memuat data_generus:", gErr);
+                }
+
+                document.getElementById('stTotalAll').textContent = `${dataJamaah.length + totalGenerus} Data Terdaftar`;
             } catch (err) {
                 console.error(err);
             }
         }
 
-        // POPUP SEMUA OPERATOR
         function showAllOperatorsModal() {
             document.getElementById('opModalTitle').textContent = "Semua Operator Terdaftar";
-            
-            // Set dataset aktif ke semua operator
             window.activeOperatorDataset = window.allOperatorsCache ? [...window.allOperatorsCache] : [];
             window.activeOperatorDataset.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
 
-            // Reset Input Search
             const searchInput = document.getElementById('opSearchInput');
             if (searchInput) searchInput.value = '';
 
@@ -1813,26 +1908,6 @@
             openModal('operatorDetailModal');
         }
 
-        // POPUP OPERATOR PER KELOMPOK
-        function showOperatorDetailModal(cacheKey) {
-            const data = window.operatorCache[cacheKey];
-            if (!data) return;
-
-            document.getElementById('opModalTitle').textContent = `Operator Klp. ${data.kelompok}`;
-
-            // Set dataset aktif ke kelompok ini
-            window.activeOperatorDataset = data.list ? [...data.list] : [];
-            window.activeOperatorDataset.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
-
-            // Reset Input Search
-            const searchInput = document.getElementById('opSearchInput');
-            if (searchInput) searchInput.value = '';
-
-            renderOperatorModalList(window.activeOperatorDataset);
-            openModal('operatorDetailModal');
-        }
-
-        // FUNGSI UNTUK MERENDER DAFTAR OPERATOR KE DALAM MODAL
         function renderOperatorModalList(listData) {
             const listEl = document.getElementById('opModalList');
             listEl.innerHTML = '';
@@ -1844,7 +1919,7 @@
 
             listData.forEach(op => {
                 const item = document.createElement('div');
-                item.className = "p-3 bg-blue-50/70 border border-blue-200 rounded-xl flex items-center justify-between gap-2 animate-fade-in-up";
+                item.className = "p-2.5 sm:p-3 bg-blue-50/70 border border-blue-200 rounded-xl flex items-center justify-between gap-2 animate-fade-in-up";
 
                 const cleanHp = (op.no_hp || '').replace(/[^0-9]/g, '');
                 const waLink = cleanHp.startsWith('0') ? `62${cleanHp.slice(1)}` : cleanHp;
@@ -1855,21 +1930,20 @@
                         <div class="text-[10px] font-semibold text-slate-500 mt-0.5">
                             Klp. <span class="text-slate-700 font-bold">${op.kelompok || '-'}</span> (${op.desa || '-'})
                         </div>
-                        <div class="text-[11px] font-semibold text-blue-600 mt-0.5">${op.no_hp || 'No HP belum diisi'}</div>
+                        <div class="text-[10px] sm:text-[11px] font-semibold text-blue-600 mt-0.5">${op.no_hp || 'No HP belum diisi'}</div>
                     </div>
                     ${op.no_hp ? `
-                        <a href="https://wa.me/${waLink}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-lg shadow-sm transition flex items-center gap-1 shrink-0">
+                        <a href="https://wa.me/${waLink}" target="_blank" class="px-2.5 py-1 sm:px-3 sm:py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-[11px] sm:text-xs rounded-lg shadow-sm transition flex items-center gap-1 shrink-0">
                             💬 WA
                         </a>
                     ` : `
-                        <span class="text-[10px] text-slate-400 italic shrink-0">No HP kosong</span>
+                        <span class="text-[9px] sm:text-[10px] text-slate-400 italic shrink-0">No HP kosong</span>
                     `}
                 `;
                 listEl.appendChild(item);
             });
         }
 
-        // FUNGSI PENCARIAN OPERATOR REALTIME
         function filterOperatorList() {
             const query = (document.getElementById('opSearchInput').value || '').toLowerCase().trim();
             
@@ -1895,10 +1969,8 @@
             const tfoot = document.getElementById('tfootRekapKelompok');
             const selectedFilterDesa = document.getElementById('filterDesaRekap').value;
 
-            tbody.innerHTML = '<tr><td colspan="11" class="p-3 text-center">Memuat rekap...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="13" class="p-3 text-center">Memuat rekap...</td></tr>';
             tfoot.innerHTML = '';
-            
-            window.operatorCache = {};
 
             try {
                 const [jamaahData, sarprasData] = await Promise.all([
@@ -1915,8 +1987,7 @@
                             rekapMap[key] = {
                                 desa, kelompok,
                                 menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJamaah: 0,
-                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0,
-                                operatorsList: []
+                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
                             };
                         });
                     }
@@ -1929,8 +2000,7 @@
                             rekapMap[key] = {
                                 desa: j.desa, kelompok: j.kelompok,
                                 menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJamaah: 0,
-                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0,
-                                operatorsList: []
+                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
                             };
                         }
                         const st = (j.status || "").toLowerCase();
@@ -1938,10 +2008,7 @@
                         else if (st === "duda") rekapMap[key].duda++;
                         else if (st === "janda") rekapMap[key].janda++;
                         else if (st === "manula") rekapMap[key].manula++;
-                        else if (st === "operator") {
-                            rekapMap[key].operator++;
-                            rekapMap[key].operatorsList.push({ nama: j.nama, no_hp: j.no_hp, desa: j.desa, kelompok: j.kelompok });
-                        }
+                        else if (st === "operator") rekapMap[key].operator++;
                         
                         rekapMap[key].totalJamaah++;
                     }
@@ -1954,25 +2021,26 @@
                             rekapMap[key] = {
                                 desa: s.desa, kelompok: s.kelompok,
                                 menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJamaah: 0,
-                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0,
-                                operatorsList: []
+                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
                             };
                         }
-                        rekapMap[key].subKlp = s.jumlah_sub_kelompok || 0;
-                        rekapMap[key].masjid = s.jumlah_masjid || 0;
-                        rekapMap[key].aula = s.jumlah_aula || 0;
-                        rekapMap[key].kmPria = s.km_pria || 0;
-                        rekapMap[key].kmWanita = s.km_wanita || 0;
+                        rekapMap[key].subKlp = parseInt(s.jumlah_sub_kelompok, 10) || 0;
+                        rekapMap[key].masjid = parseInt(s.jumlah_masjid, 10) || 0;
+                        rekapMap[key].aula = parseInt(s.jumlah_aula, 10) || 0;
+                        rekapMap[key].kmPria = parseInt(s.km_pria, 10) || 0;
+                        rekapMap[key].kmWanita = parseInt(s.km_wanita, 10) || 0;
+                        rekapMap[key].kmMt = parseInt(s.km_mt, 10) || 0;
+                        rekapMap[key].kmTamu = parseInt(s.km_tamu, 10) || 0;
                     }
                 });
 
                 tbody.innerHTML = '';
                 let totMenikah = 0, totDuda = 0, totJanda = 0, totManula = 0, totOperator = 0, totAllJamaah = 0;
-                let totSub = 0, totMasjid = 0, totAula = 0, totKmL = 0, totKmP = 0;
+                let totSub = 0, totMasjid = 0, totAula = 0, totKmL = 0, totKmP = 0, totKmMt = 0, totKmTamu = 0;
 
                 const items = Object.values(rekapMap);
 
-                items.forEach((item, index) => {
+                items.forEach((item) => {
                     totMenikah += item.menikah;
                     totDuda += item.duda;
                     totJanda += item.janda;
@@ -1985,18 +2053,8 @@
                     totAula += item.aula;
                     totKmL += item.kmPria;
                     totKmP += item.kmWanita;
-
-                    const cacheKey = `op_${index}`;
-                    window.operatorCache[cacheKey] = {
-                        kelompok: item.kelompok,
-                        list: item.operatorsList
-                    };
-
-                    let operatorBtnHTML = item.operator > 0 
-                        ? `<button type="button" onclick="showOperatorDetailModal('${cacheKey}')" class="w-full h-full font-bold text-blue-700 bg-blue-100 hover:bg-blue-200 active:scale-95 transition rounded py-1 px-2 border border-blue-300 flex items-center justify-center gap-1 shadow-xs cursor-pointer" title="Klik untuk lihat no WA operator">
-                            <span>${item.operator}</span> 📱
-                           </button>`
-                        : `<span class="text-slate-400 font-semibold">0</span>`;
+                    totKmMt += item.kmMt;
+                    totKmTamu += item.kmTamu;
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -2005,12 +2063,14 @@
                         <td class="px-1.5 py-2 text-center">${item.duda}</td>
                         <td class="px-1.5 py-2 text-center">${item.janda}</td>
                         <td class="px-1.5 py-2 text-center">${item.manula}</td>
-                        <td class="px-1 py-1 text-center bg-blue-50/40">${operatorBtnHTML}</td>
+                        <td class="px-1.5 py-2 text-center font-bold text-blue-700 bg-blue-50/40">${item.operator}</td>
                         <td class="px-1.5 py-2 text-center font-bold text-orange-600 bg-orange-50/50">${item.totalJamaah}</td>
                         <td class="px-1.5 py-2 text-center border-l border-orange-100">${item.subKlp}</td>
                         <td class="px-1.5 py-2 text-center">${item.masjid}</td>
                         <td class="px-1.5 py-2 text-center">${item.aula}</td>
                         <td class="px-1.5 py-2 text-center font-semibold">${item.kmPria}L / ${item.kmWanita}P</td>
+                        <td class="px-1.5 py-2 text-center font-semibold">${item.kmMt}</td>
+                        <td class="px-1.5 py-2 text-center font-semibold">${item.kmTamu}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -2028,10 +2088,12 @@
                         <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totMasjid}</td>
                         <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totAula}</td>
                         <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totKmL}L / ${totKmP}P</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totKmMt}</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totKmTamu}</td>
                     </tr>
                 `;
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="11" class="p-3 text-center text-red-500">Gagal memuat rekap: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="13" class="p-3 text-center text-red-500">Gagal memuat rekap: ${err.message}</td></tr>`;
             }
         }
 
