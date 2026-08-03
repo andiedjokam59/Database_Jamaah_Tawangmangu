@@ -42,6 +42,7 @@
 
         .scroll-container {
             -webkit-overflow-scrolling: touch;
+            touch-action: pan-x pan-y;
         }
 
         .sticky-col {
@@ -65,8 +66,8 @@
         }
 
         .overflow-x-auto.is-scrolled .sticky-col {
-            max-width: 85px;
-            box-shadow: 3px 0 6px -2px rgba(0, 0, 0, 0.12);
+            max-width: 95px;
+            box-shadow: 3px 0 6px -2px rgba(0, 0, 0, 0.15);
         }
 
         thead .sticky-col {
@@ -110,40 +111,134 @@
             transform: translateY(0);
         }
 
+        /* ==================== STYLES PRINT SUPER RAPI & PRESISI ==================== */
         @media print {
+            @page {
+                size: A4 portrait;
+                margin: 10mm;
+            }
+
+            html, body {
+                background: #ffffff !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+
             body * {
                 visibility: hidden !important;
             }
+
             .printable-active, .printable-active * {
                 visibility: visible !important;
             }
+
             .printable-active {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
+                position: static !important;
+                display: block !important;
                 width: 100% !important;
-                padding: 10px !important;
+                margin: 0 !important;
+                padding: 0 !important;
                 background-color: white !important;
-                color: black !important;
+                color: #0f172a !important;
             }
+
             .no-print {
                 display: none !important;
             }
-            table {
+
+            /* Header Dokumen Cetak Kustom */
+            .print-header {
+                display: block !important;
+                text-align: center;
+                border-bottom: 2px solid #1e293b;
+                padding-bottom: 10px;
+                margin-bottom: 16px;
+            }
+            .print-header h1 {
+                font-size: 16pt !important;
+                font-weight: 800 !important;
+                letter-spacing: 0.5px;
+                margin: 0;
+                color: #0f172a;
+            }
+            .print-header p {
+                font-size: 9pt !important;
+                color: #475569;
+                margin-top: 3px;
+                margin-bottom: 0;
+            }
+
+            /* Kartu Ringkasan Cetak Presisi */
+            .printable-active .grid {
+                display: grid !important;
+                gap: 8px !important;
+            }
+            .printable-active .grid-cols-2, 
+            .printable-active .grid-cols-5, 
+            .printable-active .grid-cols-3 {
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            }
+            .printable-active .p-2.5,
+            .printable-active .p-3 {
+                padding: 8px !important;
+                border: 1px solid #cbd5e1 !important;
+                border-radius: 6px !important;
+                background-color: #f8fafc !important;
+                box-shadow: none !important;
+                text-align: center !important;
+            }
+
+            .printable-active span {
+                color: #0f172a !important;
+            }
+
+            /* Tabel Cetak Presisi */
+            .printable-active table {
                 width: 100% !important;
                 border-collapse: collapse !important;
+                margin-top: 10px !important;
+                font-size: 8.5pt !important;
             }
-            th, td {
-                border: 1px solid #666 !important;
-                padding: 6px !important;
+
+            .printable-active th, 
+            .printable-active td {
+                border: 1px solid #94a3b8 !important;
+                padding: 5px 6px !important;
+                text-align: center !important;
+                background-color: transparent !important;
+                color: #0f172a !important;
             }
-            .sticky-col {
+
+            .printable-active th {
+                background-color: #f1f5f9 !important;
+                font-weight: 700 !important;
+                text-transform: uppercase;
+            }
+
+            .printable-active tfoot td {
+                background-color: #e2e8f0 !important;
+                font-weight: 800 !important;
+            }
+
+            .printable-active .sticky-col {
                 position: static !important;
                 box-shadow: none !important;
                 max-width: none !important;
+                text-align: left !important;
+                white-space: normal !important;
+            }
+
+            .overflow-x-auto, .scroll-container {
+                overflow: visible !important;
+            }
+
+            tr, .grid > div {
+                page-break-inside: avoid !important;
             }
         }
-		
+
 		@keyframes fadeInUp {
 			from {
 				opacity: 0;
@@ -437,7 +532,7 @@
                     <button onclick="switchTabAbsensi('INPUT')" id="tabInputAbsensi" class="py-2 px-3 sm:px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600">Form Absensi</button>
                     <button onclick="switchTabAbsensi('REKAP')" id="tabRekapAbsensi" class="py-2 px-3 sm:px-4 text-xs font-bold text-slate-400">Rekapan</button>
                 </div>
-                <button type="button" id="btnPrintAbsensi" onclick="printData('printableAbsensi')" class="hidden px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-[11px] rounded-lg transition flex items-center gap-1 shadow-sm">
+                <button type="button" id="btnPrintAbsensi" onclick="printData('printableAbsensi', 'Laporan Absensi Kegiatan Jamaah')" class="hidden px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-[11px] rounded-lg transition flex items-center gap-1 shadow-sm">
                     🖨️ Print
                 </button>
             </div>
@@ -495,6 +590,13 @@
             </form>
 
             <div id="printableAbsensi" class="hidden space-y-4">
+                <!-- HEADER PRINT OTOMATIS -->
+                <div class="print-header hidden">
+                    <h1>INSAN QUR'ANY TAWANGMANGU</h1>
+                    <p id="printDocTitleAbsensi">Laporan Absensi Kegiatan Jamaah</p>
+                    <p id="printDateAbsensi" class="text-[8pt] text-slate-500 mt-1"></p>
+                </div>
+
                 <div class="space-y-2 no-print">
                     <div>
                         <select id="filterKegiatanAbsensi" onchange="loadRekapAbsensi()" class="w-full text-xs p-2.5 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
@@ -626,24 +728,25 @@
                 </button>
             </form>
 
+            <!-- FIX PERBAIKAN BISA GESER TABEL SARPRAS KE KANAN -->
             <div id="sectionListSarpras" class="hidden space-y-3">
                 <div class="bg-orange-50/50 p-2.5 rounded-xl border border-orange-200">
-                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Desa</label>
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Filter Desa</label>
                     <select id="sarp_desa_update" onchange="loadListSarpras()" class="rounded-box-input w-full p-2 text-xs">
                         <option value="">Semua Desa</option>
                     </select>
                 </div>
 
-                <div class="overflow-x-auto border border-orange-100 rounded-xl scroll-container">
-                    <table class="w-full text-[11px] sm:text-xs text-left">
+                <div class="overflow-x-auto border border-orange-100 rounded-xl scroll-container w-full">
+                    <table class="w-full min-w-[650px] text-[11px] sm:text-xs text-left">
                         <thead class="bg-orange-50 text-slate-900 font-bold border-b border-orange-100">
                             <tr>
-                                <th class="px-1.5 py-2 text-slate-900 sticky-col">Kelompok</th>
-                                <th class="px-1.5 py-2 text-center text-slate-900">Status Tanah</th>
-                                <th class="px-1.5 py-2 text-center text-slate-900">Masjid/Aula</th>
-                                <th class="px-1.5 py-2 text-center text-slate-900">Toilet (L/P)</th>
-                                <th class="px-1.5 py-2 text-center text-slate-900">Kamar MT/Tamu</th>
-                                <th class="px-1.5 py-2 text-center text-slate-900">Aksi</th>
+                                <th class="px-2 py-2 text-slate-900 sticky-col">Kelompok</th>
+                                <th class="px-2 py-2 text-center text-slate-900 whitespace-nowrap">Status Tanah</th>
+                                <th class="px-2 py-2 text-center text-slate-900 whitespace-nowrap">Masjid / Aula</th>
+                                <th class="px-2 py-2 text-center text-slate-900 whitespace-nowrap">Toilet (L/P)</th>
+                                <th class="px-2 py-2 text-center text-slate-900 whitespace-nowrap">Kmr MT / Tamu</th>
+                                <th class="px-2 py-2 text-center text-slate-900 whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="tbodyListSarpras" class="divide-y divide-orange-50 text-slate-600"></tbody>
@@ -690,13 +793,20 @@
                         </svg>
                         <span>Excel</span>
                     </button>
-                    <button type="button" id="btnPrintRekap" onclick="printData('printableRekapContent')" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-semibold text-[11px] rounded-lg transition flex items-center gap-1 shadow-sm">
+                    <button type="button" id="btnPrintRekap" onclick="triggerPrintRekapCurrentTab()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-semibold text-[11px] rounded-lg transition flex items-center gap-1 shadow-sm">
                         🖨️ Print
                     </button>
                 </div>
             </div>
 
             <div id="printableRekapContent">
+                <!-- HEADER PRINT OTOMATIS -->
+                <div class="print-header hidden">
+                    <h1>INSAN QUR'ANY TAWANGMANGU</h1>
+                    <p id="printDocTitleRekap">Laporan Rekapitulasi Data Jamaah</p>
+                    <p id="printDateRekap" class="text-[8pt] text-slate-500 mt-1"></p>
+                </div>
+
                 <!-- REKAP STATUS KESELURUHAN -->
                 <div id="sectionStatusKeseluruhan" class="space-y-4">
                     <h4 class="text-xs font-bold text-slate-700 uppercase">Rekapitulasi Status Jamaah Keseluruhan</h4>
@@ -748,7 +858,7 @@
                             <span class="block text-[9px] sm:text-[10px] font-bold text-amber-800 uppercase">Remaja</span>
                             <span id="genRemaja" class="text-lg sm:text-xl font-extrabold text-amber-600">0</span>
                         </div>
-                        <div class="p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-xl text-center col-span-2 sm:col-span-1">
+                        <div class="p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
                             <span class="block text-[9px] sm:text-[10px] font-bold text-amber-800 uppercase">Usia Mandiri</span>
                             <span id="genUsiaMandiri" class="text-lg sm:text-xl font-extrabold text-amber-600">0</span>
                         </div>
@@ -897,8 +1007,8 @@
 
         let currentMode = "DAFTAR";
         let activeSectionId = null;
+        let activeRekapSubTab = "STATUS_KESELURUHAN";
 
-        // Cache data operator global
         window.allOperatorsCache = [];
         window.activeOperatorDataset = [];
 
@@ -1736,6 +1846,7 @@
             }
         }
 
+        // AMBIL & PERTANGGUNGJAWABKAN GESER TABEL SARPRAS
         async function loadListSarpras() {
             const tbody = document.getElementById('tbodyListSarpras');
             const selectedDesa = document.getElementById('sarp_desa_update').value;
@@ -1755,12 +1866,12 @@
                 data.forEach(s => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td class="px-1.5 py-2 font-semibold text-slate-800 sticky-col" title="${s.kelompok}">${s.kelompok}</td>
-                        <td class="px-1.5 py-2 text-center text-slate-700">${s.status_tanah || '-'}</td>
-                        <td class="px-1.5 py-2 text-center">${s.jumlah_masjid || 0} / ${s.jumlah_aula || 0}</td>
-                        <td class="px-1.5 py-2 text-center font-bold text-slate-700">${s.km_pria || 0}L / ${s.km_wanita || 0}P</td>
-                        <td class="px-1.5 py-2 text-center text-slate-700">${s.km_mt || 0} MT / ${s.km_tamu || 0} Tamu</td>
-                        <td class="px-1.5 py-2 text-center"><button type="button" onclick="editSarpras('${s.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button></td>
+                        <td class="px-2 py-2 font-semibold text-slate-800 sticky-col" title="${s.kelompok}">${s.kelompok}</td>
+                        <td class="px-2 py-2 text-center text-slate-700 whitespace-nowrap">${s.status_tanah || '-'}</td>
+                        <td class="px-2 py-2 text-center whitespace-nowrap">${s.jumlah_masjid || 0} / ${s.jumlah_aula || 0}</td>
+                        <td class="px-2 py-2 text-center font-bold text-slate-700 whitespace-nowrap">${s.km_pria || 0}L / ${s.km_wanita || 0}P</td>
+                        <td class="px-2 py-2 text-center text-slate-700 whitespace-nowrap">${s.km_mt || 0} MT / ${s.km_tamu || 0} Tamu</td>
+                        <td class="px-2 py-2 text-center whitespace-nowrap"><button type="button" onclick="editSarpras('${s.id}')" class="px-2.5 py-1 bg-amber-100 text-amber-800 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -1770,6 +1881,7 @@
         }
 
         function switchTabRekap(tab) {
+            activeRekapSubTab = tab;
             const btnPrint = document.getElementById('btnPrintRekap');
             const btnExport = document.getElementById('btnExportExcel');
             const secStatus = document.getElementById('sectionStatusKeseluruhan');
@@ -1804,6 +1916,16 @@
             }
         }
 
+        function triggerPrintRekapCurrentTab() {
+            let docTitle = "Laporan Rekapitulasi Data Jamaah & Generus";
+            if (activeRekapSubTab === 'REKAP_KELOMPOK') {
+                docTitle = "Laporan Rekapitulasi Jamaah & Sarpras Per Kelompok";
+            } else if (activeRekapSubTab === 'DAFTAR_JAMAAH') {
+                docTitle = "Daftar Nama Jamaah Terdaftar";
+            }
+            printData('printableRekapContent', docTitle);
+        }
+
         function switchTabAbsensi(tab) {
             const btnPrint = document.getElementById('btnPrintAbsensi');
             if(tab === 'INPUT') {
@@ -1823,7 +1945,6 @@
             }
         }
 
-        // PERBAIKAN: MEMUAT REKAP STATUS KESELURUHAN DENGAN KOLOM 'kategori_usia'
         async function loadRekapStatusKeseluruhan() {
             try {
                 const dataJamaah = await fetchAllRows('data_jamaah', 'status, nama, no_hp, desa, kelompok');
@@ -1856,7 +1977,6 @@
 
                 let totalGenerus = 0;
                 try {
-                    // Ambil khusus dari kolom 'kategori_usia'
                     const dataGenerus = await fetchAllRows('data_generus', 'kategori_usia');
                     let paud = 0, tk = 0, caberawit = 0, praRemaja = 0, remaja = 0, usiaMandiri = 0;
 
@@ -2219,9 +2339,22 @@
             XLSX.writeFile(wb, fileName);
         }
 
-        function printData(elementId) {
+        function printData(elementId, documentTitle = 'Laporan Sistem Informasi') {
             const printElement = document.getElementById(elementId);
             if (!printElement) return;
+
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+            const docTitleElAbs = document.getElementById('printDocTitleAbsensi');
+            const dateElAbs = document.getElementById('printDateAbsensi');
+            if(docTitleElAbs) docTitleElAbs.textContent = documentTitle;
+            if(dateElAbs) dateElAbs.textContent = `Dicetak pada: ${dateStr} WIB`;
+
+            const docTitleElRek = document.getElementById('printDocTitleRekap');
+            const dateElRek = document.getElementById('printDateRekap');
+            if(docTitleElRek) docTitleElRek.textContent = documentTitle;
+            if(dateElRek) dateElRek.textContent = `Dicetak pada: ${dateStr} WIB`;
 
             printElement.classList.add('printable-active');
             window.print();
