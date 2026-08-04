@@ -2197,7 +2197,7 @@
         }
 
         /* =========================================================================
-           SISTEM CETAK DENGAN IFRAME INDEPENDEN (HANYA KONTEN AKTIF & KANAN RAPI)
+           SISTEM CETAK DENGAN IFRAME INDEPENDEN (HANYA KONTEN AKTIF & ORIENTASI KETAT)
            ========================================================================= */
         function printData(elementId, documentTitle = 'Laporan Sistem Informasi') {
             const sourceElement = document.getElementById(elementId);
@@ -2226,10 +2226,12 @@
                 });
             });
 
-            // Tentukan orientasi kertas A4
+            // 5. ATUR ORIENTASI KERTAS SECARA PRESISI
             let orientation = 'portrait';
             if (activeSectionId === 'rekap' && activeRekapSubTab === 'REKAP_KELOMPOK') {
-                orientation = 'landscape';
+                orientation = 'landscape'; // Khusus Rekap Per Kelompok pakai Landscape
+            } else if (activeSectionId === 'rekap' && (activeRekapSubTab === 'STATUS_KESELURUHAN' || activeRekapSubTab === 'DAFTAR_JAMAAH')) {
+                orientation = 'portrait';  // Status Jamaah & Daftar Nama SELALU Portrait
             } else {
                 const table = clonedContent.querySelector('table');
                 if (table) {
