@@ -40,9 +40,16 @@
             opacity: 1;
         }
 
-        .scroll-container {
+        /* MEMINDAHKAN SCROLLBAR / SLIDER KE ATAS TABEL */
+        .scroll-top-container {
+            overflow-x: auto;
+            transform: rotateX(180deg);
             -webkit-overflow-scrolling: touch;
             touch-action: pan-x pan-y;
+        }
+
+        .scroll-top-container > table {
+            transform: rotateX(180deg);
         }
 
         .sticky-col {
@@ -55,18 +62,18 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 130px;
+            max-width: 120px;
             will-change: max-width;
         }
 
         @media (min-width: 640px) {
             .sticky-col {
-                max-width: 280px;
+                max-width: 220px;
             }
         }
 
-        .overflow-x-auto.is-scrolled .sticky-col {
-            max-width: 95px;
+        .scroll-top-container.is-scrolled .sticky-col {
+            max-width: 90px;
             box-shadow: 3px 0 6px -2px rgba(0, 0, 0, 0.15);
         }
 
@@ -492,7 +499,7 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto border border-orange-100 rounded-xl scroll-container">
+                <div class="border border-orange-100 rounded-xl scroll-top-container">
                     <table class="w-full text-[11px] sm:text-xs text-left">
                         <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
                             <tr>
@@ -601,7 +608,7 @@
                     </select>
                 </div>
 
-                <div class="overflow-x-auto border border-orange-100 rounded-xl scroll-container w-full">
+                <div class="border border-orange-100 rounded-xl scroll-top-container w-full">
                     <table class="w-full min-w-[650px] text-[11px] sm:text-xs text-left">
                         <thead class="bg-orange-50 text-slate-900 font-bold border-b border-orange-100">
                             <tr>
@@ -728,9 +735,9 @@
                 </div>
 
                 <!-- REKAPAN KELOMPOK -->
-                <div id="sectionRekapKelompok" class="hidden space-y-4">
+                <div id="sectionRekapKelompok" class="hidden space-y-3">
                     <div class="flex justify-between items-center flex-wrap gap-2">
-                        <h4 class="text-xs font-bold text-slate-700 uppercase">Rekap Data Jamaah & Sarpras Per Kelompok</h4>
+                        <h4 class="text-xs font-bold text-slate-700 uppercase">Rekap Jamaah & Sarpras Per Kelompok</h4>
                         <div class="flex items-center gap-1.5 no-print">
                             <span class="text-xs">🔻</span>
                             <select id="filterDesaRekap" onchange="loadRekapKelompokLengkap()" class="text-[11px] sm:text-xs px-2 py-1 rounded-lg border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
@@ -739,23 +746,33 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto border border-orange-100 rounded-xl scroll-container">
-                        <table id="tableRekapKelompok" class="w-full text-[11px] sm:text-xs text-left">
+                    <!-- CONTAINER TABEL DENGAN SCROLLBAR DI ATAS -->
+                    <div class="border border-orange-100 rounded-xl scroll-top-container">
+                        <table id="tableRekapKelompok" class="w-full text-[10px] sm:text-[11px] text-left">
                             <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
                                 <tr>
                                     <th class="px-1.5 py-2 sticky-col">Kelompok</th>
-                                    <th class="px-1.5 py-2 text-center">Menikah</th>
-                                    <th class="px-1.5 py-2 text-center">Duda</th>
-                                    <th class="px-1.5 py-2 text-center">Janda</th>
-                                    <th class="px-1.5 py-2 text-center">Manula</th>
-                                    <th class="px-1.5 py-2 text-center text-blue-700 bg-blue-50/50">Operator</th>
-                                    <th class="px-1.5 py-2 text-center bg-orange-100/50">Total</th>
-                                    <th class="px-1.5 py-2 text-center border-l border-orange-200">Sub Klp</th>
-                                    <th class="px-1.5 py-2 text-center">Masjid</th>
-                                    <th class="px-1.5 py-2 text-center">Aula</th>
-                                    <th class="px-1.5 py-2 text-center">Toilet (L/P)</th>
-                                    <th class="px-1.5 py-2 text-center">Kmr MT</th>
-                                    <th class="px-1.5 py-2 text-center">Kmr Tamu</th>
+                                    <!-- Rekapan Generus (Diringkas) -->
+                                    <th class="px-1 py-2 text-center whitespace-nowrap bg-amber-100/50 text-amber-900">PAUD</th>
+                                    <th class="px-1 py-2 text-center whitespace-nowrap bg-amber-100/50 text-amber-900">TK</th>
+                                    <th class="px-1 py-2 text-center whitespace-nowrap bg-amber-100/50 text-amber-900">Cbr</th>
+                                    <th class="px-1 py-2 text-center whitespace-nowrap bg-amber-100/50 text-amber-900">Pra Rem</th>
+                                    <th class="px-1 py-2 text-center whitespace-nowrap bg-amber-100/50 text-amber-900">Rem</th>
+                                    <th class="px-1 py-2 text-center whitespace-nowrap bg-amber-100/50 text-amber-900">Usman</th>
+                                    <!-- Status Jamaah (Diringkas) -->
+                                    <th class="px-1 py-2 text-center whitespace-nowrap">Nikah</th>
+                                    <th class="px-1 py-2 text-center whitespace-nowrap">Duda</th>
+                                    <th class="px-1 py-2 text-center whitespace-nowrap">Janda</th>
+                                    <th class="px-1 py-2 text-center whitespace-nowrap">Manula</th>
+                                    <th class="px-1 py-2 text-center text-blue-700 bg-blue-50/50 whitespace-nowrap">Opr.</th>
+                                    <!-- Total & Sarpras (Diringkas) -->
+                                    <th class="px-1.5 py-2 text-center bg-orange-100/60 font-extrabold whitespace-nowrap">Total</th>
+                                    <th class="px-1 py-2 text-center border-l border-orange-200 whitespace-nowrap">Sub</th>
+                                    <th class="px-1 py-2 text-center whitespace-nowrap">Msjd</th>
+                                    <th class="px-1 py-2 text-center whitespace-nowrap">Aula</th>
+                                    <th class="px-1 py-2 text-center whitespace-nowrap">Toilet (L/P)</th>
+                                    <th class="px-1 py-2 text-center whitespace-nowrap">Kmr MT</th>
+                                    <th class="px-1 py-2 text-center whitespace-nowrap">Kmr Tmu</th>
                                 </tr>
                             </thead>
                             <tbody id="tbodyRekapKelompok" class="divide-y divide-orange-50 text-slate-700"></tbody>
@@ -794,7 +811,7 @@
                         <span class="text-[9px] sm:text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded border border-orange-200">Terurut Abjad</span>
                     </div>
 
-                    <div class="overflow-x-auto border border-orange-100 rounded-xl scroll-container">
+                    <div class="border border-orange-100 rounded-xl scroll-top-container">
                         <table id="tableDaftarJamaah" class="w-full text-[11px] sm:text-xs text-left">
                             <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
                                 <tr>
@@ -921,7 +938,7 @@
         }
 
         function initScrollDetectors() {
-            document.querySelectorAll('.overflow-x-auto').forEach(container => {
+            document.querySelectorAll('.scroll-top-container').forEach(container => {
                 let ticking = false;
                 container.addEventListener('scroll', function() {
                     if (!ticking) {
@@ -1946,13 +1963,14 @@
             const tfoot = document.getElementById('tfootRekapKelompok');
             const selectedFilterDesa = document.getElementById('filterDesaRekap').value;
 
-            tbody.innerHTML = '<tr><td colspan="13" class="p-3 text-center">Memuat rekap...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="19" class="p-3 text-center">Memuat rekap...</td></tr>';
             tfoot.innerHTML = '';
 
             try {
-                const [jamaahData, sarprasData] = await Promise.all([
+                const [jamaahData, sarprasData, generusData] = await Promise.all([
                     fetchAllRows('data_jamaah', 'desa, kelompok, status, nama, no_hp'),
-                    fetchAllRows('fasilitas_kelompok', '*')
+                    fetchAllRows('fasilitas_kelompok', '*'),
+                    fetchAllRows('data_generus', 'desa, kelompok, kategori_usia').catch(() => [])
                 ]);
 
                 const rekapMap = {};
@@ -1963,20 +1981,49 @@
                             const key = `${desa}__${kelompok}`;
                             rekapMap[key] = {
                                 desa, kelompok,
-                                menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJamaah: 0,
+                                paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0,
+                                menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJumlah: 0,
                                 subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
                             };
                         });
                     }
                 });
 
+                // Rekap Generus
+                if (generusData && generusData.length > 0) {
+                    generusData.forEach(g => {
+                        if (!selectedFilterDesa || selectedFilterDesa === g.desa) {
+                            const key = `${g.desa}__${g.kelompok}`;
+                            if (!rekapMap[key]) {
+                                rekapMap[key] = {
+                                    desa: g.desa, kelompok: g.kelompok,
+                                    paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0,
+                                    menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJumlah: 0,
+                                    subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
+                                };
+                            }
+                            const val = (g.kategori_usia || "").toLowerCase().trim();
+                            if (val.includes('paud')) rekapMap[key].paud++;
+                            else if (val.includes('tk')) rekapMap[key].tk++;
+                            else if (val.includes('caberawit') || val.includes('cabe rawit')) rekapMap[key].caberawit++;
+                            else if (val.includes('pra remaja') || val.includes('pra-remaja') || val.includes('praremaja')) rekapMap[key].praRemaja++;
+                            else if (val.includes('remaja') && !val.includes('pra')) rekapMap[key].remaja++;
+                            else if (val.includes('usia mandiri') || val.includes('usiamandiri') || val.includes('mandiri')) rekapMap[key].usiaMandiri++;
+
+                            rekapMap[key].totalJumlah++;
+                        }
+                    });
+                }
+
+                // Rekap Status Jamaah
                 jamaahData.forEach(j => {
                     if (!selectedFilterDesa || selectedFilterDesa === j.desa) {
                         const key = `${j.desa}__${j.kelompok}`;
                         if (!rekapMap[key]) {
                             rekapMap[key] = {
                                 desa: j.desa, kelompok: j.kelompok,
-                                menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJamaah: 0,
+                                paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0,
+                                menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJumlah: 0,
                                 subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
                             };
                         }
@@ -1987,17 +2034,19 @@
                         else if (st === "manula") rekapMap[key].manula++;
                         else if (st === "operator") rekapMap[key].operator++;
                         
-                        rekapMap[key].totalJamaah++;
+                        rekapMap[key].totalJumlah++;
                     }
                 });
 
+                // Rekap Sarpras
                 sarprasData.forEach(s => {
                     if (!selectedFilterDesa || selectedFilterDesa === s.desa) {
                         const key = `${s.desa}__${s.kelompok}`;
                         if (!rekapMap[key]) {
                             rekapMap[key] = {
                                 desa: s.desa, kelompok: s.kelompok,
-                                menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJamaah: 0,
+                                paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0,
+                                menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJumlah: 0,
                                 subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
                             };
                         }
@@ -2012,18 +2061,26 @@
                 });
 
                 tbody.innerHTML = '';
-                let totMenikah = 0, totDuda = 0, totJanda = 0, totManula = 0, totOperator = 0, totAllJamaah = 0;
+                let totPaud = 0, totTk = 0, totCaberawit = 0, totPraRemaja = 0, totRemaja = 0, totUsiaMandiri = 0;
+                let totMenikah = 0, totDuda = 0, totJanda = 0, totManula = 0, totOperator = 0, totAllJumlah = 0;
                 let totSub = 0, totMasjid = 0, totAula = 0, totKmL = 0, totKmP = 0, totKmMt = 0, totKmTamu = 0;
 
                 const items = Object.values(rekapMap);
 
                 items.forEach((item) => {
+                    totPaud += item.paud;
+                    totTk += item.tk;
+                    totCaberawit += item.caberawit;
+                    totPraRemaja += item.praRemaja;
+                    totRemaja += item.remaja;
+                    totUsiaMandiri += item.usiaMandiri;
+
                     totMenikah += item.menikah;
                     totDuda += item.duda;
                     totJanda += item.janda;
                     totManula += item.manula;
                     totOperator += item.operator;
-                    totAllJamaah += item.totalJamaah;
+                    totAllJumlah += item.totalJumlah;
 
                     totSub += item.subKlp;
                     totMasjid += item.masjid;
@@ -2036,18 +2093,24 @@
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td class="px-1.5 py-2 font-bold text-slate-800 sticky-col" title="${item.kelompok}">${item.kelompok}</td>
-                        <td class="px-1.5 py-2 text-center">${item.menikah}</td>
-                        <td class="px-1.5 py-2 text-center">${item.duda}</td>
-                        <td class="px-1.5 py-2 text-center">${item.janda}</td>
-                        <td class="px-1.5 py-2 text-center">${item.manula}</td>
-                        <td class="px-1.5 py-2 text-center font-bold text-blue-700 bg-blue-50/40">${item.operator}</td>
-                        <td class="px-1.5 py-2 text-center font-bold text-orange-600 bg-orange-50/50">${item.totalJamaah}</td>
-                        <td class="px-1.5 py-2 text-center border-l border-orange-100">${item.subKlp}</td>
-                        <td class="px-1.5 py-2 text-center">${item.masjid}</td>
-                        <td class="px-1.5 py-2 text-center">${item.aula}</td>
-                        <td class="px-1.5 py-2 text-center font-semibold">${item.kmPria}L / ${item.kmWanita}P</td>
-                        <td class="px-1.5 py-2 text-center font-semibold">${item.kmMt}</td>
-                        <td class="px-1.5 py-2 text-center font-semibold">${item.kmTamu}</td>
+                        <td class="px-1 py-2 text-center bg-amber-50/30 font-medium text-amber-900">${item.paud}</td>
+                        <td class="px-1 py-2 text-center bg-amber-50/30 font-medium text-amber-900">${item.tk}</td>
+                        <td class="px-1 py-2 text-center bg-amber-50/30 font-medium text-amber-900">${item.caberawit}</td>
+                        <td class="px-1 py-2 text-center bg-amber-50/30 font-medium text-amber-900">${item.praRemaja}</td>
+                        <td class="px-1 py-2 text-center bg-amber-50/30 font-medium text-amber-900">${item.remaja}</td>
+                        <td class="px-1 py-2 text-center bg-amber-50/30 font-medium text-amber-900">${item.usiaMandiri}</td>
+                        <td class="px-1 py-2 text-center">${item.menikah}</td>
+                        <td class="px-1 py-2 text-center">${item.duda}</td>
+                        <td class="px-1 py-2 text-center">${item.janda}</td>
+                        <td class="px-1 py-2 text-center">${item.manula}</td>
+                        <td class="px-1 py-2 text-center font-bold text-blue-700 bg-blue-50/40">${item.operator}</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-600 bg-orange-50/50">${item.totalJumlah}</td>
+                        <td class="px-1 py-2 text-center border-l border-orange-100">${item.subKlp}</td>
+                        <td class="px-1 py-2 text-center">${item.masjid}</td>
+                        <td class="px-1 py-2 text-center">${item.aula}</td>
+                        <td class="px-1 py-2 text-center font-semibold">${item.kmPria}L/${item.kmWanita}P</td>
+                        <td class="px-1 py-2 text-center font-semibold">${item.kmMt}</td>
+                        <td class="px-1 py-2 text-center font-semibold">${item.kmTamu}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -2055,22 +2118,28 @@
                 tfoot.innerHTML = `
                     <tr>
                         <td class="px-1.5 py-2 text-left font-extrabold uppercase sticky-col">TOTAL</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totMenikah}</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totDuda}</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totJanda}</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totManula}</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-blue-700 bg-blue-100/50">${totOperator}</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-600 bg-orange-200/50">${totAllJamaah}</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950 border-l border-orange-200">${totSub}</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totMasjid}</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totAula}</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totKmL}L / ${totKmP}P</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totKmMt}</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-950">${totKmTamu}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-amber-900 bg-amber-100/50">${totPaud}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-amber-900 bg-amber-100/50">${totTk}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-amber-900 bg-amber-100/50">${totCaberawit}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-amber-900 bg-amber-100/50">${totPraRemaja}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-amber-900 bg-amber-100/50">${totRemaja}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-amber-900 bg-amber-100/50">${totUsiaMandiri}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totMenikah}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totDuda}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totJanda}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totManula}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-blue-700 bg-blue-100/50">${totOperator}</td>
+                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-600 bg-orange-200/50">${totAllJumlah}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-orange-950 border-l border-orange-200">${totSub}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totMasjid}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totAula}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totKmL}L/${totKmP}P</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totKmMt}</td>
+                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totKmTamu}</td>
                     </tr>
                 `;
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="13" class="p-3 text-center text-red-500">Gagal memuat rekap: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="19" class="p-3 text-center text-red-500">Gagal memuat rekap: ${err.message}</td></tr>`;
             }
         }
 
@@ -2197,25 +2266,40 @@
         }
 
         /* =========================================================================
-           SISTEM CETAK DENGAN IFRAME INDEPENDEN (HANYA KONTEN AKTIF & ORIENTASI KETAT)
+           SISTEM CETAK SESUAI KONTEN YANG DIPILIH
            ========================================================================= */
         function printData(elementId, documentTitle = 'Laporan Sistem Informasi') {
-            const sourceElement = document.getElementById(elementId);
-            if (!sourceElement) return;
+            let targetContentEl;
+
+            // Jika dipanggil dari Rekapitulasi, hanya ambil sub-tab yang sedang aktif
+            if (elementId === 'printableRekapContent') {
+                if (activeRekapSubTab === 'STATUS_KESELURUHAN') {
+                    targetContentEl = document.getElementById('sectionStatusKeseluruhan');
+                } else if (activeRekapSubTab === 'REKAP_KELOMPOK') {
+                    targetContentEl = document.getElementById('sectionRekapKelompok');
+                } else if (activeRekapSubTab === 'DAFTAR_JAMAAH') {
+                    targetContentEl = document.getElementById('sectionDaftarJamaah');
+                }
+            } else {
+                targetContentEl = document.getElementById(elementId);
+            }
+
+            if (!targetContentEl) return;
 
             const today = new Date();
             const dateStr = today.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-            // 1. Kloning area konten utama
-            const clonedContent = sourceElement.cloneNode(true);
+            // Kloning hanya elemen konten aktif
+            const clonedContent = targetContentEl.cloneNode(true);
 
-            // 2. FILTER KONTEN: Hapus elemen tersembunyi (class 'hidden')
-            clonedContent.querySelectorAll('.hidden').forEach(el => el.remove());
+            // Tampilkan elemen tersembunyi yang relevan
+            clonedContent.classList.remove('hidden');
+            clonedContent.querySelectorAll('.hidden').forEach(el => el.classList.remove('hidden'));
 
-            // 3. Bersihkan elemen UI interaktif (tombol, input, dropdown, class 'no-print')
+            // Bersihkan tombol/dropdown interaktif yang memiliki class 'no-print'
             clonedContent.querySelectorAll('.no-print, button, select, input').forEach(el => el.remove());
 
-            // 4. BERSIHKAN KOLOM 'AKSI' AGAR TIDAK LEPAS/MENINGGALKAN KOTAK KOSONG
+            // Bersihkan kolom aksi
             clonedContent.querySelectorAll('.col-aksi').forEach(el => el.remove());
             clonedContent.querySelectorAll('tr').forEach(tr => {
                 const cells = Array.from(tr.children);
@@ -2226,21 +2310,18 @@
                 });
             });
 
-            // 5. ATUR ORIENTASI KERTAS SECARA PRESISI
+            // Hilangkan efek CSS rotasi/flip scrollbar pada cetakan
+            clonedContent.querySelectorAll('.scroll-top-container, table').forEach(el => {
+                el.style.transform = 'none';
+                el.style.overflow = 'visible';
+            });
+
+            // Atur orientasi cetak
             let orientation = 'portrait';
             if (activeSectionId === 'rekap' && activeRekapSubTab === 'REKAP_KELOMPOK') {
-                orientation = 'landscape'; // Khusus Rekap Per Kelompok pakai Landscape
-            } else if (activeSectionId === 'rekap' && (activeRekapSubTab === 'STATUS_KESELURUHAN' || activeRekapSubTab === 'DAFTAR_JAMAAH')) {
-                orientation = 'portrait';  // Status Jamaah & Daftar Nama SELALU Portrait
-            } else {
-                const table = clonedContent.querySelector('table');
-                if (table) {
-                    const colCount = table.querySelectorAll('tr:first-child > *').length;
-                    if (colCount >= 7) orientation = 'landscape';
-                }
+                orientation = 'landscape';
             }
 
-            // Buat dokumen HTML khusus cetak gaya MS Word
             const printHTML = `
                 <!DOCTYPE html>
                 <html>
@@ -2250,7 +2331,7 @@
                     <style>
                         @page {
                             size: A4 ${orientation};
-                            margin: 15mm 15mm 15mm 15mm;
+                            margin: 10mm 10mm 10mm 10mm;
                         }
                         body {
                             font-family: Arial, Helvetica, sans-serif;
@@ -2258,46 +2339,44 @@
                             background: #ffffff;
                             margin: 0;
                             padding: 0;
-                            font-size: 10pt;
+                            font-size: 9pt;
                         }
                         .word-header {
                             text-align: center;
                             border-bottom: 2px solid #000000;
-                            padding-bottom: 8px;
-                            margin-bottom: 16px;
+                            padding-bottom: 6px;
+                            margin-bottom: 12px;
                         }
                         .word-header h1 {
-                            font-size: 16pt;
+                            font-size: 14pt;
                             font-weight: bold;
-                            margin: 0 0 4px 0;
+                            margin: 0 0 2px 0;
                             text-transform: uppercase;
-                            letter-spacing: 0.5px;
                         }
                         .word-header p {
-                            font-size: 10pt;
+                            font-size: 9pt;
                             margin: 2px 0;
                             color: #333333;
                         }
                         h4 {
-                            font-size: 11pt;
+                            font-size: 10pt;
                             font-weight: bold;
-                            margin: 14px 0 6px 0;
+                            margin: 10px 0 4px 0;
                             text-transform: uppercase;
                             color: #000000;
                             page-break-after: avoid;
                         }
                         
-                        /* Layout Grid Ringkasan (Kotak Status & Generus) ala MS Word */
                         .grid {
                             display: flex !important;
                             flex-wrap: wrap !important;
-                            gap: 8px !important;
-                            margin-bottom: 12px !important;
+                            gap: 6px !important;
+                            margin-bottom: 10px !important;
                         }
                         .grid > div {
                             flex: 1 1 0 !important;
                             border: 1px solid #000000 !important;
-                            padding: 8px 4px !important;
+                            padding: 6px 4px !important;
                             text-align: center !important;
                             background: #fdfdfd !important;
                             page-break-inside: avoid !important;
@@ -2306,40 +2385,39 @@
                             display: block;
                         }
                         .grid span:first-child {
-                            font-size: 8pt;
+                            font-size: 7.5pt;
                             font-weight: bold;
                             color: #444444;
                             text-transform: uppercase;
                         }
                         .grid span:last-child {
-                            font-size: 14pt;
+                            font-size: 12pt;
                             font-weight: bold;
                             color: #000000;
                             margin-top: 2px;
                         }
 
-                        /* TABEL RESMI ALA MICROSOFT WORD */
                         table {
                             width: 100% !important;
                             border-collapse: collapse !important;
-                            margin-top: 8px !important;
-                            margin-bottom: 16px !important;
-                            font-size: 9pt !important;
+                            margin-top: 6px !important;
+                            margin-bottom: 12px !important;
+                            font-size: 8pt !important;
                             page-break-inside: auto !important;
                         }
                         thead {
-                            display: table-header-group !important; /* Header diulang jika bersambung ke Halaman 2 */
+                            display: table-header-group !important;
                         }
                         tfoot {
                             display: table-footer-group !important;
                         }
                         tr {
-                            page-break-inside: avoid !important; /* Mencegah baris terpotong di tengah */
+                            page-break-inside: avoid !important;
                             break-inside: avoid !important;
                         }
                         th, td {
-                            border: 1px solid #000000 !important; /* Garis pekat tipis khas Word */
-                            padding: 5px 6px !important;
+                            border: 1px solid #000000 !important;
+                            padding: 4px 3px !important;
                             text-align: center !important;
                             vertical-align: middle !important;
                             word-wrap: break-word !important;
@@ -2362,7 +2440,7 @@
                     <div class="word-header">
                         <h1>INSAN QUR'ANY TAWANGMANGU</h1>
                         <p><strong>${documentTitle}</strong></p>
-                        <p style="font-size: 8.5pt; color: #555555;">Dicetak pada: ${dateStr} WIB</p>
+                        <p style="font-size: 8pt; color: #555555;">Dicetak pada: ${dateStr} WIB</p>
                     </div>
 
                     ${clonedContent.innerHTML}
@@ -2370,11 +2448,9 @@
                 </html>
             `;
 
-            // Hapus Iframe lama jika ada
             const oldIframe = document.getElementById('printIframeHidden');
             if (oldIframe) oldIframe.remove();
 
-            // Buat Iframe tersembunyi untuk proses print
             const iframe = document.createElement('iframe');
             iframe.id = 'printIframeHidden';
             iframe.style.position = 'fixed';
