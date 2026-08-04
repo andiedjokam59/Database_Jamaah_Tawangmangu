@@ -111,134 +111,6 @@
             transform: translateY(0);
         }
 
-        /* ==================== STYLES PRINT SUPER RAPI & PRESISI ==================== */
-        @media print {
-            @page {
-                size: A4 portrait;
-                margin: 10mm;
-            }
-
-            html, body {
-                background: #ffffff !important;
-                height: auto !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                overflow: visible !important;
-            }
-
-            body * {
-                visibility: hidden !important;
-            }
-
-            .printable-active, .printable-active * {
-                visibility: visible !important;
-            }
-
-            .printable-active {
-                position: static !important;
-                display: block !important;
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                background-color: white !important;
-                color: #0f172a !important;
-            }
-
-            .no-print {
-                display: none !important;
-            }
-
-            /* Header Dokumen Cetak Kustom */
-            .print-header {
-                display: block !important;
-                text-align: center;
-                border-bottom: 2px solid #1e293b;
-                padding-bottom: 10px;
-                margin-bottom: 16px;
-            }
-            .print-header h1 {
-                font-size: 16pt !important;
-                font-weight: 800 !important;
-                letter-spacing: 0.5px;
-                margin: 0;
-                color: #0f172a;
-            }
-            .print-header p {
-                font-size: 9pt !important;
-                color: #475569;
-                margin-top: 3px;
-                margin-bottom: 0;
-            }
-
-            /* Kartu Ringkasan Cetak Presisi */
-            .printable-active .grid {
-                display: grid !important;
-                gap: 8px !important;
-            }
-            .printable-active .grid-cols-2, 
-            .printable-active .grid-cols-5, 
-            .printable-active .grid-cols-3 {
-                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-            }
-            .printable-active .p-2.5,
-            .printable-active .p-3 {
-                padding: 8px !important;
-                border: 1px solid #cbd5e1 !important;
-                border-radius: 6px !important;
-                background-color: #f8fafc !important;
-                box-shadow: none !important;
-                text-align: center !important;
-            }
-
-            .printable-active span {
-                color: #0f172a !important;
-            }
-
-            /* Tabel Cetak Presisi */
-            .printable-active table {
-                width: 100% !important;
-                border-collapse: collapse !important;
-                margin-top: 10px !important;
-                font-size: 8.5pt !important;
-            }
-
-            .printable-active th, 
-            .printable-active td {
-                border: 1px solid #94a3b8 !important;
-                padding: 5px 6px !important;
-                text-align: center !important;
-                background-color: transparent !important;
-                color: #0f172a !important;
-            }
-
-            .printable-active th {
-                background-color: #f1f5f9 !important;
-                font-weight: 700 !important;
-                text-transform: uppercase;
-            }
-
-            .printable-active tfoot td {
-                background-color: #e2e8f0 !important;
-                font-weight: 800 !important;
-            }
-
-            .printable-active .sticky-col {
-                position: static !important;
-                box-shadow: none !important;
-                max-width: none !important;
-                text-align: left !important;
-                white-space: normal !important;
-            }
-
-            .overflow-x-auto, .scroll-container {
-                overflow: visible !important;
-            }
-
-            tr, .grid > div {
-                page-break-inside: avoid !important;
-            }
-        }
-
 		@keyframes fadeInUp {
 			from {
 				opacity: 0;
@@ -326,7 +198,7 @@
     <!-- CONTAINER UTAMA -->
     <div class="bg-white p-4 sm:p-8 rounded-2xl shadow-xl border border-orange-100 w-full max-w-2xl my-2 sm:my-4 relative">
         
-        <button type="button" onclick="window.location.reload()" title="Refresh Halaman" aria-label="Refresh Halaman" class="absolute top-3 left-3 sm:top-4 sm:left-4 p-2 bg-orange-50 hover:bg-orange-100 active:scale-95 text-orange-600 border border-orange-200 rounded-xl transition duration-200 shadow-sm z-20 no-print flex items-center justify-center">
+        <button type="button" onclick="window.location.reload()" title="Refresh Halaman" aria-label="Refresh Halaman" class="absolute top-3 left-3 sm:top-4 sm:left-4 p-2 bg-orange-50 hover:bg-orange-100 active:scale-95 text-orange-600 border border-orange-200 rounded-xl transition duration-200 shadow-sm z-20 flex items-center justify-center">
             <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
@@ -590,13 +462,6 @@
             </form>
 
             <div id="printableAbsensi" class="hidden space-y-4">
-                <!-- HEADER PRINT OTOMATIS -->
-                <div class="print-header hidden">
-                    <h1>INSAN QUR'ANY TAWANGMANGU</h1>
-                    <p id="printDocTitleAbsensi">Laporan Absensi Kegiatan Jamaah</p>
-                    <p id="printDateAbsensi" class="text-[8pt] text-slate-500 mt-1"></p>
-                </div>
-
                 <div class="space-y-2 no-print">
                     <div>
                         <select id="filterKegiatanAbsensi" onchange="loadRekapAbsensi()" class="w-full text-xs p-2.5 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
@@ -636,7 +501,7 @@
                                 <th class="px-1.5 py-2 text-center whitespace-nowrap">Hadir (L/P)</th>
                                 <th class="px-1.5 py-2 text-center whitespace-nowrap">Ijin</th>
                                 <th class="px-1.5 py-2 text-right whitespace-nowrap">Infaq</th>
-                                <th class="px-1.5 py-2 text-center no-print whitespace-nowrap">Aksi</th>
+                                <th class="px-1.5 py-2 text-center whitespace-nowrap no-print">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="tbodyRekapAbsensi" class="divide-y divide-orange-50 text-slate-600"></tbody>
@@ -728,7 +593,6 @@
                 </button>
             </form>
 
-            <!-- FIX PERBAIKAN BISA GESER TABEL SARPRAS KE KANAN -->
             <div id="sectionListSarpras" class="hidden space-y-3">
                 <div class="bg-orange-50/50 p-2.5 rounded-xl border border-orange-200">
                     <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Filter Desa</label>
@@ -746,7 +610,7 @@
                                 <th class="px-2 py-2 text-center text-slate-900 whitespace-nowrap">Masjid / Aula</th>
                                 <th class="px-2 py-2 text-center text-slate-900 whitespace-nowrap">Toilet (L/P)</th>
                                 <th class="px-2 py-2 text-center text-slate-900 whitespace-nowrap">Kmr MT / Tamu</th>
-                                <th class="px-2 py-2 text-center text-slate-900 whitespace-nowrap">Aksi</th>
+                                <th class="px-2 py-2 text-center text-slate-900 whitespace-nowrap no-print">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="tbodyListSarpras" class="divide-y divide-orange-50 text-slate-600"></tbody>
@@ -800,13 +664,6 @@
             </div>
 
             <div id="printableRekapContent">
-                <!-- HEADER PRINT OTOMATIS -->
-                <div class="print-header hidden">
-                    <h1>INSAN QUR'ANY TAWANGMANGU</h1>
-                    <p id="printDocTitleRekap">Laporan Rekapitulasi Data Jamaah</p>
-                    <p id="printDateRekap" class="text-[8pt] text-slate-500 mt-1"></p>
-                </div>
-
                 <!-- REKAP STATUS KESELURUHAN -->
                 <div id="sectionStatusKeseluruhan" class="space-y-4">
                     <h4 class="text-xs font-bold text-slate-700 uppercase">Rekapitulasi Status Jamaah Keseluruhan</h4>
@@ -909,7 +766,8 @@
 
                 <!-- DAFTAR NAMA JAMAAH & OPERATOR -->
                 <div id="sectionDaftarJamaah" class="hidden space-y-3 sm:space-y-4">
-                    <div class="bg-orange-50/60 p-2.5 sm:p-3 rounded-xl border border-orange-200 no-print space-y-2">
+                    <!-- KOTAK FILTER DIPASANG CLASS no-print AGAR HILANG SAAT PRINT -->
+                    <div class="bg-orange-50/60 p-2.5 sm:p-3 rounded-xl border border-orange-200 space-y-2 no-print">
                         <h4 class="text-xs font-bold text-orange-900 uppercase"> Filter Jamaah Per Kelompok</h4>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             <div>
@@ -931,7 +789,7 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-between items-center text-[11px] sm:text-xs text-slate-600 font-medium px-1">
+                    <div class="flex justify-between items-center text-[11px] sm:text-xs text-slate-600 font-medium px-1 no-print">
                         <span id="summaryTextDaftarJamaah">Menampilkan 0 jamaah terdaftar</span>
                         <span class="text-[9px] sm:text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded border border-orange-200">Terurut Abjad</span>
                     </div>
@@ -946,7 +804,7 @@
                                     <th class="px-1.5 py-2">Kelompok / Desa</th>
                                     <th class="px-1.5 py-2 text-center">Umur</th>
                                     <th class="px-1.5 py-2 text-center">Status</th>
-                                    <th class="px-1.5 py-2 text-center no-print">Aksi</th>
+                                    <th class="px-1.5 py-2 text-center col-aksi no-print">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="tbodyDaftarJamaah" class="divide-y divide-orange-50 text-slate-700"></tbody>
@@ -1661,7 +1519,7 @@
                         <td class="px-1.5 py-2 text-slate-600">${j.kelompok} <span class="text-[9px] sm:text-[10px] text-slate-400">(${j.desa})</span></td>
                         <td class="px-1.5 py-2 text-center font-medium">${calculatedUmur} thn</td>
                         <td class="px-1.5 py-2 text-center">${statusBadgeHTML}</td>
-                        <td class="px-1.5 py-2 text-center no-print">
+                        <td class="px-1.5 py-2 text-center col-aksi no-print">
                             <button type="button" onclick="editJamaahDirect('${j.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button>
                         </td>
                     `;
@@ -1846,7 +1704,6 @@
             }
         }
 
-        // AMBIL & PERTANGGUNGJAWABKAN GESER TABEL SARPRAS
         async function loadListSarpras() {
             const tbody = document.getElementById('tbodyListSarpras');
             const selectedDesa = document.getElementById('sarp_desa_update').value;
@@ -1871,7 +1728,7 @@
                         <td class="px-2 py-2 text-center whitespace-nowrap">${s.jumlah_masjid || 0} / ${s.jumlah_aula || 0}</td>
                         <td class="px-2 py-2 text-center font-bold text-slate-700 whitespace-nowrap">${s.km_pria || 0}L / ${s.km_wanita || 0}P</td>
                         <td class="px-2 py-2 text-center text-slate-700 whitespace-nowrap">${s.km_mt || 0} MT / ${s.km_tamu || 0} Tamu</td>
-                        <td class="px-2 py-2 text-center whitespace-nowrap"><button type="button" onclick="editSarpras('${s.id}')" class="px-2.5 py-1 bg-amber-100 text-amber-800 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button></td>
+                        <td class="px-2 py-2 text-center whitespace-nowrap no-print"><button type="button" onclick="editSarpras('${s.id}')" class="px-2.5 py-1 bg-amber-100 text-amber-800 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -2293,7 +2150,7 @@
                         <td class="px-1.5 py-2 text-center whitespace-nowrap">${item.jumlah_laki}L / ${item.jumlah_perempuan}P</td>
                         <td class="px-1.5 py-2 text-center whitespace-nowrap font-medium text-amber-700">${item.jumlah_ijin || 0} Orang</td>
                         <td class="px-1.5 py-2 text-right font-medium whitespace-nowrap">Rp${(item.infaq || 0).toLocaleString('id-ID')}</td>
-                        <td class="px-1.5 py-2 text-center no-print whitespace-nowrap"><button onclick="editAbsensi('${item.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button></td>
+                        <td class="px-1.5 py-2 text-center whitespace-nowrap no-print"><button onclick="editAbsensi('${item.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -2339,29 +2196,205 @@
             XLSX.writeFile(wb, fileName);
         }
 
+        /* =========================================================================
+           SISTEM CETAK DENGAN IFRAME INDEPENDEN (HANYA KONTEN AKTIF & KANAN RAPI)
+           ========================================================================= */
         function printData(elementId, documentTitle = 'Laporan Sistem Informasi') {
-            const printElement = document.getElementById(elementId);
-            if (!printElement) return;
+            const sourceElement = document.getElementById(elementId);
+            if (!sourceElement) return;
 
             const today = new Date();
             const dateStr = today.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-            const docTitleElAbs = document.getElementById('printDocTitleAbsensi');
-            const dateElAbs = document.getElementById('printDateAbsensi');
-            if(docTitleElAbs) docTitleElAbs.textContent = documentTitle;
-            if(dateElAbs) dateElAbs.textContent = `Dicetak pada: ${dateStr} WIB`;
+            // 1. Kloning area konten utama
+            const clonedContent = sourceElement.cloneNode(true);
 
-            const docTitleElRek = document.getElementById('printDocTitleRekap');
-            const dateElRek = document.getElementById('printDateRekap');
-            if(docTitleElRek) docTitleElRek.textContent = documentTitle;
-            if(dateElRek) dateElRek.textContent = `Dicetak pada: ${dateStr} WIB`;
+            // 2. FILTER KONTEN: Hapus elemen tersembunyi (class 'hidden')
+            clonedContent.querySelectorAll('.hidden').forEach(el => el.remove());
 
-            printElement.classList.add('printable-active');
-            window.print();
+            // 3. Bersihkan elemen UI interaktif (tombol, input, dropdown, class 'no-print')
+            clonedContent.querySelectorAll('.no-print, button, select, input').forEach(el => el.remove());
 
-            setTimeout(() => {
-                printElement.classList.remove('printable-active');
-            }, 500);
+            // 4. BERSIHKAN KOLOM 'AKSI' AGAR TIDAK LEPAS/MENINGGALKAN KOTAK KOSONG
+            clonedContent.querySelectorAll('.col-aksi').forEach(el => el.remove());
+            clonedContent.querySelectorAll('tr').forEach(tr => {
+                const cells = Array.from(tr.children);
+                cells.forEach(cell => {
+                    if (cell.classList.contains('no-print') || cell.classList.contains('col-aksi') || cell.querySelector('button')) {
+                        cell.remove();
+                    }
+                });
+            });
+
+            // Tentukan orientasi kertas A4
+            let orientation = 'portrait';
+            if (activeSectionId === 'rekap' && activeRekapSubTab === 'REKAP_KELOMPOK') {
+                orientation = 'landscape';
+            } else {
+                const table = clonedContent.querySelector('table');
+                if (table) {
+                    const colCount = table.querySelectorAll('tr:first-child > *').length;
+                    if (colCount >= 7) orientation = 'landscape';
+                }
+            }
+
+            // Buat dokumen HTML khusus cetak gaya MS Word
+            const printHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${documentTitle}</title>
+                    <style>
+                        @page {
+                            size: A4 ${orientation};
+                            margin: 15mm 15mm 15mm 15mm;
+                        }
+                        body {
+                            font-family: Arial, Helvetica, sans-serif;
+                            color: #111111;
+                            background: #ffffff;
+                            margin: 0;
+                            padding: 0;
+                            font-size: 10pt;
+                        }
+                        .word-header {
+                            text-align: center;
+                            border-bottom: 2px solid #000000;
+                            padding-bottom: 8px;
+                            margin-bottom: 16px;
+                        }
+                        .word-header h1 {
+                            font-size: 16pt;
+                            font-weight: bold;
+                            margin: 0 0 4px 0;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                        }
+                        .word-header p {
+                            font-size: 10pt;
+                            margin: 2px 0;
+                            color: #333333;
+                        }
+                        h4 {
+                            font-size: 11pt;
+                            font-weight: bold;
+                            margin: 14px 0 6px 0;
+                            text-transform: uppercase;
+                            color: #000000;
+                            page-break-after: avoid;
+                        }
+                        
+                        /* Layout Grid Ringkasan (Kotak Status & Generus) ala MS Word */
+                        .grid {
+                            display: flex !important;
+                            flex-wrap: wrap !important;
+                            gap: 8px !important;
+                            margin-bottom: 12px !important;
+                        }
+                        .grid > div {
+                            flex: 1 1 0 !important;
+                            border: 1px solid #000000 !important;
+                            padding: 8px 4px !important;
+                            text-align: center !important;
+                            background: #fdfdfd !important;
+                            page-break-inside: avoid !important;
+                        }
+                        .grid span {
+                            display: block;
+                        }
+                        .grid span:first-child {
+                            font-size: 8pt;
+                            font-weight: bold;
+                            color: #444444;
+                            text-transform: uppercase;
+                        }
+                        .grid span:last-child {
+                            font-size: 14pt;
+                            font-weight: bold;
+                            color: #000000;
+                            margin-top: 2px;
+                        }
+
+                        /* TABEL RESMI ALA MICROSOFT WORD */
+                        table {
+                            width: 100% !important;
+                            border-collapse: collapse !important;
+                            margin-top: 8px !important;
+                            margin-bottom: 16px !important;
+                            font-size: 9pt !important;
+                            page-break-inside: auto !important;
+                        }
+                        thead {
+                            display: table-header-group !important; /* Header diulang jika bersambung ke Halaman 2 */
+                        }
+                        tfoot {
+                            display: table-footer-group !important;
+                        }
+                        tr {
+                            page-break-inside: avoid !important; /* Mencegah baris terpotong di tengah */
+                            break-inside: avoid !important;
+                        }
+                        th, td {
+                            border: 1px solid #000000 !important; /* Garis pekat tipis khas Word */
+                            padding: 5px 6px !important;
+                            text-align: center !important;
+                            vertical-align: middle !important;
+                            word-wrap: break-word !important;
+                        }
+                        th {
+                            background-color: #f0f0f0 !important;
+                            font-weight: bold !important;
+                            text-transform: uppercase !important;
+                        }
+                        tfoot td {
+                            background-color: #e6e6e6 !important;
+                            font-weight: bold !important;
+                        }
+                        td.sticky-col, th.sticky-col {
+                            text-align: left !important;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="word-header">
+                        <h1>INSAN QUR'ANY TAWANGMANGU</h1>
+                        <p><strong>${documentTitle}</strong></p>
+                        <p style="font-size: 8.5pt; color: #555555;">Dicetak pada: ${dateStr} WIB</p>
+                    </div>
+
+                    ${clonedContent.innerHTML}
+                </body>
+                </html>
+            `;
+
+            // Hapus Iframe lama jika ada
+            const oldIframe = document.getElementById('printIframeHidden');
+            if (oldIframe) oldIframe.remove();
+
+            // Buat Iframe tersembunyi untuk proses print
+            const iframe = document.createElement('iframe');
+            iframe.id = 'printIframeHidden';
+            iframe.style.position = 'fixed';
+            iframe.style.right = '0';
+            iframe.style.bottom = '0';
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.style.border = '0';
+
+            document.body.appendChild(iframe);
+
+            const iframeDoc = iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(printHTML);
+            iframeDoc.close();
+
+            iframe.onload = function() {
+                setTimeout(() => {
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print();
+                }, 200);
+            };
         }
     </script>
 </body>
