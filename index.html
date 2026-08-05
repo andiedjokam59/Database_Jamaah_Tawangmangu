@@ -239,6 +239,35 @@
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
 
+        /* DYNAMIC PICKER STYLES PER THEME */
+        /* Theme Absensi (Fuchsia) */
+        .theme-absensi .picker-option-item:hover, .theme-absensi .picker-option-item:active {
+            background: rgba(217, 70, 239, 0.12);
+            color: #a21caf;
+        }
+        .theme-absensi .picker-option-item.active-selected {
+            background: linear-gradient(135deg, #d946ef 0%, #a21caf 100%);
+            box-shadow: 0 4px 12px rgba(217, 70, 239, 0.3);
+        }
+        /* Theme Sarpras (Teal) */
+        .theme-sarpras .picker-option-item:hover, .theme-sarpras .picker-option-item:active {
+            background: rgba(20, 184, 166, 0.12);
+            color: #0f766e;
+        }
+        .theme-sarpras .picker-option-item.active-selected {
+            background: linear-gradient(135deg, #14b8a6 0%, #0f766e 100%);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+        }
+        /* Theme Rekap (Amber) */
+        .theme-rekap .picker-option-item:hover, .theme-rekap .picker-option-item:active {
+            background: rgba(245, 158, 11, 0.12);
+            color: #b45309;
+        }
+        .theme-rekap .picker-option-item.active-selected {
+            background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
         /* SECTION ANIMATIONS */
         .section-content {
             opacity: 0;
@@ -945,7 +974,7 @@
 
     <!-- CUSTOM MODAL NOTIFICATION -->
     <div id="customModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-        <div class="modal-content-card glass-card rounded-[2rem] p-6 max-w-sm w-full text-center space-y-5 border border-white/60">
+        <div id="customModalCard" class="modal-content-card glass-card rounded-[2rem] p-6 max-w-sm w-full text-center space-y-5 border border-white/60">
             <div id="modalIcon" class="w-16 h-16 bg-gradient-to-br from-indigo-100 to-fuchsia-100 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto text-3xl font-bold shadow-inner">
                 💡
             </div>
@@ -963,8 +992,8 @@
 
     <!-- MODAL DETAIL OPERATOR WA -->
     <div id="operatorDetailModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-        <div class="modal-content-card glass-card rounded-[2rem] p-6 max-w-sm w-full text-center space-y-4 border border-blue-100/60">
-            <div class="w-14 h-14 bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-600 rounded-3xl flex items-center justify-center mx-auto text-2xl font-bold shadow-inner">
+        <div id="operatorDetailModalCard" class="modal-content-card glass-card rounded-[2rem] p-6 max-w-sm w-full text-center space-y-4 border border-blue-100/60">
+            <div id="opModalIconBox" class="w-14 h-14 bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-600 rounded-3xl flex items-center justify-center mx-auto text-2xl font-bold shadow-inner">
                 🎧
             </div>
             <div>
@@ -1006,7 +1035,7 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentMode = "DAFTAR";
-        let activeSectionId = null;
+        let activeSectionId = 'home';
         let activeRekapSubTab = "STATUS_KESELURUHAN";
 
         window.allOperatorsCache = [];
@@ -1326,6 +1355,24 @@
             document.getElementById('modalMessage').textContent = message;
             document.getElementById('modalIcon').textContent = icon;
             
+            const iconBox = document.getElementById('modalIcon');
+            const card = document.getElementById('customModalCard');
+
+            // Penyesuaian Warna Modal Notifikasi Sesuai Menu Aktif
+            if (activeSectionId === 'absensi') {
+                iconBox.className = "w-16 h-16 bg-gradient-to-br from-fuchsia-100 to-pink-100 text-fuchsia-600 rounded-3xl flex items-center justify-center mx-auto text-3xl font-bold shadow-inner";
+                card.style.borderColor = "rgba(217, 70, 239, 0.4)";
+            } else if (activeSectionId === 'sarpras') {
+                iconBox.className = "w-16 h-16 bg-gradient-to-br from-teal-100 to-emerald-100 text-teal-600 rounded-3xl flex items-center justify-center mx-auto text-3xl font-bold shadow-inner";
+                card.style.borderColor = "rgba(20, 184, 166, 0.4)";
+            } else if (activeSectionId === 'rekap') {
+                iconBox.className = "w-16 h-16 bg-gradient-to-br from-amber-100 to-orange-100 text-amber-600 rounded-3xl flex items-center justify-center mx-auto text-3xl font-bold shadow-inner";
+                card.style.borderColor = "rgba(245, 158, 11, 0.4)";
+            } else {
+                iconBox.className = "w-16 h-16 bg-gradient-to-br from-indigo-100 to-fuchsia-100 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto text-3xl font-bold shadow-inner";
+                card.style.borderColor = "rgba(255, 255, 255, 0.6)";
+            }
+
             const actionsDiv = document.getElementById('modalActions');
             actionsDiv.innerHTML = '';
 
@@ -1343,7 +1390,15 @@
 
             const btnOk = document.createElement('button');
             btnOk.type = 'button';
-            btnOk.className = showCancel ? 'w-1/2 py-3 bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white rounded-xl text-sm font-bold transition-all shadow-md' : 'w-full py-3 bg-gradient-to-r from-indigo-600 to-fuchsia-600 hover:from-indigo-700 hover:to-fuchsia-700 text-white rounded-xl text-sm font-bold transition-all shadow-lg hover:shadow-[0_5px_15px_rgba(99,102,241,0.3)] hover:-translate-y-0.5';
+
+            let btnGradient = 'from-indigo-600 to-fuchsia-600 hover:from-indigo-700 hover:to-fuchsia-700';
+            if (activeSectionId === 'absensi') btnGradient = 'from-fuchsia-600 to-pink-600 hover:from-fuchsia-700 hover:to-pink-700';
+            else if (activeSectionId === 'sarpras') btnGradient = 'from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700';
+            else if (activeSectionId === 'rekap') btnGradient = 'from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700';
+
+            btnOk.className = showCancel 
+                ? `w-1/2 py-3 bg-gradient-to-r ${btnGradient} text-white rounded-xl text-sm font-bold transition-all shadow-md` 
+                : `w-full py-3 bg-gradient-to-r ${btnGradient} text-white rounded-xl text-sm font-bold transition-all shadow-lg hover:-translate-y-0.5`;
             btnOk.textContent = showCancel ? 'Ya, Lanjutkan' : 'OK';
             btnOk.onclick = () => {
                 closeCustomModal();
@@ -1934,6 +1989,24 @@
 
             const searchInput = document.getElementById('opSearchInput');
             if (searchInput) searchInput.value = '';
+
+            const iconBox = document.getElementById('opModalIconBox');
+            const opCard = document.getElementById('operatorDetailModalCard');
+
+            // Penyesuaian Warna Modal Operator Sesuai Menu Aktif
+            if (activeSectionId === 'absensi') {
+                iconBox.className = "w-14 h-14 bg-gradient-to-br from-fuchsia-100 to-pink-100 text-fuchsia-600 rounded-3xl flex items-center justify-center mx-auto text-2xl font-bold shadow-inner";
+                opCard.style.borderColor = "rgba(217, 70, 239, 0.4)";
+            } else if (activeSectionId === 'sarpras') {
+                iconBox.className = "w-14 h-14 bg-gradient-to-br from-teal-100 to-emerald-100 text-teal-600 rounded-3xl flex items-center justify-center mx-auto text-2xl font-bold shadow-inner";
+                opCard.style.borderColor = "rgba(20, 184, 166, 0.4)";
+            } else if (activeSectionId === 'rekap') {
+                iconBox.className = "w-14 h-14 bg-gradient-to-br from-amber-100 to-orange-100 text-amber-600 rounded-3xl flex items-center justify-center mx-auto text-2xl font-bold shadow-inner";
+                opCard.style.borderColor = "rgba(245, 158, 11, 0.4)";
+            } else {
+                iconBox.className = "w-14 h-14 bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-600 rounded-3xl flex items-center justify-center mx-auto text-2xl font-bold shadow-inner";
+                opCard.style.borderColor = "rgba(191, 219, 254, 0.6)";
+            }
 
             renderOperatorModalList(window.activeOperatorDataset);
             openModal('operatorDetailModal');
@@ -2580,6 +2653,22 @@
             const titleEl = document.getElementById('centerPickerTitle');
             const optionsContainer = document.getElementById('centerPickerOptions');
 
+            // Set Warna Judul & Opsi Picker Berdasarkan Menu yang Sedang Aktif
+            modal.classList.remove('theme-absensi', 'theme-sarpras', 'theme-rekap');
+            
+            if (activeSectionId === 'absensi') {
+                modal.classList.add('theme-absensi');
+                titleEl.className = "text-xs font-extrabold uppercase tracking-widest text-fuchsia-800";
+            } else if (activeSectionId === 'sarpras') {
+                modal.classList.add('theme-sarpras');
+                titleEl.className = "text-xs font-extrabold uppercase tracking-widest text-teal-800";
+            } else if (activeSectionId === 'rekap') {
+                modal.classList.add('theme-rekap');
+                titleEl.className = "text-xs font-extrabold uppercase tracking-widest text-amber-800";
+            } else {
+                titleEl.className = "text-xs font-extrabold uppercase tracking-widest text-indigo-800";
+            }
+
             let labelText = "Pilih Opsi";
             const parent = select.closest('div');
             if (parent) {
@@ -2600,7 +2689,13 @@
                     } else if (child.tagName.toLowerCase() === 'optgroup') {
                         const groupDivider = document.createElement('div');
                         groupDivider.className = "pt-3 pb-1 px-1 border-t border-slate-200/80 mt-2 first:mt-0 first:border-0";
-                        groupDivider.innerHTML = `<span class="text-[10px] font-extrabold uppercase tracking-widest text-indigo-800 bg-indigo-50 px-2.5 py-1 rounded-md inline-block border border-indigo-100/80 shadow-2xs">${child.label}</span>`;
+                        
+                        let badgeBg = "text-indigo-800 bg-indigo-50 border-indigo-100/80";
+                        if (activeSectionId === 'absensi') badgeBg = "text-fuchsia-800 bg-fuchsia-50 border-fuchsia-100/80";
+                        else if (activeSectionId === 'sarpras') badgeBg = "text-teal-800 bg-teal-50 border-teal-100/80";
+                        else if (activeSectionId === 'rekap') badgeBg = "text-amber-800 bg-amber-50 border-amber-100/80";
+
+                        groupDivider.innerHTML = `<span class="text-[10px] font-extrabold uppercase tracking-widest ${badgeBg} px-2.5 py-1 rounded-md inline-block border shadow-2xs">${child.label}</span>`;
                         optionsContainer.appendChild(groupDivider);
 
                         Array.from(child.children).forEach((opt) => {
