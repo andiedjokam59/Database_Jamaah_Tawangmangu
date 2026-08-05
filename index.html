@@ -67,39 +67,82 @@
             opacity: 1;
         }
 
-        /* PERBAIKAN SCROLLBAR DI ATAS TABEL */
-        .scroll-top-container {
-            overflow-x: auto !important;
-            transform: rotateX(180deg);
+        /* WRAPPER SCROLL VERTIKAL & HORISONTAL */
+        .table-vertical-scroll {
+            max-height: 60vh;
+            overflow-y: auto;
+            overflow-x: auto;
+            border-radius: 1rem;
             -webkit-overflow-scrolling: touch;
-            touch-action: pan-x pan-y;
+            scroll-behavior: smooth;
         }
 
-        .scroll-top-container > table {
-            transform: rotateX(180deg);
+        .table-vertical-scroll > table {
             min-width: 650px;
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
         }
 
-        /* KOLOM STICKY KELOMPOK (SMOOTH, TRANSPARAN & ADAPTIF) */
+        /* HEADER STICKY DENGAN BACKGROUND PADAT & BLUR KETAT */
+        thead tr th {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 20 !important;
+            background-color: rgba(243, 244, 250, 0.98) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        /* FOOTER (TOTAL) STICKY DI BAWAH AGAR SELALU TERLIHAT */
+        tfoot tr td {
+            position: sticky !important;
+            bottom: 0 !important;
+            z-index: 20 !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            box-shadow: 0 -4px 10px -2px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        /* HEADER DENGAN TEMA SPESIFIK AGAR WARNA PADAT & BURAM/BLUR MEWAH */
+        #sectionAbsensi thead tr th {
+            background-color: rgba(253, 242, 248, 0.98) !important;
+        }
+        #sectionAbsensi tfoot tr td {
+            background-color: rgba(251, 207, 232, 0.98) !important;
+        }
+
+        #sectionSarpras thead tr th {
+            background-color: rgba(240, 253, 250, 0.98) !important;
+        }
+        #sectionSarpras tfoot tr td {
+            background-color: rgba(204, 251, 241, 0.98) !important;
+        }
+
+        #sectionRekap thead tr th {
+            background-color: rgba(238, 242, 255, 0.98) !important;
+        }
+        #sectionRekap tfoot tr td {
+            background-color: rgba(224, 231, 255, 0.98) !important;
+        }
+
+        /* KOLOM STICKY KELOMPOK (SMOOTH & ADAPTIF) */
         .sticky-col {
             position: sticky !important;
             left: 0 !important;
-            background-color: rgba(255, 255, 255, 0.9) !important;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background-color: rgba(255, 255, 255, 0.98) !important;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             z-index: 10 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
             
-            /* LEBAR AWAL FULL (SBLM DIGESER) */
             max-width: 180px;
             min-width: 90px;
             
-            transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease, background-color 0.35s ease;
+            transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
             box-shadow: none;
             will-change: max-width, box-shadow;
         }
@@ -111,27 +154,32 @@
             }
         }
 
-        /* KETIKA TABEL DIGESER KE SAMPLING (EFEK TERPOTONG & SMOOTH SHADOW) */
-        .scroll-top-container.is-scrolled .sticky-col {
+        /* EFEK KETIKA DISERET KE SAMPING */
+        .table-vertical-scroll.is-scrolled .sticky-col {
             max-width: 90px !important;
-            background-color: rgba(255, 255, 255, 0.95) !important;
+            background-color: rgba(255, 255, 255, 0.98) !important;
             box-shadow: 4px 0 12px -2px rgba(79, 70, 229, 0.18) !important;
         }
 
         @media (min-width: 640px) {
-            .scroll-top-container.is-scrolled .sticky-col {
+            .table-vertical-scroll.is-scrolled .sticky-col {
                 max-width: 130px !important;
             }
         }
 
-        thead .sticky-col {
-            background-color: rgba(238, 242, 255, 0.95) !important;
-            z-index: 11 !important;
+        /* Z-INDEX TERTINGGI UTK KELOMPOK DI HEADER & FOOTER (POJOK KIRI) */
+        thead .sticky-col, tfoot .sticky-col {
+            z-index: 30 !important;
         }
 
-        tfoot .sticky-col {
-            background-color: rgba(224, 231, 255, 0.95) !important;
-            z-index: 11 !important;
+        #sectionAbsensi thead .sticky-col, #sectionAbsensi tfoot .sticky-col {
+            background-color: rgba(251, 207, 232, 0.98) !important;
+        }
+        #sectionSarpras thead .sticky-col, #sectionSarpras tfoot .sticky-col {
+            background-color: rgba(204, 251, 241, 0.98) !important;
+        }
+        #sectionRekap thead .sticky-col, #sectionRekap tfoot .sticky-col {
+            background-color: rgba(224, 231, 255, 0.98) !important;
         }
 
         /* MODAL ANIMATIONS */
@@ -176,20 +224,20 @@
 			animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 		}
 
-        /* CUSTOM SCROLLBAR ATAS */
-		#autoJamaahList::-webkit-scrollbar, .scroll-container::-webkit-scrollbar, .scroll-top-container::-webkit-scrollbar {
+        /* CUSTOM SCROLLBAR */
+		#autoJamaahList::-webkit-scrollbar, .scroll-container::-webkit-scrollbar, .table-vertical-scroll::-webkit-scrollbar {
 			height: 6px;
 			width: 6px;
 		}
-		#autoJamaahList::-webkit-scrollbar-track, .scroll-container::-webkit-scrollbar-track, .scroll-top-container::-webkit-scrollbar-track {
+		#autoJamaahList::-webkit-scrollbar-track, .scroll-container::-webkit-scrollbar-track, .table-vertical-scroll::-webkit-scrollbar-track {
 			background: rgba(241, 245, 249, 0.8);
             border-radius: 8px;
 		}
-		#autoJamaahList::-webkit-scrollbar-thumb, .scroll-container::-webkit-scrollbar-thumb, .scroll-top-container::-webkit-scrollbar-thumb {
+		#autoJamaahList::-webkit-scrollbar-thumb, .scroll-container::-webkit-scrollbar-thumb, .table-vertical-scroll::-webkit-scrollbar-thumb {
 			background: #a5b4fc;
 			border-radius: 8px;
 		}
-		#autoJamaahList::-webkit-scrollbar-thumb:hover, .scroll-container::-webkit-scrollbar-thumb:hover, .scroll-top-container::-webkit-scrollbar-thumb:hover {
+		#autoJamaahList::-webkit-scrollbar-thumb:hover, .scroll-container::-webkit-scrollbar-thumb:hover, .table-vertical-scroll::-webkit-scrollbar-thumb:hover {
 			background: #6366f1;
 		}
 
@@ -567,22 +615,24 @@
                     </div>
                 </div>
 
-                <!-- 1. ABSENSI (TAB REKAP) WITH SCROLL ATAS & EFEK SMOOTH -->
-                <div class="border border-fuchsia-100 rounded-2xl scroll-top-container shadow-inner overflow-hidden">
-                    <table class="w-full text-[11px] sm:text-xs text-left">
-                        <thead class="bg-gradient-to-r from-fuchsia-50 to-pink-50 text-fuchsia-900 font-extrabold border-b border-fuchsia-100">
-                            <tr>
-                                <th class="px-2.5 py-3 whitespace-nowrap sticky-col">Kelompok</th>
-                                <th class="px-2 py-3 text-center whitespace-nowrap">Tanggal</th>
-                                <th class="px-2 py-3 text-center whitespace-nowrap">Hadir (L/P)</th>
-                                <th class="px-2 py-3 text-center whitespace-nowrap">Ijin</th>
-                                <th class="px-2 py-3 text-right whitespace-nowrap">Infaq</th>
-                                <th class="px-2 py-3 text-center whitespace-nowrap no-print">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbodyRekapAbsensi" class="divide-y divide-fuchsia-50 text-slate-700 bg-white/50"></tbody>
-                        <tfoot id="tfootRekapAbsensi" class="bg-fuchsia-100/80 font-extrabold text-fuchsia-950 border-t border-fuchsia-200"></tfoot>
-                    </table>
+                <!-- 1. ABSENSI (TAB REKAP) SCROLLABLE & HEADER/FOOTER KETAT STICKY -->
+                <div class="border border-fuchsia-100 rounded-2xl shadow-inner overflow-hidden">
+                    <div class="table-vertical-scroll">
+                        <table class="w-full text-[11px] sm:text-xs text-left">
+                            <thead class="bg-gradient-to-r from-fuchsia-100 to-pink-100 text-fuchsia-950 font-extrabold border-b border-fuchsia-200">
+                                <tr>
+                                    <th class="px-2.5 py-3 whitespace-nowrap sticky-col">Kelompok</th>
+                                    <th class="px-2 py-3 text-center whitespace-nowrap">Tanggal</th>
+                                    <th class="px-2 py-3 text-center whitespace-nowrap">Hadir (L/P)</th>
+                                    <th class="px-2 py-3 text-center whitespace-nowrap">Ijin</th>
+                                    <th class="px-2 py-3 text-right whitespace-nowrap">Infaq</th>
+                                    <th class="px-2 py-3 text-center whitespace-nowrap no-print">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyRekapAbsensi" class="divide-y divide-fuchsia-50 text-slate-700 bg-white/50"></tbody>
+                            <tfoot id="tfootRekapAbsensi" class="bg-fuchsia-100/95 font-extrabold text-fuchsia-950 border-t border-fuchsia-200"></tfoot>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -678,21 +728,24 @@
                     </select>
                 </div>
 
-                <!-- 2. SARPRAS (UPDATE DATA SARPRAS) WITH SCROLL ATAS & EFEK SMOOTH -->
-                <div class="border border-teal-100 rounded-2xl scroll-top-container w-full shadow-inner overflow-hidden">
-                    <table class="w-full text-[11px] sm:text-xs text-left">
-                        <thead class="bg-gradient-to-r from-teal-50 to-emerald-50 text-teal-900 font-extrabold border-b border-teal-100">
-                            <tr>
-                                <th class="px-2.5 py-3 sticky-col">Kelompok</th>
-                                <th class="px-2 py-3 text-center whitespace-nowrap">Status Tanah</th>
-                                <th class="px-2 py-3 text-center whitespace-nowrap">Masjid / Aula</th>
-                                <th class="px-2 py-3 text-center whitespace-nowrap">Toilet (L/P)</th>
-                                <th class="px-2 py-3 text-center whitespace-nowrap">Kmr MT / Tamu</th>
-                                <th class="px-2 py-3 text-center whitespace-nowrap no-print">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbodyListSarpras" class="divide-y divide-teal-50 text-slate-700 bg-white/50"></tbody>
-                    </table>
+                <!-- 2. SARPRAS (UPDATE DATA SARPRAS) SCROLLABLE & HEADER/FOOTER STICKY -->
+                <div class="border border-teal-100 rounded-2xl w-full shadow-inner overflow-hidden">
+                    <div class="table-vertical-scroll">
+                        <table class="w-full text-[11px] sm:text-xs text-left">
+                            <thead class="bg-gradient-to-r from-teal-100 to-emerald-100 text-teal-950 font-extrabold border-b border-teal-200">
+                                <tr>
+                                    <th class="px-2.5 py-3 sticky-col">Kelompok</th>
+                                    <th class="px-2 py-3 text-center whitespace-nowrap">Status Tanah</th>
+                                    <th class="px-2 py-3 text-center whitespace-nowrap">Masjid / Aula</th>
+                                    <th class="px-2 py-3 text-center whitespace-nowrap">Toilet (L/P)</th>
+                                    <th class="px-2 py-3 text-center whitespace-nowrap">Kmr MT / Tamu</th>
+                                    <th class="px-2 py-3 text-center whitespace-nowrap no-print">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyListSarpras" class="divide-y divide-teal-50 text-slate-700 bg-white/50"></tbody>
+                            <tfoot id="tfootListSarpras" class="bg-teal-100/95 font-extrabold text-teal-950 border-t border-teal-200"></tfoot>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -824,38 +877,40 @@
                         </div>
                     </div>
 
-                    <!-- 3. REKAP (TAB REKAP PER KLP) WITH SCROLL ATAS & EFEK SMOOTH -->
-                    <div class="border border-indigo-100 rounded-2xl scroll-top-container shadow-inner overflow-hidden">
-                        <table id="tableRekapKelompok" class="w-full text-[10px] sm:text-[11px] text-left">
-                            <thead class="bg-gradient-to-b from-indigo-50 to-indigo-100/50 text-indigo-950 font-extrabold border-b border-indigo-200">
-                                <tr>
-                                    <th class="px-2.5 py-3 sticky-col">Kelompok</th>
-                                    <!-- Rekapan Generus -->
-                                    <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100/60 text-fuchsia-900 border-l border-indigo-100">PAUD</th>
-                                    <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100/60 text-fuchsia-900">TK</th>
-                                    <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100/60 text-fuchsia-900">Cbr</th>
-                                    <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100/60 text-fuchsia-900">Pra Rem</th>
-                                    <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100/60 text-fuchsia-900">Rem</th>
-                                    <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100/60 text-fuchsia-900 border-r border-indigo-100">Usman</th>
-                                    <!-- Status Jamaah -->
-                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Nikah</th>
-                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Duda</th>
-                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Janda</th>
-                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Manula</th>
-                                    <th class="px-1.5 py-3 text-center text-blue-700 bg-blue-50/50 whitespace-nowrap">Opr.</th>
-                                    <!-- Total & Sarpras -->
-                                    <th class="px-2 py-3 text-center bg-indigo-200/50 font-black whitespace-nowrap border-l border-indigo-200">Total</th>
-                                    <th class="px-1.5 py-3 text-center border-l border-indigo-200 whitespace-nowrap">Sub</th>
-                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Msjd</th>
-                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Aula</th>
-                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Toilet (L/P)</th>
-                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Kmr MT</th>
-                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Kmr Tmu</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbodyRekapKelompok" class="divide-y divide-indigo-50/80 text-slate-700 bg-white/60"></tbody>
-                            <tfoot id="tfootRekapKelompok" class="bg-indigo-100/80 font-black text-indigo-950 border-t border-indigo-200"></tfoot>
-                        </table>
+                    <!-- 3. REKAP (TAB REKAP PER KLP) SCROLLABLE & HEADER/FOOTER KETAT STICKY -->
+                    <div class="border border-indigo-100 rounded-2xl shadow-inner overflow-hidden">
+                        <div class="table-vertical-scroll">
+                            <table id="tableRekapKelompok" class="w-full text-[10px] sm:text-[11px] text-left">
+                                <thead class="bg-gradient-to-b from-indigo-100 to-indigo-200/80 text-indigo-950 font-extrabold border-b border-indigo-300">
+                                    <tr>
+                                        <th class="px-2.5 py-3 sticky-col">Kelompok</th>
+                                        <!-- Rekapan Generus -->
+                                        <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950 border-l border-indigo-200">PAUD</th>
+                                        <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">TK</th>
+                                        <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">Cbr</th>
+                                        <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">Pra Rem</th>
+                                        <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">Rem</th>
+                                        <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950 border-r border-indigo-200">Usman</th>
+                                        <!-- Status Jamaah -->
+                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Nikah</th>
+                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Duda</th>
+                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Janda</th>
+                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Manula</th>
+                                        <th class="px-1.5 py-3 text-center text-blue-800 bg-blue-100/80 whitespace-nowrap">Opr.</th>
+                                        <!-- Total & Sarpras -->
+                                        <th class="px-2 py-3 text-center bg-indigo-200/80 font-black whitespace-nowrap border-l border-indigo-300">Total</th>
+                                        <th class="px-1.5 py-3 text-center border-l border-indigo-300 whitespace-nowrap">Sub</th>
+                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Msjd</th>
+                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Aula</th>
+                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Toilet (L/P)</th>
+                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Kmr MT</th>
+                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Kmr Tmu</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyRekapKelompok" class="divide-y divide-indigo-50/80 text-slate-700 bg-white/60"></tbody>
+                                <tfoot id="tfootRekapKelompok" class="bg-indigo-100/90 font-black text-indigo-950 border-t border-indigo-200"></tfoot>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -969,7 +1024,7 @@
 
         // DETEKSI SCROLL UTK EFEK TERPOTONG / KECILIN KOLOM KELOMPOK
         function initScrollDetectors() {
-            document.querySelectorAll('.scroll-top-container').forEach(container => {
+            document.querySelectorAll('.table-vertical-scroll').forEach(container => {
                 let ticking = false;
                 container.addEventListener('scroll', function() {
                     if (!ticking) {
@@ -1653,8 +1708,10 @@
 
         async function loadListSarpras() {
             const tbody = document.getElementById('tbodyListSarpras');
+            const tfoot = document.getElementById('tfootListSarpras');
             const selectedDesa = document.getElementById('sarp_desa_update').value;
             tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center font-bold text-teal-700">Memuat sarpras...</td></tr>';
+            tfoot.innerHTML = '';
 
             try {
                 let data = await fetchAllRows('fasilitas_kelompok', '*');
@@ -1667,7 +1724,17 @@
 
                 data.sort((a, b) => (a.desa || '').localeCompare(b.desa || ''));
                 tbody.innerHTML = '';
+
+                let totalMasjid = 0, totalAula = 0, totalKmL = 0, totalKmP = 0, totalKmMt = 0, totalKmTamu = 0;
+
                 data.forEach(s => {
+                    totalMasjid += (s.jumlah_masjid || 0);
+                    totalAula += (s.jumlah_aula || 0);
+                    totalKmL += (s.km_pria || 0);
+                    totalKmP += (s.km_wanita || 0);
+                    totalKmMt += (s.km_mt || 0);
+                    totalKmTamu += (s.km_tamu || 0);
+
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-teal-50/50 transition-colors";
                     tr.innerHTML = `
@@ -1680,6 +1747,17 @@
                     `;
                     tbody.appendChild(tr);
                 });
+
+                tfoot.innerHTML = `
+                    <tr>
+                        <td class="px-2.5 py-4 text-left font-black uppercase whitespace-nowrap sticky-col bg-teal-200/90">TOTAL</td>
+                        <td class="px-2 py-4 text-center font-black text-teal-950 whitespace-nowrap">-</td>
+                        <td class="px-2 py-4 text-center font-black text-teal-950 whitespace-nowrap">${totalMasjid} Msjd / ${totalAula} Aula</td>
+                        <td class="px-2 py-4 text-center font-black text-teal-950 whitespace-nowrap">${totalKmL}L / ${totalKmP}P</td>
+                        <td class="px-2 py-4 text-center font-black text-teal-950 whitespace-nowrap">${totalKmMt} MT / ${totalKmTamu} Tamu</td>
+                        <td class="px-2 py-4 text-center no-print"></td>
+                    </tr>
+                `;
             } catch (err) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500 font-bold">Gagal memuat: ${err.message}</td></tr>`;
             }
@@ -2039,19 +2117,19 @@
 
                 tfoot.innerHTML = `
                     <tr>
-                        <td class="px-2.5 py-4 text-left font-black uppercase sticky-col bg-indigo-200/50">TOTAL</td>
-                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/60 border-l border-indigo-200">${totPaud}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/60">${totTk}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/60">${totCaberawit}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/60">${totPraRemaja}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/60">${totRemaja}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/60 border-r border-indigo-200">${totUsiaMandiri}</td>
+                        <td class="px-2.5 py-4 text-left font-black uppercase sticky-col bg-indigo-200/90">TOTAL</td>
+                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80 border-l border-indigo-200">${totPaud}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totTk}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totCaberawit}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totPraRemaja}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totRemaja}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80 border-r border-indigo-200">${totUsiaMandiri}</td>
                         <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totMenikah}</td>
                         <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totDuda}</td>
                         <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totJanda}</td>
                         <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totManula}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-blue-800 bg-blue-100/70">${totOperator}</td>
-                        <td class="px-2 py-4 text-center font-black text-indigo-800 bg-indigo-300/50 border-l border-indigo-300 text-[13px]">${totAllJumlah}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-blue-800 bg-blue-100/90">${totOperator}</td>
+                        <td class="px-2 py-4 text-center font-black text-indigo-800 bg-indigo-300/80 border-l border-indigo-300 text-[13px]">${totAllJumlah}</td>
                         <td class="px-1.5 py-4 text-center font-black text-indigo-950 border-l border-indigo-300">${totSub}</td>
                         <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totMasjid}</td>
                         <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totAula}</td>
@@ -2149,7 +2227,8 @@
 
                 tfoot.innerHTML = `
                     <tr>
-                        <td class="px-2.5 py-4 text-left font-black uppercase whitespace-nowrap sticky-col bg-fuchsia-200/50" colspan="2">TOTAL KESELURUHAN</td>
+                        <td class="px-2.5 py-4 text-left font-black uppercase whitespace-nowrap sticky-col bg-fuchsia-200/90">TOTAL</td>
+                        <td class="px-2 py-4 text-center font-black text-fuchsia-950 whitespace-nowrap">-</td>
                         <td class="px-2 py-4 text-center font-black text-fuchsia-950 whitespace-nowrap">${totalLaki}L / ${totalPerempuan}P</td>
                         <td class="px-2 py-4 text-center font-black text-pink-800 whitespace-nowrap">${totalIjin} Orang</td>
                         <td class="px-2 py-4 text-right font-black text-emerald-700 whitespace-nowrap text-[13px]">Rp${totalInfaq.toLocaleString('id-ID')}</td>
@@ -2194,7 +2273,6 @@
         function printData(elementId, documentTitle = 'Laporan Sistem Informasi') {
             let targetContentEl;
 
-            // Jika dipanggil dari Rekapitulasi, hanya ambil sub-tab yang sedang aktif
             if (elementId === 'printableRekapContent') {
                 if (activeRekapSubTab === 'STATUS_KESELURUHAN') {
                     targetContentEl = document.getElementById('sectionStatusKeseluruhan');
@@ -2210,17 +2288,13 @@
             const today = new Date();
             const dateStr = today.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-            // Kloning hanya elemen konten aktif
             const clonedContent = targetContentEl.cloneNode(true);
 
-            // Tampilkan elemen tersembunyi yang relevan
             clonedContent.classList.remove('hidden');
             clonedContent.querySelectorAll('.hidden').forEach(el => el.classList.remove('hidden'));
 
-            // Bersihkan tombol/dropdown interaktif yang memiliki class 'no-print'
             clonedContent.querySelectorAll('.no-print, button, select, input').forEach(el => el.remove());
 
-            // Bersihkan kolom aksi
             clonedContent.querySelectorAll('.col-aksi').forEach(el => el.remove());
             clonedContent.querySelectorAll('tr').forEach(tr => {
                 const cells = Array.from(tr.children);
@@ -2231,13 +2305,12 @@
                 });
             });
 
-            // Hilangkan efek CSS rotasi/flip scrollbar pada cetakan
-            clonedContent.querySelectorAll('.scroll-top-container, table').forEach(el => {
+            clonedContent.querySelectorAll('.table-vertical-scroll, table').forEach(el => {
                 el.style.transform = 'none';
                 el.style.overflow = 'visible';
+                el.style.maxHeight = 'none';
             });
 
-            // Atur orientasi cetak
             let orientation = 'portrait';
             if (activeSectionId === 'rekap' && activeRekapSubTab === 'REKAP_KELOMPOK') {
                 orientation = 'landscape';
