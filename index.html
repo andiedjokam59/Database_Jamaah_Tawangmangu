@@ -79,30 +79,25 @@
             transform: rotateX(180deg);
         }
 
+        /* STICKY COLUMN UNTUK NAMA KELOMPOK (TETAP TERLIHAT SAAT DIGESER) */
         .sticky-col {
             position: sticky;
             left: 0;
-            background-color: rgba(255, 255, 255, 0.95) !important;
-            backdrop-filter: blur(8px);
+            background-color: #ffffff !important;
             z-index: 10;
-            transition: max-width 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s ease;
-            box-shadow: none;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 120px;
-            will-change: max-width;
+            max-width: 110px;
+            min-width: 90px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
         }
 
         @media (min-width: 640px) {
             .sticky-col {
-                max-width: 220px;
+                max-width: 160px;
+                min-width: 120px;
             }
-        }
-
-        .scroll-top-container.is-scrolled .sticky-col {
-            max-width: 90px;
-            box-shadow: 3px 0 10px -2px rgba(79, 70, 229, 0.15);
         }
 
         thead .sticky-col {
