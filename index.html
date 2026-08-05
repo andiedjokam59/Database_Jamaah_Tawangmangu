@@ -2505,23 +2505,74 @@
         }
 
         /* -------------------------------------------------------------
-         * INTERCEPTOR POPUP OPTION PICKER DI TENGAH LAYAR
-         * ------------------------------------------------------------- */
-        let activeSelectTarget = null;
+		 * INTERCEPTOR POPUP OPTION PICKER DI TENGAH LAYAR (RESPONSIF & MULUS)
+		 * ------------------------------------------------------------- */
+		let activeSelectTarget = null;
 
-        document.addEventListener('mousedown', handleSelectClick);
-        document.addEventListener('touchstart', handleSelectClick, { passive: false });
+		let touchStartY = 0;
+		let touchStartX = 0;
+		let isSwiping = false;
 
-        function handleSelectClick(e) {
-            const select = e.target.closest('select');
-            if (!select || select.disabled) return;
+		// Tangkap interaksi di desktop (mousedown)
+		document.addEventListener('mousedown', interceptSelectMouseDown, { capture: true });
 
-            e.preventDefault();
-            e.stopPropagation();
+		// Tangkap interaksi di mobile (touch) tanpa mematikan scroll bawaan
+		document.addEventListener('touchstart', interceptSelectTouchStart, { capture: true, passive: true });
+		document.addEventListener('touchmove', interceptSelectTouchMove, { capture: true, passive: true });
+		document.addEventListener('touchend', interceptSelectTouchEnd, { capture: true });
 
-            activeSelectTarget = select;
-            openCenterPicker(select);
-        }
+		function interceptSelectMouseDown(e) {
+			const select = e.target.closest('select');
+			if (!select || select.disabled) return;
+
+			// Untuk PC/Desktop: Matikan dropdown native bawaan browser
+			e.preventDefault();
+			e.stopPropagation();
+
+			activeSelectTarget = select;
+			openCenterPicker(select);
+		}
+
+		function interceptSelectTouchStart(e) {
+			const select = e.target.closest('select');
+			if (!select || select.disabled) return;
+
+			// CATATAN: e.preventDefault() DIBUANG di sini agar scroll layar tetap MULUS!
+			isSwiping = false;
+			touchStartY = e.touches[0].clientY;
+			touchStartX = e.touches[0].clientX;
+		}
+
+		function interceptSelectTouchMove(e) {
+			if (!touchStartY) return;
+
+			const diffY = Math.abs(e.touches[0].clientY - touchStartY);
+			const diffX = Math.abs(e.touches[0].clientX - touchStartX);
+
+			// Jika jari bergeser lebih dari 6px, tandai bahwa pengguna sedang scrolling
+			if (diffY > 6 || diffX > 6) {
+				isSwiping = true;
+			}
+		}
+
+		function interceptSelectTouchEnd(e) {
+			const select = e.target.closest('select');
+			if (!select || select.disabled) return;
+
+			// Jika jari TIDAK mengusap/scrolling (murni di-tap), buka custom popup
+			if (!isSwiping) {
+				e.preventDefault(); // Hentikan klik/dropdown native bawaan browser
+				e.stopPropagation();
+				
+				activeSelectTarget = select;
+				openCenterPicker(select);
+			}
+
+			// Reset koordinat
+			isSwiping = false;
+			touchStartY = 0;
+			touchStartX = 0;
+		}
 
         function openCenterPicker(select) {
             const modal = document.getElementById('centerPickerModal');
