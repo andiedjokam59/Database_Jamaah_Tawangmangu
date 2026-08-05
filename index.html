@@ -34,7 +34,6 @@
             overflow: hidden;
         }
 
-        /* Motif Beranimasi Tambahan di Background */
         .animated-bg::after {
             content: "";
             position: absolute;
@@ -90,6 +89,7 @@
             background-color: rgba(255, 255, 255, 0.8);
             border: 2px solid #e2e8f0;
             border-radius: 1rem;
+            cursor: pointer;
         }
         .rounded-box-input:focus {
             background-color: #ffffff;
@@ -121,7 +121,7 @@
             border-spacing: 0;
         }
 
-        /* HEADER STICKY DENGAN BACKGROUND PADAT & BLUR KETAT */
+        /* HEADER STICKY */
         thead tr th {
             position: sticky !important;
             top: 0 !important;
@@ -132,7 +132,6 @@
             box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.08) !important;
         }
 
-        /* FOOTER (TOTAL) STICKY DI BAWAH AGAR SELALU TERLIHAT */
         tfoot tr td {
             position: sticky !important;
             bottom: 0 !important;
@@ -142,29 +141,16 @@
             box-shadow: 0 -4px 10px -2px rgba(0, 0, 0, 0.08) !important;
         }
 
-        /* HEADER DENGAN TEMA SPESIFIK AGAR WARNA PADAT & BURAM/BLUR MEWAH */
-        #sectionAbsensi thead tr th {
-            background-color: rgba(253, 242, 248, 0.98) !important;
-        }
-        #sectionAbsensi tfoot tr td {
-            background-color: rgba(251, 207, 232, 0.98) !important;
-        }
+        #sectionAbsensi thead tr th { background-color: rgba(253, 242, 248, 0.98) !important; }
+        #sectionAbsensi tfoot tr td { background-color: rgba(251, 207, 232, 0.98) !important; }
 
-        #sectionSarpras thead tr th {
-            background-color: rgba(240, 253, 250, 0.98) !important;
-        }
-        #sectionSarpras tfoot tr td {
-            background-color: rgba(204, 251, 241, 0.98) !important;
-        }
+        #sectionSarpras thead tr th { background-color: rgba(240, 253, 250, 0.98) !important; }
+        #sectionSarpras tfoot tr td { background-color: rgba(204, 251, 241, 0.98) !important; }
 
-        #sectionRekap thead tr th {
-            background-color: rgba(238, 242, 255, 0.98) !important;
-        }
-        #sectionRekap tfoot tr td {
-            background-color: rgba(224, 231, 255, 0.98) !important;
-        }
+        #sectionRekap thead tr th { background-color: rgba(238, 242, 255, 0.98) !important; }
+        #sectionRekap tfoot tr td { background-color: rgba(224, 231, 255, 0.98) !important; }
 
-        /* KOLOM STICKY KELOMPOK (SMOOTH & ADAPTIF) */
+        /* KOLOM STICKY KELOMPOK */
         .sticky-col {
             position: sticky !important;
             left: 0 !important;
@@ -175,23 +161,17 @@
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
-            
             max-width: 180px;
             min-width: 90px;
-            
             transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
             box-shadow: none;
             will-change: max-width, box-shadow;
         }
 
         @media (min-width: 640px) {
-            .sticky-col {
-                max-width: 240px;
-                min-width: 130px;
-            }
+            .sticky-col { max-width: 240px; min-width: 130px; }
         }
 
-        /* EFEK KETIKA DISERET KE SAMPING */
         .table-vertical-scroll.is-scrolled .sticky-col {
             max-width: 90px !important;
             background-color: rgba(255, 255, 255, 0.98) !important;
@@ -199,25 +179,14 @@
         }
 
         @media (min-width: 640px) {
-            .table-vertical-scroll.is-scrolled .sticky-col {
-                max-width: 130px !important;
-            }
+            .table-vertical-scroll.is-scrolled .sticky-col { max-width: 130px !important; }
         }
 
-        /* Z-INDEX TERTINGGI UTK KELOMPOK DI HEADER & FOOTER (POJOK KIRI) */
-        thead .sticky-col, tfoot .sticky-col {
-            z-index: 30 !important;
-        }
+        thead .sticky-col, tfoot .sticky-col { z-index: 30 !important; }
 
-        #sectionAbsensi thead .sticky-col, #sectionAbsensi tfoot .sticky-col {
-            background-color: rgba(251, 207, 232, 0.98) !important;
-        }
-        #sectionSarpras thead .sticky-col, #sectionSarpras tfoot .sticky-col {
-            background-color: rgba(204, 251, 241, 0.98) !important;
-        }
-        #sectionRekap thead .sticky-col, #sectionRekap tfoot .sticky-col {
-            background-color: rgba(224, 231, 255, 0.98) !important;
-        }
+        #sectionAbsensi thead .sticky-col, #sectionAbsensi tfoot .sticky-col { background-color: rgba(251, 207, 232, 0.98) !important; }
+        #sectionSarpras thead .sticky-col, #sectionSarpras tfoot .sticky-col { background-color: rgba(204, 251, 241, 0.98) !important; }
+        #sectionRekap thead .sticky-col, #sectionRekap tfoot .sticky-col { background-color: rgba(224, 231, 255, 0.98) !important; }
 
         /* MODAL ANIMATIONS */
         .modal-backdrop {
@@ -238,6 +207,36 @@
         .modal-backdrop.active .modal-content-card {
             transform: scale(1) translateY(0);
             opacity: 1;
+        }
+
+        /* POPUP CENTER PICKER OPTION GLASSMORPHISM */
+        #centerPickerModal {
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        #centerPickerModal > div {
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(28px) saturate(200%);
+            -webkit-backdrop-filter: blur(28px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .picker-option-item {
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .picker-option-item:hover, .picker-option-item:active {
+            background: rgba(99, 102, 241, 0.12);
+            color: #4338ca;
+            transform: translateX(4px);
+        }
+        .picker-option-item.active-selected {
+            background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+            color: #ffffff;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
 
         /* SECTION ANIMATIONS */
@@ -262,23 +261,19 @@
 		}
 
         /* CUSTOM SCROLLBAR */
-		#autoJamaahList::-webkit-scrollbar, .scroll-container::-webkit-scrollbar, .table-vertical-scroll::-webkit-scrollbar {
+		#autoJamaahList::-webkit-scrollbar, .scroll-container::-webkit-scrollbar, .table-vertical-scroll::-webkit-scrollbar, #centerPickerOptions::-webkit-scrollbar {
 			height: 6px;
 			width: 6px;
 		}
-		#autoJamaahList::-webkit-scrollbar-track, .scroll-container::-webkit-scrollbar-track, .table-vertical-scroll::-webkit-scrollbar-track {
+		#autoJamaahList::-webkit-scrollbar-track, .scroll-container::-webkit-scrollbar-track, .table-vertical-scroll::-webkit-scrollbar-track, #centerPickerOptions::-webkit-scrollbar-track {
 			background: rgba(241, 245, 249, 0.8);
             border-radius: 8px;
 		}
-		#autoJamaahList::-webkit-scrollbar-thumb, .scroll-container::-webkit-scrollbar-thumb, .table-vertical-scroll::-webkit-scrollbar-thumb {
+		#autoJamaahList::-webkit-scrollbar-thumb, .scroll-container::-webkit-scrollbar-thumb, .table-vertical-scroll::-webkit-scrollbar-thumb, #centerPickerOptions::-webkit-scrollbar-thumb {
 			background: #a5b4fc;
 			border-radius: 8px;
 		}
-		#autoJamaahList::-webkit-scrollbar-thumb:hover, .scroll-container::-webkit-scrollbar-thumb:hover, .table-vertical-scroll::-webkit-scrollbar-thumb:hover {
-			background: #6366f1;
-		}
 
-        /* GLOWING LOADING SCREEN */
         #loadingScreen {
             transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
         }
@@ -290,9 +285,7 @@
             0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
             50% { transform: scale(1.08); box-shadow: 0 0 40px rgba(168, 85, 247, 0.6); }
         }
-        .animate-pulse-glow {
-            animation: pulseGlow 2.5s infinite ease-in-out;
-        }
+        .animate-pulse-glow { animation: pulseGlow 2.5s infinite ease-in-out; }
         
         @keyframes spinGradient {
             0% { transform: rotate(0deg); }
@@ -367,7 +360,7 @@
             <div class="w-12 sm:w-16 h-1.5 bg-gradient-to-r from-indigo-500 to-fuchsia-500 mx-auto mt-4 rounded-full shadow-lg"></div>
         </div>
 
-        <!-- MENU UTAMA DENGAN STYLE KACA / GLASSMORPHISM -->
+        <!-- MENU UTAMA -->
         <div id="mainDashboard" class="section-content grid grid-cols-2 gap-3 sm:gap-5 py-2 sm:py-4">
             <button type="button" onclick="showSection('database')" class="glass-btn-menu flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl group">
                 <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 to-blue-600 text-white rounded-[1.2rem] flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
@@ -462,7 +455,7 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Jenis Kelamin</label>
                     <select id="jenis_kelamin" required class="rounded-box-input w-full p-3 text-sm font-semibold">
-                        <option value="">-- Pilih --</option>
+                        <option value="">-- Pilih Jenis Kelamin --</option>
                         <option value="L">Laki-laki</option>
                         <option value="P">Perempuan</option>
                     </select>
@@ -653,7 +646,6 @@
                     </div>
                 </div>
 
-                <!-- 1. ABSENSI (TAB REKAP) SCROLLABLE & HEADER/FOOTER KETAT STICKY -->
                 <div class="border border-fuchsia-100 rounded-2xl shadow-inner overflow-hidden">
                     <div class="table-vertical-scroll">
                         <table class="w-full text-[11px] sm:text-xs text-left">
@@ -766,7 +758,6 @@
                     </select>
                 </div>
 
-                <!-- 2. SARPRAS (UPDATE DATA SARPRAS) SCROLLABLE & HEADER/FOOTER STICKY -->
                 <div class="border border-teal-100 rounded-2xl w-full shadow-inner overflow-hidden">
                     <div class="table-vertical-scroll">
                         <table class="w-full text-[11px] sm:text-xs text-left">
@@ -915,27 +906,23 @@
                         </div>
                     </div>
 
-                    <!-- 3. REKAP (TAB REKAP PER KLP) SCROLLABLE & HEADER/FOOTER KETAT STICKY -->
                     <div class="border border-indigo-100 rounded-2xl shadow-inner overflow-hidden">
                         <div class="table-vertical-scroll">
                             <table id="tableRekapKelompok" class="w-full text-[10px] sm:text-[11px] text-left">
                                 <thead class="bg-gradient-to-b from-indigo-100 to-indigo-200/80 text-indigo-950 font-extrabold border-b border-indigo-300">
                                     <tr>
                                         <th class="px-2.5 py-3 sticky-col">Kelompok</th>
-                                        <!-- Rekapan Generus -->
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950 border-l border-indigo-200">PAUD</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">TK</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">Cbr</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">Pra Rem</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">Rem</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950 border-r border-indigo-200">Usman</th>
-                                        <!-- Status Jamaah -->
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap">Nikah</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap">Duda</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap">Janda</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap">Manula</th>
                                         <th class="px-1.5 py-3 text-center text-blue-800 bg-blue-100/80 whitespace-nowrap">Opr.</th>
-                                        <!-- Total & Sarpras -->
                                         <th class="px-2 py-3 text-center bg-indigo-200/80 font-black whitespace-nowrap border-l border-indigo-300">Total</th>
                                         <th class="px-1.5 py-3 text-center border-l border-indigo-300 whitespace-nowrap">Sub</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap">Msjd</th>
@@ -994,6 +981,21 @@
             <button type="button" onclick="closeModal('operatorDetailModal')" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-extrabold transition-all duration-300 mt-3 border border-slate-200">
                 Tutup
             </button>
+        </div>
+    </div>
+
+    <!-- MODAL CUSTOM PICKER PILIHAN TEPAT DI TENGAH LAYAR (GLASSMORPHISM) -->
+    <div id="centerPickerModal" class="fixed inset-0 z-[150] flex items-center justify-center p-4 hidden opacity-0" onclick="closeCenterPicker()">
+        <div class="rounded-[2rem] p-5 sm:p-6 max-w-sm w-full transform scale-90 opacity-0 max-h-[75vh] flex flex-col" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between border-b border-slate-200/60 pb-3 mb-3 shrink-0">
+                <span id="centerPickerTitle" class="text-xs font-extrabold uppercase tracking-widest text-indigo-800">Pilih Opsi</span>
+                <button type="button" onclick="closeCenterPicker()" class="p-1.5 text-slate-400 hover:text-slate-800 bg-slate-100/80 rounded-full transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div id="centerPickerOptions" class="overflow-y-auto space-y-1.5 pr-1 flex-1">
+                <!-- Pilihan opsi dirender secara otomatis melalui JS -->
+            </div>
         </div>
     </div>
 
@@ -1060,7 +1062,6 @@
             }, 1000);
         }
 
-        // DETEKSI SCROLL UTK EFEK TERPOTONG / KECILIN KOLOM KELOMPOK
         function initScrollDetectors() {
             document.querySelectorAll('.table-vertical-scroll').forEach(container => {
                 let ticking = false;
@@ -1515,7 +1516,6 @@
             document.getElementById('formJamaah').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // SIMPAN JAMAAH / OPERATOR
         document.getElementById('formJamaah').addEventListener('submit', function(e) {
             e.preventDefault();
             const editId = document.getElementById('edit_jamaah_id').value;
@@ -2026,7 +2026,6 @@
                     }
                 });
 
-                // Rekap Generus
                 if (generusData && generusData.length > 0) {
                     generusData.forEach(g => {
                         if (!selectedFilterDesa || selectedFilterDesa === g.desa) {
@@ -2052,7 +2051,6 @@
                     });
                 }
 
-                // Rekap Status Jamaah
                 jamaahData.forEach(j => {
                     if (!selectedFilterDesa || selectedFilterDesa === j.desa) {
                         const key = `${j.desa}__${j.kelompok}`;
@@ -2075,7 +2073,6 @@
                     }
                 });
 
-                // Rekap Sarpras
                 sarprasData.forEach(s => {
                     if (!selectedFilterDesa || selectedFilterDesa === s.desa) {
                         const key = `${s.desa}__${s.kelompok}`;
@@ -2306,7 +2303,7 @@
         }
 
         /* =========================================================================
-           SISTEM CETAK SESUAI KONTEN YANG DIPILIH
+           SISTEM CETAK
            ========================================================================= */
         function printData(elementId, documentTitle = 'Laporan Sistem Informasi') {
             let targetContentEl;
@@ -2505,6 +2502,110 @@
                     iframe.contentWindow.print();
                 }, 200);
             };
+        }
+
+        /* -------------------------------------------------------------
+         * INTERCEPTOR POPUP OPTION PICKER DI TENGAH LAYAR
+         * ------------------------------------------------------------- */
+        let activeSelectTarget = null;
+
+        document.addEventListener('mousedown', handleSelectClick);
+        document.addEventListener('touchstart', handleSelectClick, { passive: false });
+
+        function handleSelectClick(e) {
+            const select = e.target.closest('select');
+            if (!select || select.disabled) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            activeSelectTarget = select;
+            openCenterPicker(select);
+        }
+
+        function openCenterPicker(select) {
+            const modal = document.getElementById('centerPickerModal');
+            const modalContent = modal.querySelector('div');
+            const titleEl = document.getElementById('centerPickerTitle');
+            const optionsContainer = document.getElementById('centerPickerOptions');
+
+            let labelText = "Pilih Opsi";
+            const parent = select.closest('div');
+            if (parent) {
+                const label = parent.querySelector('label');
+                if (label) labelText = label.textContent;
+            }
+            titleEl.textContent = labelText;
+
+            optionsContainer.innerHTML = '';
+
+            const hasOptGroup = select.querySelectorAll('optgroup').length > 0;
+
+            if (hasOptGroup) {
+                Array.from(select.children).forEach((child) => {
+                    if (child.tagName.toLowerCase() === 'option') {
+                        if (child.disabled) return;
+                        appendPickerOptionItem(optionsContainer, child, select);
+                    } else if (child.tagName.toLowerCase() === 'optgroup') {
+                        const groupDivider = document.createElement('div');
+                        groupDivider.className = "pt-3 pb-1 px-1 border-t border-slate-200/80 mt-2 first:mt-0 first:border-0";
+                        groupDivider.innerHTML = `<span class="text-[10px] font-extrabold uppercase tracking-widest text-indigo-800 bg-indigo-50 px-2.5 py-1 rounded-md inline-block border border-indigo-100/80 shadow-2xs">${child.label}</span>`;
+                        optionsContainer.appendChild(groupDivider);
+
+                        Array.from(child.children).forEach((opt) => {
+                            if (opt.disabled) return;
+                            appendPickerOptionItem(optionsContainer, opt, select);
+                        });
+                    }
+                });
+            } else {
+                Array.from(select.options).forEach((opt) => {
+                    if (opt.disabled) return;
+                    appendPickerOptionItem(optionsContainer, opt, select);
+                });
+            }
+
+            modal.classList.remove('hidden');
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            modalContent.classList.remove('scale-90', 'opacity-0');
+            modalContent.classList.add('scale-100', 'opacity-100');
+        }
+
+        function appendPickerOptionItem(container, opt, select) {
+            const item = document.createElement('button');
+            item.type = "button";
+            const isSelected = (opt.value === select.value);
+            item.className = `w-full text-left p-3 rounded-xl text-xs font-semibold flex items-center justify-between cursor-pointer picker-option-item ${isSelected ? 'active-selected' : 'text-slate-700 bg-white/40 border border-white/60'}`;
+            
+            item.innerHTML = `
+                <span>${opt.text}</span>
+                ${isSelected ? `<svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>` : ''}
+            `;
+
+            item.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                select.value = opt.value;
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+                closeCenterPicker();
+            });
+
+            container.appendChild(item);
+        }
+
+        function closeCenterPicker() {
+            const modal = document.getElementById('centerPickerModal');
+            if (!modal || modal.classList.contains('hidden')) return;
+
+            const modalContent = modal.querySelector('div');
+            modal.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-90', 'opacity-0');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                activeSelectTarget = null;
+            }, 300);
         }
     </script>
 </body>
