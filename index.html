@@ -67,9 +67,9 @@
             opacity: 1;
         }
 
-        /* MEMINDAHKAN SCROLLBAR / SLIDER KE ATAS TABEL */
+        /* PERBAIKAN SCROLLBAR DI ATAS TABEL */
         .scroll-top-container {
-            overflow-x: auto;
+            overflow-x: auto !important;
             transform: rotateX(180deg);
             -webkit-overflow-scrolling: touch;
             touch-action: pan-x pan-y;
@@ -77,37 +77,61 @@
 
         .scroll-top-container > table {
             transform: rotateX(180deg);
+            min-width: 650px;
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
         }
 
-        /* STICKY COLUMN UNTUK NAMA KELOMPOK (TETAP TERLIHAT SAAT DIGESER) */
+        /* KOLOM STICKY KELOMPOK (SMOOTH, TRANSPARAN & ADAPTIF) */
         .sticky-col {
-            position: sticky;
-            left: 0;
-            background-color: #ffffff !important;
-            z-index: 10;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 110px;
+            position: sticky !important;
+            left: 0 !important;
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 10 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            
+            /* LEBAR AWAL FULL (SBLM DIGESER) */
+            max-width: 180px;
             min-width: 90px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            
+            transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease, background-color 0.35s ease;
+            box-shadow: none;
+            will-change: max-width, box-shadow;
         }
 
         @media (min-width: 640px) {
             .sticky-col {
-                max-width: 160px;
-                min-width: 120px;
+                max-width: 240px;
+                min-width: 130px;
+            }
+        }
+
+        /* KETIKA TABEL DIGESER KE SAMPLING (EFEK TERPOTONG & SMOOTH SHADOW) */
+        .scroll-top-container.is-scrolled .sticky-col {
+            max-width: 90px !important;
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            box-shadow: 4px 0 12px -2px rgba(79, 70, 229, 0.18) !important;
+        }
+
+        @media (min-width: 640px) {
+            .scroll-top-container.is-scrolled .sticky-col {
+                max-width: 130px !important;
             }
         }
 
         thead .sticky-col {
-            background-color: #eef2ff !important;
-            z-index: 11;
+            background-color: rgba(238, 242, 255, 0.95) !important;
+            z-index: 11 !important;
         }
 
         tfoot .sticky-col {
-            background-color: #e0e7ff !important;
-            z-index: 11;
+            background-color: rgba(224, 231, 255, 0.95) !important;
+            z-index: 11 !important;
         }
 
         /* MODAL ANIMATIONS */
@@ -152,18 +176,20 @@
 			animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 		}
 
-        /* CUSTOM SCROLLBAR */
-		#autoJamaahList::-webkit-scrollbar, .scroll-container::-webkit-scrollbar {
+        /* CUSTOM SCROLLBAR ATAS */
+		#autoJamaahList::-webkit-scrollbar, .scroll-container::-webkit-scrollbar, .scroll-top-container::-webkit-scrollbar {
+			height: 6px;
 			width: 6px;
 		}
-		#autoJamaahList::-webkit-scrollbar-track, .scroll-container::-webkit-scrollbar-track {
-			background: transparent;
+		#autoJamaahList::-webkit-scrollbar-track, .scroll-container::-webkit-scrollbar-track, .scroll-top-container::-webkit-scrollbar-track {
+			background: rgba(241, 245, 249, 0.8);
+            border-radius: 8px;
 		}
-		#autoJamaahList::-webkit-scrollbar-thumb, .scroll-container::-webkit-scrollbar-thumb {
+		#autoJamaahList::-webkit-scrollbar-thumb, .scroll-container::-webkit-scrollbar-thumb, .scroll-top-container::-webkit-scrollbar-thumb {
 			background: #a5b4fc;
 			border-radius: 8px;
 		}
-		#autoJamaahList::-webkit-scrollbar-thumb:hover, .scroll-container::-webkit-scrollbar-thumb:hover {
+		#autoJamaahList::-webkit-scrollbar-thumb:hover, .scroll-container::-webkit-scrollbar-thumb:hover, .scroll-top-container::-webkit-scrollbar-thumb:hover {
 			background: #6366f1;
 		}
 
@@ -541,11 +567,12 @@
                     </div>
                 </div>
 
+                <!-- 1. ABSENSI (TAB REKAP) WITH SCROLL ATAS & EFEK SMOOTH -->
                 <div class="border border-fuchsia-100 rounded-2xl scroll-top-container shadow-inner overflow-hidden">
                     <table class="w-full text-[11px] sm:text-xs text-left">
                         <thead class="bg-gradient-to-r from-fuchsia-50 to-pink-50 text-fuchsia-900 font-extrabold border-b border-fuchsia-100">
                             <tr>
-                                <th class="px-2 py-3 whitespace-nowrap sticky-col">Kelompok</th>
+                                <th class="px-2.5 py-3 whitespace-nowrap sticky-col">Kelompok</th>
                                 <th class="px-2 py-3 text-center whitespace-nowrap">Tanggal</th>
                                 <th class="px-2 py-3 text-center whitespace-nowrap">Hadir (L/P)</th>
                                 <th class="px-2 py-3 text-center whitespace-nowrap">Ijin</th>
@@ -651,11 +678,12 @@
                     </select>
                 </div>
 
+                <!-- 2. SARPRAS (UPDATE DATA SARPRAS) WITH SCROLL ATAS & EFEK SMOOTH -->
                 <div class="border border-teal-100 rounded-2xl scroll-top-container w-full shadow-inner overflow-hidden">
-                    <table class="w-full min-w-[650px] text-[11px] sm:text-xs text-left">
+                    <table class="w-full text-[11px] sm:text-xs text-left">
                         <thead class="bg-gradient-to-r from-teal-50 to-emerald-50 text-teal-900 font-extrabold border-b border-teal-100">
                             <tr>
-                                <th class="px-2 py-3 sticky-col">Kelompok</th>
+                                <th class="px-2.5 py-3 sticky-col">Kelompok</th>
                                 <th class="px-2 py-3 text-center whitespace-nowrap">Status Tanah</th>
                                 <th class="px-2 py-3 text-center whitespace-nowrap">Masjid / Aula</th>
                                 <th class="px-2 py-3 text-center whitespace-nowrap">Toilet (L/P)</th>
@@ -796,12 +824,12 @@
                         </div>
                     </div>
 
-                    <!-- CONTAINER TABEL -->
+                    <!-- 3. REKAP (TAB REKAP PER KLP) WITH SCROLL ATAS & EFEK SMOOTH -->
                     <div class="border border-indigo-100 rounded-2xl scroll-top-container shadow-inner overflow-hidden">
                         <table id="tableRekapKelompok" class="w-full text-[10px] sm:text-[11px] text-left">
                             <thead class="bg-gradient-to-b from-indigo-50 to-indigo-100/50 text-indigo-950 font-extrabold border-b border-indigo-200">
                                 <tr>
-                                    <th class="px-2 py-3 sticky-col">Kelompok</th>
+                                    <th class="px-2.5 py-3 sticky-col">Kelompok</th>
                                     <!-- Rekapan Generus -->
                                     <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100/60 text-fuchsia-900 border-l border-indigo-100">PAUD</th>
                                     <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100/60 text-fuchsia-900">TK</th>
@@ -939,6 +967,7 @@
             }, 1000);
         }
 
+        // DETEKSI SCROLL UTK EFEK TERPOTONG / KECILIN KOLOM KELOMPOK
         function initScrollDetectors() {
             document.querySelectorAll('.scroll-top-container').forEach(container => {
                 let ticking = false;
@@ -954,7 +983,7 @@
                         });
                         ticking = true;
                     }
-                });
+                }, { passive: true });
             });
         }
 
@@ -1642,7 +1671,7 @@
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-teal-50/50 transition-colors";
                     tr.innerHTML = `
-                        <td class="px-2 py-3 font-extrabold text-teal-900 sticky-col" title="${s.kelompok}">${s.kelompok}</td>
+                        <td class="px-2.5 py-3 font-extrabold text-teal-900 sticky-col" title="${s.kelompok}">${s.kelompok}</td>
                         <td class="px-2 py-3 text-center font-semibold text-slate-700 whitespace-nowrap">${s.status_tanah || '-'}</td>
                         <td class="px-2 py-3 text-center font-bold whitespace-nowrap">${s.jumlah_masjid || 0} / ${s.jumlah_aula || 0}</td>
                         <td class="px-2 py-3 text-center font-black text-teal-700 whitespace-nowrap">${s.km_pria || 0}L / ${s.km_wanita || 0}P</td>
@@ -1985,7 +2014,7 @@
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-indigo-50/50 transition-colors";
                     tr.innerHTML = `
-                        <td class="px-2 py-3 font-extrabold text-indigo-900 sticky-col" title="${item.kelompok}">${item.kelompok}</td>
+                        <td class="px-2.5 py-3 font-extrabold text-indigo-900 sticky-col" title="${item.kelompok}">${item.kelompok}</td>
                         <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900 border-l border-indigo-100">${item.paud}</td>
                         <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.tk}</td>
                         <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.caberawit}</td>
@@ -2010,7 +2039,7 @@
 
                 tfoot.innerHTML = `
                     <tr>
-                        <td class="px-2 py-4 text-left font-black uppercase sticky-col bg-indigo-200/50">TOTAL</td>
+                        <td class="px-2.5 py-4 text-left font-black uppercase sticky-col bg-indigo-200/50">TOTAL</td>
                         <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/60 border-l border-indigo-200">${totPaud}</td>
                         <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/60">${totTk}</td>
                         <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/60">${totCaberawit}</td>
@@ -2108,7 +2137,7 @@
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-fuchsia-50/50 transition-colors";
                     tr.innerHTML = `
-                        <td class="px-2 py-3 font-extrabold text-fuchsia-900 whitespace-nowrap sticky-col" title="${item.kelompok}">${item.kelompok}</td>
+                        <td class="px-2.5 py-3 font-extrabold text-fuchsia-900 whitespace-nowrap sticky-col" title="${item.kelompok}">${item.kelompok}</td>
                         <td class="px-2 py-3 text-center whitespace-nowrap font-semibold text-slate-600">${tglFormatted}</td>
                         <td class="px-2 py-3 text-center whitespace-nowrap font-bold">${item.jumlah_laki}L / ${item.jumlah_perempuan}P</td>
                         <td class="px-2 py-3 text-center whitespace-nowrap font-bold text-pink-600">${item.jumlah_ijin || 0} Orang</td>
@@ -2120,7 +2149,7 @@
 
                 tfoot.innerHTML = `
                     <tr>
-                        <td class="px-2 py-4 text-left font-black uppercase whitespace-nowrap sticky-col bg-fuchsia-200/50" colspan="2">TOTAL KESELURUHAN</td>
+                        <td class="px-2.5 py-4 text-left font-black uppercase whitespace-nowrap sticky-col bg-fuchsia-200/50" colspan="2">TOTAL KESELURUHAN</td>
                         <td class="px-2 py-4 text-center font-black text-fuchsia-950 whitespace-nowrap">${totalLaki}L / ${totalPerempuan}P</td>
                         <td class="px-2 py-4 text-center font-black text-pink-800 whitespace-nowrap">${totalIjin} Orang</td>
                         <td class="px-2 py-4 text-right font-black text-emerald-700 whitespace-nowrap text-[13px]">Rp${totalInfaq.toLocaleString('id-ID')}</td>
