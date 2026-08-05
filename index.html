@@ -7,7 +7,7 @@
 
     <link rel="icon" type="image/jpeg" href="logo sdc tw.png">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ea580c">
+    <meta name="theme-color" content="#4f46e5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -15,24 +15,51 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+        
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #fff7ed;
+            font-family: 'Outfit', sans-serif;
+            background-color: #f8fafc;
             -webkit-tap-highlight-color: transparent;
         }
+
+        /* ANIMATED BACKGROUND MESH */
+        .animated-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            background: linear-gradient(-45deg, #e0c3fc, #8ec5fc, #e0eafc, #f3e7e9);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* GLASSMORPHISM CARD */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 40px rgba(79, 70, 229, 0.1);
+        }
         
+        /* PREMIUM INPUTS */
         .rounded-box-input {
-            transition: all 0.2s ease-in-out;
-            background-color: #ffffff;
-            border: 2px solid #fed7aa;
-            border-radius: 0.75rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e2e8f0;
+            border-radius: 1rem;
         }
         .rounded-box-input:focus {
             background-color: #ffffff;
-            border-color: #f97316;
-            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+            border-color: #6366f1;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
             outline: none;
+            transform: translateY(-2px);
         }
 
         input.input-transparent-zero::placeholder {
@@ -55,7 +82,8 @@
         .sticky-col {
             position: sticky;
             left: 0;
-            background-color: #ffffff !important;
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(8px);
             z-index: 10;
             transition: max-width 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s ease;
             box-shadow: none;
@@ -74,21 +102,22 @@
 
         .scroll-top-container.is-scrolled .sticky-col {
             max-width: 90px;
-            box-shadow: 3px 0 6px -2px rgba(0, 0, 0, 0.15);
+            box-shadow: 3px 0 10px -2px rgba(79, 70, 229, 0.15);
         }
 
         thead .sticky-col {
-            background-color: #fff7ed !important;
+            background-color: #eef2ff !important;
             z-index: 11;
         }
 
         tfoot .sticky-col {
-            background-color: #ffedd5 !important;
+            background-color: #e0e7ff !important;
             z-index: 11;
         }
 
+        /* MODAL ANIMATIONS */
         .modal-backdrop {
-            transition: opacity 0.25s ease-out;
+            transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0;
             pointer-events: none;
         }
@@ -98,8 +127,8 @@
         }
         
         .modal-content-card {
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease-out;
-            transform: scale(0.95) translateY(10px);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease-out;
+            transform: scale(0.85) translateY(20px);
             opacity: 0;
         }
         .modal-backdrop.active .modal-content-card {
@@ -107,95 +136,103 @@
             opacity: 1;
         }
 
+        /* SECTION ANIMATIONS */
         .section-content {
             opacity: 0;
-            transform: translateY(16px);
-            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(20px) scale(0.98);
+            transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .section-content.section-active {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
         }
 
 		@keyframes fadeInUp {
-			from {
-				opacity: 0;
-				transform: translateY(12px);
-			}
-			to {
-				opacity: 1;
-				transform: translateY(0);
-			}
+			0% { opacity: 0; transform: translateY(20px); }
+			100% { opacity: 1; transform: translateY(0); }
 		}
 
 		.animate-fade-in-up {
-			animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+			animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 		}
 
-		#autoJamaahList::-webkit-scrollbar {
-			width: 5px;
+        /* CUSTOM SCROLLBAR */
+		#autoJamaahList::-webkit-scrollbar, .scroll-container::-webkit-scrollbar {
+			width: 6px;
 		}
-		#autoJamaahList::-webkit-scrollbar-track {
-			background: #fff7ed;
+		#autoJamaahList::-webkit-scrollbar-track, .scroll-container::-webkit-scrollbar-track {
+			background: transparent;
+		}
+		#autoJamaahList::-webkit-scrollbar-thumb, .scroll-container::-webkit-scrollbar-thumb {
+			background: #a5b4fc;
 			border-radius: 8px;
 		}
-		#autoJamaahList::-webkit-scrollbar-thumb {
-			background: #fdba74;
-			border-radius: 8px;
-		}
-		#autoJamaahList::-webkit-scrollbar-thumb:hover {
-			background: #f97316;
+		#autoJamaahList::-webkit-scrollbar-thumb:hover, .scroll-container::-webkit-scrollbar-thumb:hover {
+			background: #6366f1;
 		}
 
+        /* GLOWING LOADING SCREEN */
         #loadingScreen {
-            transition: opacity 0.5s ease-out, visibility 0.5s;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
         }
         #loadingScreen.fade-out {
             opacity: 0;
             visibility: hidden;
         }
         @keyframes pulseGlow {
-            0%, 100% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.05); opacity: 1; box-shadow: 0 0 25px rgba(249, 115, 22, 0.4); }
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+            50% { transform: scale(1.08); box-shadow: 0 0 40px rgba(168, 85, 247, 0.6); }
         }
         .animate-pulse-glow {
-            animation: pulseGlow 2s infinite ease-in-out;
+            animation: pulseGlow 2.5s infinite ease-in-out;
+        }
+        
+        @keyframes spinGradient {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loader-ring {
+            border: 4px solid transparent;
+            border-top-color: #6366f1;
+            border-right-color: #a855f7;
+            animation: spinGradient 1s linear infinite;
         }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 sm:p-6 antialiased text-slate-800">
+    <div class="animated-bg"></div>
 
     <!-- ANIMASI LOADING -->
-    <div id="loadingScreen" class="fixed inset-0 bg-amber-50/95 backdrop-blur-md z-[100] flex flex-col items-center justify-center p-4">
+    <div id="loadingScreen" class="fixed inset-0 bg-white/60 backdrop-blur-xl z-[100] flex flex-col items-center justify-center p-4">
         <div class="relative flex flex-col items-center">
-            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-orange-500/30 p-1.5 bg-white shadow-2xl animate-pulse-glow flex items-center justify-center mb-6 overflow-hidden">
-                <img src="logo sdc tw.png" alt="Logo Insan Qur'any" class="w-full h-full object-contain">
+            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full p-2 bg-white/80 backdrop-blur-md shadow-[0_0_40px_rgba(99,102,241,0.4)] animate-pulse-glow flex items-center justify-center mb-8 overflow-hidden border border-indigo-200">
+                <img src="logo sdc tw.png" alt="Logo Insan Qur'any" class="w-full h-full object-contain drop-shadow-md">
             </div>
-            <div class="w-10 h-10 sm:w-12 sm:h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mb-4"></div>
-            <h3 class="text-base sm:text-lg font-bold text-slate-800 tracking-wide text-center">INSAN QUR'ANY TAWANGMANGU</h3>
-            <p class="text-xs text-slate-500 mt-1 font-medium">Memuat Sistem Informasi...</p>
+            <div class="w-10 h-10 sm:w-12 sm:h-12 loader-ring rounded-full mb-5"></div>
+            <h3 class="text-base sm:text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-fuchsia-500 tracking-wider text-center">INSAN QUR'ANY TAWANGMANGU</h3>
+            <p class="text-xs text-indigo-400 mt-2 font-semibold tracking-widest uppercase">Memuat Sistem Informasi...</p>
         </div>
     </div>
 
     <!-- MODAL AUTHENTICATION -->
-    <div id="authModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[90] flex items-center justify-center p-4 transition-all duration-300">
-        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl border border-orange-100 text-center space-y-5 animate-fade-in-up">
-            <div id="authIconBox" class="w-16 h-16 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-inner transition-colors duration-300">
+    <div id="authModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[90] flex items-center justify-center p-4 transition-all duration-300">
+        <div class="glass-card rounded-[2rem] p-6 sm:p-8 max-w-sm w-full text-center space-y-6 animate-fade-in-up">
+            <div id="authIconBox" class="w-20 h-20 bg-gradient-to-br from-indigo-100 to-fuchsia-100 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto text-4xl shadow-inner transition-colors duration-300 transform hover:scale-105 hover:rotate-3">
                 🔒
             </div>
             <div>
-                <h3 id="authTitle" class="text-xl font-extrabold text-slate-800">Akses Terkunci</h3>
-                <p id="authSubtitle" class="text-xs text-slate-500 mt-1">Masukkan kata sandi untuk mengakses aplikasi</p>
+                <h3 id="authTitle" class="text-2xl font-extrabold text-slate-800 tracking-tight">Akses Terkunci</h3>
+                <p id="authSubtitle" class="text-xs text-slate-500 mt-1 font-medium">Masukkan kata sandi untuk mengakses aplikasi</p>
             </div>
-            <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-3">
+            <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
                 <div>
-                    <input type="password" id="appPasswordInput" required placeholder="Masukkan Password" class="rounded-box-input w-full p-3 text-center text-sm font-bold tracking-widest text-slate-800 transition-all duration-200">
-                    <p id="authErrorMsg" class="text-[11px] text-red-500 font-semibold mt-2 hidden">⚠️ Password salah! Silakan coba lagi.</p>
-                    <p id="authSuccessMsg" class="text-[11px] text-emerald-600 font-bold mt-2 hidden">✅ Password Benar! Mengalihkan...</p>
+                    <input type="password" id="appPasswordInput" required placeholder="Masukkan Password" class="rounded-box-input w-full p-3.5 text-center text-sm font-bold tracking-widest text-indigo-900 transition-all duration-300">
+                    <p id="authErrorMsg" class="text-[11px] text-red-500 font-bold mt-2 hidden">⚠️ Password salah! Silakan coba lagi.</p>
+                    <p id="authSuccessMsg" class="text-[11px] text-emerald-500 font-bold mt-2 hidden">✅ Password Benar! Mengalihkan...</p>
                 </div>
-                <button type="submit" id="authSubmitBtn" class="w-full py-3 bg-orange-500 hover:bg-orange-600 active:scale-[0.98] text-white rounded-xl text-xs font-bold transition duration-200 shadow-md hover:shadow-orange-200 flex items-center justify-center gap-2">
-                    <span id="authBtnSpinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                <button type="submit" id="authSubmitBtn" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-fuchsia-500 hover:from-indigo-700 hover:to-fuchsia-600 active:scale-[0.98] text-white rounded-xl text-sm font-bold transition-all duration-300 shadow-[0_8px_20px_rgba(99,102,241,0.3)] flex items-center justify-center gap-2">
+                    <span id="authBtnSpinner" class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                     <span id="authBtnText">Buka Aplikasi</span>
                 </button>
             </form>
@@ -203,117 +240,121 @@
     </div>
 
     <!-- CONTAINER UTAMA -->
-    <div class="bg-white p-4 sm:p-8 rounded-2xl shadow-xl border border-orange-100 w-full max-w-2xl my-2 sm:my-4 relative">
+    <div class="glass-card p-4 sm:p-8 rounded-[2rem] w-full max-w-2xl my-2 sm:my-4 relative transition-all duration-500 hover:shadow-[0_15px_50px_rgba(99,102,241,0.15)]">
         
-        <button type="button" onclick="window.location.reload()" title="Refresh Halaman" aria-label="Refresh Halaman" class="absolute top-3 left-3 sm:top-4 sm:left-4 p-2 bg-orange-50 hover:bg-orange-100 active:scale-95 text-orange-600 border border-orange-200 rounded-xl transition duration-200 shadow-sm z-20 flex items-center justify-center">
-            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <button type="button" onclick="window.location.reload()" title="Refresh Halaman" aria-label="Refresh Halaman" class="absolute top-4 left-4 sm:top-6 sm:left-6 p-2.5 bg-white/60 hover:bg-white active:scale-90 text-indigo-600 border border-indigo-100 rounded-xl transition duration-300 shadow-sm hover:shadow-md z-20 flex items-center justify-center backdrop-blur-md">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 transition-transform hover:rotate-180 duration-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
         </button>
 
-        <div class="flex justify-center mb-3 sm:mb-4">
-            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-orange-400 p-1 bg-white shadow-md flex items-center justify-center overflow-hidden">
-                <img src="logo sdc tw.png" alt="Logo Insan Qur'any Tawangmangu" class="w-full h-full object-contain">
+        <div class="flex justify-center mb-4 sm:mb-5">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-[3px] border-indigo-200 p-1.5 bg-white shadow-xl flex items-center justify-center overflow-hidden transform hover:scale-110 transition-transform duration-500">
+                <img src="logo sdc tw.png" alt="Logo Insan Qur'any Tawangmangu" class="w-full h-full object-contain drop-shadow-sm">
             </div>
         </div>
 
-        <div class="text-center mb-5 sm:mb-6">
-            <h2 id="mainTitle" class="text-xl sm:text-2xl font-bold text-slate-800 leading-tight">INSAN QUR'ANY<br>TAWANGMANGU</h2>
-            <p id="mainSubtitle" class="text-[11px] sm:text-xs text-slate-500 mt-1">Sistem Informasi Jamaah & Sarana Prasarana</p>
-            <div class="w-10 sm:w-12 h-1 bg-orange-500 mx-auto mt-2.5 rounded-full"></div>
+        <div class="text-center mb-6 sm:mb-8">
+            <h2 id="mainTitle" class="text-2xl sm:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-fuchsia-600 leading-tight tracking-tight">INSAN QUR'ANY<br>TAWANGMANGU</h2>
+            <p id="mainSubtitle" class="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium">Sistem Informasi Jamaah & Sarana Prasarana</p>
+            <div class="w-12 sm:w-16 h-1.5 bg-gradient-to-r from-indigo-500 to-fuchsia-500 mx-auto mt-4 rounded-full shadow-lg"></div>
         </div>
 
         <!-- MENU UTAMA -->
-        <div id="mainDashboard" class="section-content grid grid-cols-2 gap-3 sm:gap-4 py-2 sm:py-4">
-            <button type="button" onclick="showSection('database')" class="flex flex-col items-center justify-center p-3.5 sm:p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
-                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
-                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <div id="mainDashboard" class="section-content grid grid-cols-2 gap-3 sm:gap-5 py-2 sm:py-4">
+            <button type="button" onclick="showSection('database')" class="flex flex-col items-center justify-center p-4 sm:p-6 bg-white/40 backdrop-blur-sm hover:bg-white/80 border border-white hover:border-indigo-200 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_25px_rgba(99,102,241,0.2)] group">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 to-blue-600 text-white rounded-[1.2rem] flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
+                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                     </svg>
                 </div>
-                <span class="text-[11px] sm:text-xs font-bold text-slate-800 group-hover:text-orange-600">DATABASE</span>
-                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-0.5">Input & Edit Jamaah</span>
+                <span class="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-indigo-700 tracking-wide">DATABASE</span>
+                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-1 font-medium">Input & Edit Jamaah</span>
             </button>
 
-            <button type="button" onclick="showSection('absensi')" class="flex flex-col items-center justify-center p-3.5 sm:p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
-                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
-                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <button type="button" onclick="showSection('absensi')" class="flex flex-col items-center justify-center p-4 sm:p-6 bg-white/40 backdrop-blur-sm hover:bg-white/80 border border-white hover:border-fuchsia-200 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_25px_rgba(168,85,247,0.2)] group">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-fuchsia-500 to-pink-600 text-white rounded-[1.2rem] flex items-center justify-center mb-3 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 shadow-lg">
+                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
-                <span class="text-[11px] sm:text-xs font-bold text-slate-800 group-hover:text-orange-600">ABSENSI</span>
-                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-0.5">Absensi Kegiatan</span>
+                <span class="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-fuchsia-700 tracking-wide">ABSENSI</span>
+                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-1 font-medium">Absensi Kegiatan</span>
             </button>
 
-            <button type="button" onclick="showSection('sarpras')" class="flex flex-col items-center justify-center p-3.5 sm:p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
-                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
-                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <button type="button" onclick="showSection('sarpras')" class="flex flex-col items-center justify-center p-4 sm:p-6 bg-white/40 backdrop-blur-sm hover:bg-white/80 border border-white hover:border-teal-200 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_25px_rgba(20,184,166,0.2)] group">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-teal-500 to-emerald-600 text-white rounded-[1.2rem] flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
+                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                         <path d="M3 21h13V9L9.5 4 3 9v12z"></path>
                         <path d="M7 13h5v8H7z"></path>
                         <path d="M16 21h5v-6l-2.5-2L16 15v6z"></path>
                     </svg>
                 </div>
-                <span class="text-[11px] sm:text-xs font-bold text-slate-800 group-hover:text-orange-600">SARPRAS</span>
-                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-0.5">Fasilitas Kelompok</span>
+                <span class="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-teal-700 tracking-wide">SARPRAS</span>
+                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-1 font-medium">Fasilitas Kelompok</span>
             </button>
 
-            <button type="button" onclick="showSection('rekap')" class="flex flex-col items-center justify-center p-3.5 sm:p-5 bg-orange-50/60 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl transition-all duration-200 hover:scale-105 shadow-sm group">
-                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-orange-600 shadow-md transition-colors">
-                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <button type="button" onclick="showSection('rekap')" class="flex flex-col items-center justify-center p-4 sm:p-6 bg-white/40 backdrop-blur-sm hover:bg-white/80 border border-white hover:border-amber-200 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_25px_rgba(245,158,11,0.2)] group">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-amber-500 to-orange-500 text-white rounded-[1.2rem] flex items-center justify-center mb-3 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 shadow-lg">
+                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                 </div>
-                <span class="text-[11px] sm:text-xs font-bold text-slate-800 group-hover:text-orange-600">REKAP</span>
-                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-0.5">Data & Laporan</span>
+                <span class="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-amber-700 tracking-wide">REKAP</span>
+                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-1 font-medium">Data & Laporan</span>
             </button>
         </div>
 
         <!-- ================= SECTION DATABASE JAMAAH ================= -->
         <div id="sectionDatabase" class="section-content hidden">
-            <button type="button" onclick="showSection('home')" class="mb-4 inline-flex items-center gap-1 text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-200 transition">
-                &larr; Kembali ke Menu Utama
+            <button type="button" onclick="showSection('home')" class="mb-5 inline-flex items-center gap-2 text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50/80 px-4 py-2 rounded-xl border border-indigo-200 transition-all hover:-translate-x-1 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Kembali ke Menu Utama
             </button>
 
-            <div class="bg-orange-100/70 p-1 rounded-xl grid grid-cols-2 gap-1 mb-5 max-w-xs mx-auto border border-orange-200">
-                <button type="button" id="tabDaftar" onclick="switchMode('DAFTAR')" class="py-2 text-xs font-semibold rounded-lg bg-orange-500 text-white shadow-sm transition">Daftar Baru</button>
-                <button type="button" id="tabUpdate" onclick="switchMode('UPDATE')" class="py-2 text-xs font-semibold rounded-lg text-orange-800 hover:bg-orange-200/50 transition">Update Data</button>
+            <div class="bg-indigo-50/70 p-1.5 rounded-2xl grid grid-cols-2 gap-1 mb-6 max-w-sm mx-auto border border-indigo-100 shadow-inner">
+                <button type="button" id="tabDaftar" onclick="switchMode('DAFTAR')" class="py-2.5 text-xs font-bold rounded-xl bg-indigo-600 text-white shadow-md transition-all duration-300">Daftar Baru</button>
+                <button type="button" id="tabUpdate" onclick="switchMode('UPDATE')" class="py-2.5 text-xs font-bold rounded-xl text-indigo-800 hover:bg-indigo-200/50 transition-all duration-300">Update Data</button>
             </div>
 
-            <div id="searchSection" class="hidden bg-orange-50/50 p-3.5 sm:p-4 rounded-xl border border-orange-200 mb-5 space-y-3">
-                <h3 class="text-xs font-bold text-orange-800 uppercase">Pilih Desa dan Kelompok Dulu</h3>
-                <div class="grid grid-cols-2 gap-2">
+            <div id="searchSection" class="hidden bg-white/60 p-4 sm:p-5 rounded-2xl border border-indigo-100 shadow-sm mb-6 space-y-4 backdrop-blur-md">
+                <h3 class="text-xs font-extrabold text-indigo-800 uppercase flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    Pilih Desa dan Kelompok Dulu
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Desa</label>
-                        <select id="searchDesa" class="rounded-box-input w-full p-2 text-xs">
+                        <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 ml-1">Desa</label>
+                        <select id="searchDesa" class="rounded-box-input w-full p-2.5 text-xs font-semibold">
                             <option value="">-- Desa --</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Kelompok</label>
-                        <select id="searchKelompok" disabled class="rounded-box-input w-full p-2 text-xs bg-slate-50">
+                        <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 ml-1">Kelompok</label>
+                        <select id="searchKelompok" disabled class="rounded-box-input w-full p-2.5 text-xs font-semibold bg-slate-100/50 text-slate-400">
                             <option value="">-- Pilih Desa Dulu --</option>
                         </select>
                     </div>
                 </div>
 
-                <div id="autoJamaahListContainer" class="hidden mt-3 pt-3 border-t border-orange-200/70">
-                    <p class="text-[11px] font-semibold text-slate-600 mb-2">Pilih nama jamaah di bawah ini untuk mengedit data:</p>
-                    <div id="autoJamaahList" class="max-h-48 overflow-y-auto space-y-1.5 pr-1"></div>
+                <div id="autoJamaahListContainer" class="hidden mt-4 pt-4 border-t border-indigo-100 border-dashed">
+                    <p class="text-[11px] font-semibold text-slate-600 mb-3 ml-1">Pilih nama jamaah di bawah ini untuk mengedit data:</p>
+                    <div id="autoJamaahList" class="max-h-52 overflow-y-auto space-y-2 pr-1"></div>
                 </div>
             </div>
 
             <!-- Form Main Jamaah -->
-            <form id="formJamaah" class="space-y-3.5 sm:space-y-4 pt-1">
+            <form id="formJamaah" class="space-y-4 sm:space-y-5 pt-1">
                 <input type="hidden" id="edit_jamaah_id">
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap</label>
-                    <input type="text" id="nama" required placeholder="Sesuai KTP/KK" oninput="autoCapitalize(this)" class="rounded-box-input w-full p-2.5 text-xs sm:text-sm">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Nama Lengkap</label>
+                    <input type="text" id="nama" required placeholder="Sesuai KTP/KK" oninput="autoCapitalize(this)" class="rounded-box-input w-full p-3 text-sm font-semibold">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Kelamin</label>
-                    <select id="jenis_kelamin" required class="rounded-box-input w-full p-2.5 text-xs sm:text-sm">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Jenis Kelamin</label>
+                    <select id="jenis_kelamin" required class="rounded-box-input w-full p-3 text-sm font-semibold">
                         <option value="">-- Pilih --</option>
                         <option value="L">Laki-laki</option>
                         <option value="P">Perempuan</option>
@@ -321,22 +362,22 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Tempat Lahir</label>
-                    <input type="text" id="tempat_lahir" required placeholder="Kota/Kab" oninput="autoCapitalize(this)" class="rounded-box-input w-full p-2.5 text-xs sm:text-sm">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Tempat Lahir</label>
+                    <input type="text" id="tempat_lahir" required placeholder="Kota/Kab" oninput="autoCapitalize(this)" class="rounded-box-input w-full p-3 text-sm font-semibold">
                 </div>
 
                 <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="block text-xs font-semibold text-slate-700">Tanggal Lahir</label>
-                        <span id="displayUmur" class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200 hidden">
+                    <div class="flex justify-between items-center mb-1.5 px-1">
+                        <label class="block text-xs font-bold text-slate-700">Tanggal Lahir</label>
+                        <span id="displayUmur" class="text-xs font-bold text-fuchsia-600 bg-fuchsia-50 px-2.5 py-1 rounded-md border border-fuchsia-200 hidden shadow-sm animate-fade-in-up">
                             Umur: <span id="umurVal">0</span> thn
                         </span>
                     </div>
-                    <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
-                        <select id="tgl_lahir_tgl" required onchange="hitungUmurOtomatis()" class="rounded-box-input w-full p-2 sm:p-2.5 text-xs sm:text-sm">
+                    <div class="grid grid-cols-3 gap-2 sm:gap-3">
+                        <select id="tgl_lahir_tgl" required onchange="hitungUmurOtomatis()" class="rounded-box-input w-full p-3 text-sm font-semibold">
                             <option value="">Tanggal</option>
                         </select>
-                        <select id="tgl_lahir_bln" required onchange="hitungUmurOtomatis()" class="rounded-box-input w-full p-2 sm:p-2.5 text-xs sm:text-sm">
+                        <select id="tgl_lahir_bln" required onchange="hitungUmurOtomatis()" class="rounded-box-input w-full p-3 text-sm font-semibold">
                             <option value="">Bulan</option>
                             <option value="01">Januari</option>
                             <option value="02">Februari</option>
@@ -351,46 +392,49 @@
                             <option value="11">November</option>
                             <option value="12">Desember</option>
                         </select>
-                        <select id="tgl_lahir_thn" required onchange="hitungUmurOtomatis()" class="rounded-box-input w-full p-2 sm:p-2.5 text-xs sm:text-sm">
+                        <select id="tgl_lahir_thn" required onchange="hitungUmurOtomatis()" class="rounded-box-input w-full p-3 text-sm font-semibold">
                             <option value="">Tahun</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                <div class="grid grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Desa</label>
-                        <select id="desa" required class="rounded-box-input w-full p-2.5 text-xs sm:text-sm">
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Desa</label>
+                        <select id="desa" required class="rounded-box-input w-full p-3 text-sm font-semibold">
                             <option value="">-- Pilih Desa --</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Kelompok</label>
-                        <select id="kelompok" required disabled class="rounded-box-input w-full p-2.5 text-xs sm:text-sm bg-slate-50">
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Kelompok</label>
+                        <select id="kelompok" required disabled class="rounded-box-input w-full p-3 text-sm font-semibold bg-slate-100/50 text-slate-400">
                             <option value="">-- Pilih Desa Dulu --</option>
                         </select>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Status Jamaah / Pengguna</label>
-                    <select id="status" required onchange="toggleNoHpInput(this.value)" class="rounded-box-input w-full p-2.5 text-xs sm:text-sm font-semibold">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Status Jamaah / Pengguna</label>
+                    <select id="status" required onchange="toggleNoHpInput(this.value)" class="rounded-box-input w-full p-3 text-sm font-bold text-indigo-900 bg-white">
                         <option value="Menikah">Menikah</option>
                         <option value="Duda">Duda</option>
                         <option value="Janda">Janda</option>
                         <option value="Manula">Manula</option>
-                        <option value="Operator" class="text-blue-600 font-bold bg-blue-50">Operator</option>
+                        <option value="Operator" class="text-blue-600 font-extrabold bg-blue-50">Operator</option>
                     </select>
                 </div>
 
                 <!-- INPUT NOMOR HP OPERATOR -->
-                <div id="boxNoHpOperator" class="hidden animate-fade-in-up bg-blue-50/70 p-3 rounded-xl border border-blue-200">
-                    <label class="block text-xs font-bold text-blue-800 mb-1">Nomor HP / WhatsApp Operator</label>
-                    <input type="tel" id="no_hp" placeholder="Contoh: 081234567890" pattern="[0-9]{10,14}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="rounded-box-input w-full p-2.5 text-xs sm:text-sm font-semibold text-blue-950 border-blue-300 focus:border-blue-500">
-                    <span class="text-[10px] text-blue-600 mt-1 block font-medium">*Khusus Operator untuk keperluan sistem & koordinasi</span>
+                <div id="boxNoHpOperator" class="hidden animate-fade-in-up bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-2xl border border-blue-200 shadow-inner">
+                    <label class="block text-xs font-extrabold text-blue-800 mb-2 flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                        Nomor HP / WhatsApp Operator
+                    </label>
+                    <input type="tel" id="no_hp" placeholder="Contoh: 081234567890" pattern="[0-9]{10,14}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="rounded-box-input w-full p-3 text-sm font-bold text-blue-900 border-blue-300 focus:border-blue-500 bg-white">
+                    <span class="text-[10px] text-blue-600 mt-2 block font-semibold">*Khusus Operator untuk keperluan sistem & koordinasi</span>
                 </div>
 
-                <button type="submit" id="submitJamaahBtn" class="w-full py-3 mt-4 text-xs sm:text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-xl shadow-md hover:shadow-lg transition">
+                <button type="submit" id="submitJamaahBtn" class="w-full py-3.5 mt-2 text-sm font-extrabold text-white bg-gradient-to-r from-indigo-600 to-fuchsia-600 hover:from-indigo-700 hover:to-fuchsia-700 rounded-xl shadow-[0_8px_20px_rgba(99,102,241,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
                     Simpan Data Jamaah
                 </button>
             </form>
@@ -398,30 +442,31 @@
 
         <!-- ================= SECTION ABSENSI KEGIATAN ================= -->
         <div id="sectionAbsensi" class="section-content hidden">
-            <button type="button" onclick="showSection('home')" class="mb-4 inline-flex items-center gap-1 text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-200 transition">
-                &larr; Kembali ke Menu Utama
+            <button type="button" onclick="showSection('home')" class="mb-5 inline-flex items-center gap-2 text-xs font-bold text-fuchsia-600 hover:text-fuchsia-700 bg-fuchsia-50/80 px-4 py-2 rounded-xl border border-fuchsia-200 transition-all hover:-translate-x-1 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Kembali ke Menu Utama
             </button>
 
-            <div class="flex justify-between items-center border-b border-orange-100 pb-3 mb-4">
-                <h3 class="font-bold text-orange-600 text-sm sm:text-base">Absensi Kegiatan Jamaah</h3>
+            <div class="flex justify-between items-center border-b border-slate-200/60 pb-3 mb-5">
+                <h3 class="font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-600 to-pink-500 text-base sm:text-lg">Absensi Kegiatan Jamaah</h3>
             </div>
 
-            <div class="flex justify-between items-center border-b border-orange-100 mb-4">
-                <div class="flex">
-                    <button onclick="switchTabAbsensi('INPUT')" id="tabInputAbsensi" class="py-2 px-3 sm:px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600">Form Absensi</button>
-                    <button onclick="switchTabAbsensi('REKAP')" id="tabRekapAbsensi" class="py-2 px-3 sm:px-4 text-xs font-bold text-slate-400">Rekapan</button>
+            <div class="flex justify-between items-center border-b border-slate-200/60 mb-5">
+                <div class="flex gap-2">
+                    <button onclick="switchTabAbsensi('INPUT')" id="tabInputAbsensi" class="py-2.5 px-4 text-xs font-extrabold border-b-[3px] border-fuchsia-500 text-fuchsia-700 transition-colors">Form Absensi</button>
+                    <button onclick="switchTabAbsensi('REKAP')" id="tabRekapAbsensi" class="py-2.5 px-4 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors">Rekapan</button>
                 </div>
-                <button type="button" id="btnPrintAbsensi" onclick="printData('printableAbsensi', 'Laporan Absensi Kegiatan Jamaah')" class="hidden px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-[11px] rounded-lg transition flex items-center gap-1 shadow-sm">
+                <button type="button" id="btnPrintAbsensi" onclick="printData('printableAbsensi', 'Laporan Absensi Kegiatan Jamaah')" class="hidden px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-1.5 hover:-translate-y-0.5">
                     🖨️ Print
                 </button>
             </div>
 
-            <form id="formAbsensiKegiatan" class="space-y-3">
+            <form id="formAbsensiKegiatan" class="space-y-4 pt-1">
                 <input type="hidden" id="edit_absensi_id">
                 <input type="hidden" id="edit_tanggal_kegiatan">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Kegiatan</label>
-                    <select id="abs_nama" required onchange="toggleNamaKegiatanLainnya(this)" class="rounded-box-input w-full p-2.5 text-xs sm:text-sm">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Nama Kegiatan</label>
+                    <select id="abs_nama" required onchange="toggleNamaKegiatanLainnya(this)" class="rounded-box-input w-full p-3 text-sm font-semibold">
                         <option value="">-- Pilih Nama Kegiatan --</option>
                         <option value="Penyampaian materi PPG pusat">Penyampaian materi PPG pusat</option>
                         <option value="Pengajian ibu-ibu daerah">Pengajian ibu-ibu daerah</option>
@@ -430,57 +475,59 @@
                         <option value="Penyampaian CAI">Penyampaian CAI</option>
                         <option value="LAINNYA">-- Ketik Lainnya --</option>
                     </select>
-                    <input type="text" id="abs_nama_custom" placeholder="Ketik nama kegiatan lainnya..." oninput="autoCapitalize(this)" class="hidden rounded-box-input w-full p-2.5 text-xs sm:text-sm mt-2">
+                    <input type="text" id="abs_nama_custom" placeholder="Ketik nama kegiatan lainnya..." oninput="autoCapitalize(this)" class="hidden rounded-box-input w-full p-3 text-sm font-semibold mt-2 border-fuchsia-300 focus:border-fuchsia-500">
                 </div>
 
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Desa</label>
-                        <select id="abs_desa" required class="rounded-box-input w-full p-2 text-xs">
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Desa</label>
+                        <select id="abs_desa" required class="rounded-box-input w-full p-2.5 text-xs font-semibold">
                             <option value="">-- Desa --</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Kelompok</label>
-                        <select id="abs_kelompok" required disabled class="rounded-box-input w-full p-2 text-xs bg-slate-50">
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Kelompok</label>
+                        <select id="abs_kelompok" required disabled class="rounded-box-input w-full p-2.5 text-xs font-semibold bg-slate-100/50 text-slate-400">
                             <option value="">-- Kelompok --</option>
                         </select>
                     </div>
                 </div>
-                <div class="grid grid-cols-3 gap-2">
+                <div class="grid grid-cols-3 gap-2.5">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Laki-laki</label>
-                        <input type="number" id="abs_laki" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1.5 ml-1">Laki-laki</label>
+                        <input type="number" id="abs_laki" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2.5 text-sm font-bold text-center">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Perempuan</label>
-                        <input type="number" id="abs_perempuan" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1.5 ml-1">Perempuan</label>
+                        <input type="number" id="abs_perempuan" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2.5 text-sm font-bold text-center">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Ijin</label>
-                        <input type="number" id="abs_ijin" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1.5 ml-1 text-amber-600">Ijin</label>
+                        <input type="number" id="abs_ijin" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2.5 text-sm font-bold text-center border-amber-200 focus:border-amber-500">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Infaq (Rp)</label>
-                    <input type="number" id="abs_infaq" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2.5 text-xs sm:text-sm">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1 text-emerald-600">Infaq (Rp)</label>
+                    <input type="number" id="abs_infaq" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-3 text-sm font-extrabold text-emerald-700 border-emerald-200 focus:border-emerald-500">
                 </div>
-                <button type="submit" id="absBtn" class="w-full py-2.5 bg-orange-500 text-white rounded-xl font-semibold text-xs hover:bg-orange-600 transition shadow-sm">Simpan Absensi</button>
+                <button type="submit" id="absBtn" class="w-full py-3.5 bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white rounded-xl font-extrabold text-sm hover:shadow-[0_8px_20px_rgba(219,39,119,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 mt-2">
+                    Simpan Absensi
+                </button>
             </form>
 
-            <div id="printableAbsensi" class="hidden space-y-4">
-                <div class="space-y-2 no-print">
+            <div id="printableAbsensi" class="hidden space-y-5 pt-1">
+                <div class="space-y-3 no-print bg-slate-50/50 p-4 rounded-2xl border border-slate-200/60">
                     <div>
-                        <select id="filterKegiatanAbsensi" onchange="loadRekapAbsensi()" class="w-full text-xs p-2.5 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
+                        <select id="filterKegiatanAbsensi" onchange="loadRekapAbsensi()" class="rounded-box-input w-full p-3 text-xs font-bold text-fuchsia-900 focus:border-fuchsia-500">
                             <option value="">-- Semua Kegiatan --</option>
                         </select>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
-                        <select id="filterDesaAbsensi" onchange="loadRekapAbsensi()" class="w-full text-[11px] sm:text-xs p-2 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
+                    <div class="grid grid-cols-3 gap-2">
+                        <select id="filterDesaAbsensi" onchange="loadRekapAbsensi()" class="rounded-box-input w-full p-2 text-[11px] sm:text-xs font-semibold focus:border-fuchsia-500">
                             <option value="">Semua Desa</option>
                         </select>
-                        <select id="filterBulanAbsensi" onchange="loadRekapAbsensi()" class="w-full text-[11px] sm:text-xs p-2 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
+                        <select id="filterBulanAbsensi" onchange="loadRekapAbsensi()" class="rounded-box-input w-full p-2 text-[11px] sm:text-xs font-semibold focus:border-fuchsia-500">
                             <option value="">Semua Bulan</option>
                             <option value="01">Januari</option>
                             <option value="02">Februari</option>
@@ -495,24 +542,24 @@
                             <option value="11">November</option>
                             <option value="12">Desember</option>
                         </select>
-                        <select id="filterTahun" onchange="loadRekapAbsensi()" class="w-full text-[11px] sm:text-xs p-2 rounded-xl border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm"></select>
+                        <select id="filterTahun" onchange="loadRekapAbsensi()" class="rounded-box-input w-full p-2 text-[11px] sm:text-xs font-semibold focus:border-fuchsia-500"></select>
                     </div>
                 </div>
 
-                <div class="border border-orange-100 rounded-xl scroll-top-container">
+                <div class="border border-fuchsia-100 rounded-2xl scroll-top-container shadow-inner overflow-hidden">
                     <table class="w-full text-[11px] sm:text-xs text-left">
-                        <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
+                        <thead class="bg-gradient-to-r from-fuchsia-50 to-pink-50 text-fuchsia-900 font-extrabold border-b border-fuchsia-100">
                             <tr>
-                                <th class="px-1.5 py-2 whitespace-nowrap sticky-col">Kelompok</th>
-                                <th class="px-1.5 py-2 text-center whitespace-nowrap">Tanggal</th>
-                                <th class="px-1.5 py-2 text-center whitespace-nowrap">Hadir (L/P)</th>
-                                <th class="px-1.5 py-2 text-center whitespace-nowrap">Ijin</th>
-                                <th class="px-1.5 py-2 text-right whitespace-nowrap">Infaq</th>
-                                <th class="px-1.5 py-2 text-center whitespace-nowrap no-print">Aksi</th>
+                                <th class="px-2 py-3 whitespace-nowrap sticky-col">Kelompok</th>
+                                <th class="px-2 py-3 text-center whitespace-nowrap">Tanggal</th>
+                                <th class="px-2 py-3 text-center whitespace-nowrap">Hadir (L/P)</th>
+                                <th class="px-2 py-3 text-center whitespace-nowrap">Ijin</th>
+                                <th class="px-2 py-3 text-right whitespace-nowrap">Infaq</th>
+                                <th class="px-2 py-3 text-center whitespace-nowrap no-print">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="tbodyRekapAbsensi" class="divide-y divide-orange-50 text-slate-600"></tbody>
-                        <tfoot id="tfootRekapAbsensi" class="bg-orange-100/60 font-bold text-orange-950 border-t border-orange-200"></tfoot>
+                        <tbody id="tbodyRekapAbsensi" class="divide-y divide-fuchsia-50 text-slate-700 bg-white/50"></tbody>
+                        <tfoot id="tfootRekapAbsensi" class="bg-fuchsia-100/80 font-extrabold text-fuchsia-950 border-t border-fuchsia-200"></tfoot>
                     </table>
                 </div>
             </div>
@@ -520,38 +567,39 @@
 
         <!-- ================= SECTION SARPRAS ================= -->
         <div id="sectionSarpras" class="section-content hidden">
-            <button type="button" onclick="showSection('home')" class="mb-4 inline-flex items-center gap-1 text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-200 transition">
-                &larr; Kembali ke Menu Utama
+            <button type="button" onclick="showSection('home')" class="mb-5 inline-flex items-center gap-2 text-xs font-bold text-teal-600 hover:text-teal-700 bg-teal-50/80 px-4 py-2 rounded-xl border border-teal-200 transition-all hover:-translate-x-1 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Kembali ke Menu Utama
             </button>
 
-            <div class="flex justify-between items-center border-b border-orange-100 pb-3 mb-4">
-                <h3 class="font-bold text-orange-600 text-sm sm:text-base">Kelola Sarpras Kelompok</h3>
+            <div class="flex justify-between items-center border-b border-slate-200/60 pb-3 mb-5">
+                <h3 class="font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-emerald-500 text-base sm:text-lg">Kelola Sarpras Kelompok</h3>
             </div>
 
-            <div class="flex border-b border-orange-100 mb-4">
-                <button onclick="switchTabSarpras('INPUT')" id="tabInputSarpras" class="py-2 px-3 sm:px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600">Form Sarpras</button>
-                <button onclick="switchTabSarpras('UPDATE')" id="tabUpdateSarpras" class="py-2 px-3 sm:px-4 text-xs font-bold text-slate-400">Update Data Sarpras</button>
+            <div class="flex gap-2 border-b border-slate-200/60 mb-5">
+                <button onclick="switchTabSarpras('INPUT')" id="tabInputSarpras" class="py-2.5 px-4 text-xs font-extrabold border-b-[3px] border-teal-500 text-teal-700 transition-colors">Form Sarpras</button>
+                <button onclick="switchTabSarpras('UPDATE')" id="tabUpdateSarpras" class="py-2.5 px-4 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors">Update Data Sarpras</button>
             </div>
 
-            <form id="formSarpras" class="space-y-3">
+            <form id="formSarpras" class="space-y-4 pt-1">
                 <input type="hidden" id="edit_sarpras_id">
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Desa</label>
-                        <select id="sarp_desa" required class="rounded-box-input w-full p-2 text-xs">
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Desa</label>
+                        <select id="sarp_desa" required class="rounded-box-input w-full p-2.5 text-xs font-semibold focus:border-teal-500">
                             <option value="">-- Desa --</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Kelompok</label>
-                        <select id="sarp_kelompok" required disabled class="rounded-box-input w-full p-2 text-xs bg-slate-50">
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Kelompok</label>
+                        <select id="sarp_kelompok" required disabled class="rounded-box-input w-full p-2.5 text-xs font-semibold bg-slate-100/50 text-slate-400">
                             <option value="">-- Kelompok --</option>
                         </select>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Status Tanah</label>
-                    <select id="sarp_status_tanah" required class="rounded-box-input w-full p-2 text-xs">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Status Tanah</label>
+                    <select id="sarp_status_tanah" required class="rounded-box-input w-full p-3 text-sm font-semibold focus:border-teal-500">
                         <option value="">-- Pilih Status Tanah --</option>
                         <option value="Milik Sendiri">Milik Sendiri</option>
                         <option value="Wakaf">Wakaf</option>
@@ -559,68 +607,68 @@
                         <option value="Numpang">Numpang</option>
                     </select>
                 </div>
-                <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
+                <div class="grid grid-cols-3 gap-2.5">
                     <div>
-                        <label class="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Sub Klp</label>
-                        <input type="number" id="sarp_sub" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1.5 ml-1">Sub Klp</label>
+                        <input type="number" id="sarp_sub" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2.5 text-sm font-bold text-center focus:border-teal-500">
                     </div>
                     <div>
-                        <label class="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Masjid</label>
-                        <input type="number" id="sarp_masjid" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1.5 ml-1">Masjid</label>
+                        <input type="number" id="sarp_masjid" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2.5 text-sm font-bold text-center focus:border-teal-500">
                     </div>
                     <div>
-                        <label class="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Aula</label>
-                        <input type="number" id="sarp_aula" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Toilet Pria</label>
-                        <input type="number" id="sarp_km_pria" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Toilet Wanita</label>
-                        <input type="number" id="sarp_km_wanita" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1.5 ml-1">Aula</label>
+                        <input type="number" id="sarp_aula" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2.5 text-sm font-bold text-center focus:border-teal-500">
                     </div>
                 </div>
-
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Kamar MT</label>
-                        <input type="number" id="sarp_km_mt" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Toilet Pria</label>
+                        <input type="number" id="sarp_km_pria" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2.5 text-sm font-bold text-center focus:border-teal-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Kamar Tamu</label>
-                        <input type="number" id="sarp_km_tamu" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2 text-xs">
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Toilet Wanita</label>
+                        <input type="number" id="sarp_km_wanita" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2.5 text-sm font-bold text-center focus:border-teal-500">
                     </div>
                 </div>
 
-                <button type="submit" id="sarpBtn" class="w-full py-2.5 bg-orange-500 text-white rounded-xl font-semibold text-xs hover:bg-orange-600 transition shadow-sm mt-2">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Kamar MT</label>
+                        <input type="number" id="sarp_km_mt" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2.5 text-sm font-bold text-center focus:border-teal-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Kamar Tamu</label>
+                        <input type="number" id="sarp_km_tamu" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-2.5 text-sm font-bold text-center focus:border-teal-500">
+                    </div>
+                </div>
+
+                <button type="submit" id="sarpBtn" class="w-full py-3.5 bg-gradient-to-r from-teal-500 to-emerald-600 text-white rounded-xl font-extrabold text-sm hover:shadow-[0_8px_20px_rgba(20,184,166,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 mt-4">
                     Simpan Sarpras
                 </button>
             </form>
 
-            <div id="sectionListSarpras" class="hidden space-y-3">
-                <div class="bg-orange-50/50 p-2.5 rounded-xl border border-orange-200">
-                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Filter Desa</label>
-                    <select id="sarp_desa_update" onchange="loadListSarpras()" class="rounded-box-input w-full p-2 text-xs">
+            <div id="sectionListSarpras" class="hidden space-y-4 pt-1">
+                <div class="bg-teal-50/50 p-4 rounded-2xl border border-teal-100 shadow-inner">
+                    <label class="block text-[10px] font-extrabold uppercase text-teal-800 mb-2 ml-1">Filter Desa</label>
+                    <select id="sarp_desa_update" onchange="loadListSarpras()" class="rounded-box-input w-full p-2.5 text-xs font-bold text-teal-900 focus:border-teal-500">
                         <option value="">Semua Desa</option>
                     </select>
                 </div>
 
-                <div class="border border-orange-100 rounded-xl scroll-top-container w-full">
+                <div class="border border-teal-100 rounded-2xl scroll-top-container w-full shadow-inner overflow-hidden">
                     <table class="w-full min-w-[650px] text-[11px] sm:text-xs text-left">
-                        <thead class="bg-orange-50 text-slate-900 font-bold border-b border-orange-100">
+                        <thead class="bg-gradient-to-r from-teal-50 to-emerald-50 text-teal-900 font-extrabold border-b border-teal-100">
                             <tr>
-                                <th class="px-2 py-2 text-slate-900 sticky-col">Kelompok</th>
-                                <th class="px-2 py-2 text-center text-slate-900 whitespace-nowrap">Status Tanah</th>
-                                <th class="px-2 py-2 text-center text-slate-900 whitespace-nowrap">Masjid / Aula</th>
-                                <th class="px-2 py-2 text-center text-slate-900 whitespace-nowrap">Toilet (L/P)</th>
-                                <th class="px-2 py-2 text-center text-slate-900 whitespace-nowrap">Kmr MT / Tamu</th>
-                                <th class="px-2 py-2 text-center text-slate-900 whitespace-nowrap no-print">Aksi</th>
+                                <th class="px-2 py-3 sticky-col">Kelompok</th>
+                                <th class="px-2 py-3 text-center whitespace-nowrap">Status Tanah</th>
+                                <th class="px-2 py-3 text-center whitespace-nowrap">Masjid / Aula</th>
+                                <th class="px-2 py-3 text-center whitespace-nowrap">Toilet (L/P)</th>
+                                <th class="px-2 py-3 text-center whitespace-nowrap">Kmr MT / Tamu</th>
+                                <th class="px-2 py-3 text-center whitespace-nowrap no-print">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="tbodyListSarpras" class="divide-y divide-orange-50 text-slate-600"></tbody>
+                        <tbody id="tbodyListSarpras" class="divide-y divide-teal-50 text-slate-700 bg-white/50"></tbody>
                     </table>
                 </div>
             </div>
@@ -628,37 +676,38 @@
 
         <!-- ================= SECTION REKAP ================= -->
         <div id="sectionRekap" class="section-content hidden">
-            <button type="button" onclick="showSection('home')" class="mb-4 inline-flex items-center gap-1 text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-200 transition">
-                &larr; Kembali ke Menu Utama
+            <button type="button" onclick="showSection('home')" class="mb-5 inline-flex items-center gap-2 text-xs font-bold text-amber-600 hover:text-amber-700 bg-amber-50/80 px-4 py-2 rounded-xl border border-amber-200 transition-all hover:-translate-x-1 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Kembali ke Menu Utama
             </button>
 
-            <div class="flex justify-between items-center border-b border-orange-100 pb-3 mb-4">
-                <h3 class="font-bold text-orange-600 text-sm sm:text-base">Rekapan Data Jamaah & Sarpras</h3>
+            <div class="flex justify-between items-center border-b border-slate-200/60 pb-3 mb-5">
+                <h3 class="font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-500 text-base sm:text-lg">Rekapan Data Jamaah & Sarpras</h3>
             </div>
 
-            <div class="flex justify-between items-center border-b border-orange-100 mb-4 overflow-x-auto gap-2">
-                <div class="flex whitespace-nowrap gap-1">
-                    <button onclick="switchTabRekap('STATUS_KESELURUHAN')" id="tabStatusKeseluruhan" class="py-2 px-2.5 sm:px-3 text-xs font-bold border-b-2 border-orange-500 text-orange-600 flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <div class="flex justify-between items-center border-b border-slate-200/60 mb-5 overflow-x-auto gap-3 pb-1">
+                <div class="flex whitespace-nowrap gap-2">
+                    <button onclick="switchTabRekap('STATUS_KESELURUHAN')" id="tabStatusKeseluruhan" class="py-2.5 px-3 text-xs font-extrabold border-b-[3px] border-amber-500 text-amber-700 flex items-center gap-1.5 transition-colors">
+                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path>
                         </svg>
                         Status Jamaah
                     </button>
-                    <button onclick="switchTabRekap('REKAP_KELOMPOK')" id="tabRekapKelompok" class="py-2 px-2.5 sm:px-3 text-xs font-bold text-slate-400 flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <button onclick="switchTabRekap('REKAP_KELOMPOK')" id="tabRekapKelompok" class="py-2.5 px-3 text-xs font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1.5 transition-colors">
+                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                         </svg>
                         Rekap Per Klp
                     </button>
                 </div>
-                <div class="flex items-center gap-1.5 shrink-0">
-                    <button type="button" id="btnExportExcel" onclick="exportTableToExcel('tbodyRekapKelompok', 'tfootRekapKelompok')" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold text-[11px] rounded-lg transition flex items-center gap-1 shadow-sm">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <div class="flex items-center gap-2 shrink-0">
+                    <button type="button" id="btnExportExcel" onclick="exportTableToExcel('tbodyRekapKelompok', 'tfootRekapKelompok')" class="px-3 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 active:scale-95 text-white font-bold text-[11px] rounded-xl transition-all shadow-md flex items-center gap-1.5">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                             <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM6 20V4h7v5h5v11H6zm11.5-6l-2-2 2-2h-2.1l-1 1.2-1-1.2h-2.1l2 2-2 2h2.1l1-1.2 1 1.2h2.1z"/>
                         </svg>
                         <span>Excel</span>
                     </button>
-                    <button type="button" id="btnPrintRekap" onclick="triggerPrintRekapCurrentTab()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-semibold text-[11px] rounded-lg transition flex items-center gap-1 shadow-sm">
+                    <button type="button" id="btnPrintRekap" onclick="triggerPrintRekapCurrentTab()" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-bold text-[11px] rounded-xl transition-all shadow-md flex items-center gap-1.5">
                         🖨️ Print
                     </button>
                 </div>
@@ -666,111 +715,123 @@
 
             <div id="printableRekapContent">
                 <!-- REKAP STATUS KESELURUHAN -->
-                <div id="sectionStatusKeseluruhan" class="space-y-4">
-                    <h4 class="text-xs font-bold text-slate-700 uppercase">Rekapitulasi Status Jamaah Keseluruhan</h4>
-                    
-                    <!-- REKAP STATUS JAMAAH UTAMA -->
-                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                        <div class="p-2.5 sm:p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
-                            <span class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase">Menikah</span>
-                            <span id="stMenikah" class="text-lg sm:text-xl font-extrabold text-orange-600">0</span>
-                        </div>
-                        <div class="p-2.5 sm:p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
-                            <span class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase">Duda</span>
-                            <span id="stDuda" class="text-lg sm:text-xl font-extrabold text-orange-600">0</span>
-                        </div>
-                        <div class="p-2.5 sm:p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
-                            <span class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase">Janda</span>
-                            <span id="stJanda" class="text-lg sm:text-xl font-extrabold text-orange-600">0</span>
-                        </div>
-                        <div class="p-2.5 sm:p-3 bg-orange-50 border border-orange-200 rounded-xl text-center">
-                            <span class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase">Manula</span>
-                            <span id="stManula" class="text-lg sm:text-xl font-extrabold text-orange-600">0</span>
-                        </div>
+                <div id="sectionStatusKeseluruhan" class="space-y-6">
+                    <div>
+                        <h4 class="text-xs font-extrabold text-indigo-900 uppercase mb-3 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500 inline-block"></span>
+                            Rekapitulasi Status Jamaah Keseluruhan
+                        </h4>
                         
-                        <button type="button" onclick="showAllOperatorsModal()" class="p-2.5 sm:p-3 bg-blue-50/80 hover:bg-blue-100 active:scale-95 border border-blue-200 hover:border-blue-300 rounded-xl text-center col-span-2 sm:col-span-1 transition cursor-pointer shadow-xs group">
-                            <span class="block text-[9px] sm:text-[10px] font-bold text-blue-600 uppercase group-hover:text-blue-700">OPERATOR</span>
-                            <span id="stOperator" class="text-lg sm:text-xl font-extrabold text-blue-600 group-hover:text-blue-700">0</span>
-                        </button>
-                    </div>
-
-                    <h4 class="text-xs font-bold text-slate-700 uppercase pt-2">Rekapitulasi Data Generus</h4>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        <div class="p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
-                            <span class="block text-[9px] sm:text-[10px] font-bold text-amber-800 uppercase">PAUD</span>
-                            <span id="genPaud" class="text-lg sm:text-xl font-extrabold text-amber-600">0</span>
-                        </div>
-                        <div class="p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
-                            <span class="block text-[9px] sm:text-[10px] font-bold text-amber-800 uppercase">TK</span>
-                            <span id="genTk" class="text-lg sm:text-xl font-extrabold text-amber-600">0</span>
-                        </div>
-                        <div class="p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
-                            <span class="block text-[9px] sm:text-[10px] font-bold text-amber-800 uppercase">Caberawit</span>
-                            <span id="genCaberawit" class="text-lg sm:text-xl font-extrabold text-amber-600">0</span>
-                        </div>
-                        <div class="p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
-                            <span class="block text-[9px] sm:text-[10px] font-bold text-amber-800 uppercase">Pra Remaja</span>
-                            <span id="genPraRemaja" class="text-lg sm:text-xl font-extrabold text-amber-600">0</span>
-                        </div>
-                        <div class="p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
-                            <span class="block text-[9px] sm:text-[10px] font-bold text-amber-800 uppercase">Remaja</span>
-                            <span id="genRemaja" class="text-lg sm:text-xl font-extrabold text-amber-600">0</span>
-                        </div>
-                        <div class="p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
-                            <span class="block text-[9px] sm:text-[10px] font-bold text-amber-800 uppercase">Usia Mandiri</span>
-                            <span id="genUsiaMandiri" class="text-lg sm:text-xl font-extrabold text-amber-600">0</span>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                            <div class="p-4 bg-white/60 border border-indigo-100 rounded-2xl text-center shadow-sm hover:shadow-md transition-shadow">
+                                <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Menikah</span>
+                                <span id="stMenikah" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500">0</span>
+                            </div>
+                            <div class="p-4 bg-white/60 border border-indigo-100 rounded-2xl text-center shadow-sm hover:shadow-md transition-shadow">
+                                <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Duda</span>
+                                <span id="stDuda" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500">0</span>
+                            </div>
+                            <div class="p-4 bg-white/60 border border-indigo-100 rounded-2xl text-center shadow-sm hover:shadow-md transition-shadow">
+                                <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Janda</span>
+                                <span id="stJanda" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500">0</span>
+                            </div>
+                            <div class="p-4 bg-white/60 border border-indigo-100 rounded-2xl text-center shadow-sm hover:shadow-md transition-shadow">
+                                <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Manula</span>
+                                <span id="stManula" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500">0</span>
+                            </div>
+                            
+                            <button type="button" onclick="showAllOperatorsModal()" class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 active:scale-[0.98] border border-blue-200 hover:border-blue-300 rounded-2xl text-center col-span-2 sm:col-span-1 transition-all cursor-pointer shadow-sm group">
+                                <span class="block text-[10px] font-extrabold text-blue-600 uppercase tracking-widest group-hover:text-blue-700">OPERATOR</span>
+                                <span id="stOperator" class="text-2xl font-black text-blue-600 group-hover:text-blue-700">0</span>
+                            </button>
                         </div>
                     </div>
 
-                    <div class="p-3 bg-slate-800 text-white rounded-xl flex justify-between items-center shadow-sm">
-                        <span class="text-[11px] sm:text-xs font-bold uppercase">Total Keseluruhan Terdaftar</span>
-                        <span id="stTotalAll" class="text-base sm:text-lg font-black text-orange-400">0 Data</span>
+                    <div>
+                        <h4 class="text-xs font-extrabold text-fuchsia-900 uppercase mb-3 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-fuchsia-500 inline-block"></span>
+                            Rekapitulasi Data Generus
+                        </h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            <div class="p-3 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
+                                <span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">PAUD</span>
+                                <span id="genPaud" class="text-xl font-black text-fuchsia-600">0</span>
+                            </div>
+                            <div class="p-3 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
+                                <span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">TK</span>
+                                <span id="genTk" class="text-xl font-black text-fuchsia-600">0</span>
+                            </div>
+                            <div class="p-3 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
+                                <span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">Caberawit</span>
+                                <span id="genCaberawit" class="text-xl font-black text-fuchsia-600">0</span>
+                            </div>
+                            <div class="p-3 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
+                                <span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">Pra Remaja</span>
+                                <span id="genPraRemaja" class="text-xl font-black text-fuchsia-600">0</span>
+                            </div>
+                            <div class="p-3 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
+                                <span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">Remaja</span>
+                                <span id="genRemaja" class="text-xl font-black text-fuchsia-600">0</span>
+                            </div>
+                            <div class="p-3 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
+                                <span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">Usia Mandiri</span>
+                                <span id="genUsiaMandiri" class="text-xl font-black text-fuchsia-600">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 sm:p-5 bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-2xl flex justify-between items-center shadow-xl transform hover:scale-[1.01] transition-transform duration-300 border border-slate-700">
+                        <span class="text-xs sm:text-sm font-extrabold uppercase tracking-wider flex items-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            Total Keseluruhan Terdaftar
+                        </span>
+                        <span id="stTotalAll" class="text-lg sm:text-xl font-black bg-clip-text text-transparent bg-gradient-to-l from-indigo-300 to-fuchsia-300">0 Data</span>
                     </div>
                 </div>
 
                 <!-- REKAPAN KELOMPOK -->
-                <div id="sectionRekapKelompok" class="hidden space-y-3">
-                    <div class="flex justify-between items-center flex-wrap gap-2">
-                        <h4 class="text-xs font-bold text-slate-700 uppercase">Rekap Jamaah & Sarpras Per Kelompok</h4>
-                        <div class="flex items-center gap-1.5 no-print">
-                            <span class="text-xs">🔻</span>
-                            <select id="filterDesaRekap" onchange="loadRekapKelompokLengkap()" class="text-[11px] sm:text-xs px-2 py-1 rounded-lg border-2 border-orange-200 bg-white font-semibold text-slate-700 focus:outline-none focus:border-orange-500 shadow-sm">
+                <div id="sectionRekapKelompok" class="hidden space-y-4">
+                    <div class="flex justify-between items-center flex-wrap gap-3 bg-white/50 p-3 rounded-2xl border border-indigo-100">
+                        <h4 class="text-xs font-extrabold text-indigo-900 uppercase ml-1">Rekap Jamaah & Sarpras Per Kelompok</h4>
+                        <div class="flex items-center gap-2 no-print">
+                            <span class="text-xs text-indigo-600 font-bold">Filter:</span>
+                            <select id="filterDesaRekap" onchange="loadRekapKelompokLengkap()" class="text-[11px] sm:text-xs px-3 py-2 rounded-xl border-[2px] border-indigo-200 bg-white font-bold text-indigo-900 focus:outline-none focus:border-indigo-500 shadow-sm">
                                 <option value="">Semua Desa</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- CONTAINER TABEL DENGAN SCROLLBAR DI ATAS -->
-                    <div class="border border-orange-100 rounded-xl scroll-top-container">
+                    <!-- CONTAINER TABEL -->
+                    <div class="border border-indigo-100 rounded-2xl scroll-top-container shadow-inner overflow-hidden">
                         <table id="tableRekapKelompok" class="w-full text-[10px] sm:text-[11px] text-left">
-                            <thead class="bg-orange-50 text-orange-900 font-bold border-b border-orange-100">
+                            <thead class="bg-gradient-to-b from-indigo-50 to-indigo-100/50 text-indigo-950 font-extrabold border-b border-indigo-200">
                                 <tr>
-                                    <th class="px-1.5 py-2 sticky-col">Kelompok</th>
-                                    <!-- Rekapan Generus (Diringkas) -->
-                                    <th class="px-1 py-2 text-center whitespace-nowrap bg-amber-100/50 text-amber-900">PAUD</th>
-                                    <th class="px-1 py-2 text-center whitespace-nowrap bg-amber-100/50 text-amber-900">TK</th>
-                                    <th class="px-1 py-2 text-center whitespace-nowrap bg-amber-100/50 text-amber-900">Cbr</th>
-                                    <th class="px-1 py-2 text-center whitespace-nowrap bg-amber-100/50 text-amber-900">Pra Rem</th>
-                                    <th class="px-1 py-2 text-center whitespace-nowrap bg-amber-100/50 text-amber-900">Rem</th>
-                                    <th class="px-1 py-2 text-center whitespace-nowrap bg-amber-100/50 text-amber-900">Usman</th>
-                                    <!-- Status Jamaah (Diringkas) -->
-                                    <th class="px-1 py-2 text-center whitespace-nowrap">Nikah</th>
-                                    <th class="px-1 py-2 text-center whitespace-nowrap">Duda</th>
-                                    <th class="px-1 py-2 text-center whitespace-nowrap">Janda</th>
-                                    <th class="px-1 py-2 text-center whitespace-nowrap">Manula</th>
-                                    <th class="px-1 py-2 text-center text-blue-700 bg-blue-50/50 whitespace-nowrap">Opr.</th>
-                                    <!-- Total & Sarpras (Diringkas) -->
-                                    <th class="px-1.5 py-2 text-center bg-orange-100/60 font-extrabold whitespace-nowrap">Total</th>
-                                    <th class="px-1 py-2 text-center border-l border-orange-200 whitespace-nowrap">Sub</th>
-                                    <th class="px-1 py-2 text-center whitespace-nowrap">Msjd</th>
-                                    <th class="px-1 py-2 text-center whitespace-nowrap">Aula</th>
-                                    <th class="px-1 py-2 text-center whitespace-nowrap">Toilet (L/P)</th>
-                                    <th class="px-1 py-2 text-center whitespace-nowrap">Kmr MT</th>
-                                    <th class="px-1 py-2 text-center whitespace-nowrap">Kmr Tmu</th>
+                                    <th class="px-2 py-3 sticky-col">Kelompok</th>
+                                    <!-- Rekapan Generus -->
+                                    <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100/60 text-fuchsia-900 border-l border-indigo-100">PAUD</th>
+                                    <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100/60 text-fuchsia-900">TK</th>
+                                    <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100/60 text-fuchsia-900">Cbr</th>
+                                    <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100/60 text-fuchsia-900">Pra Rem</th>
+                                    <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100/60 text-fuchsia-900">Rem</th>
+                                    <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100/60 text-fuchsia-900 border-r border-indigo-100">Usman</th>
+                                    <!-- Status Jamaah -->
+                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Nikah</th>
+                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Duda</th>
+                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Janda</th>
+                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Manula</th>
+                                    <th class="px-1.5 py-3 text-center text-blue-700 bg-blue-50/50 whitespace-nowrap">Opr.</th>
+                                    <!-- Total & Sarpras -->
+                                    <th class="px-2 py-3 text-center bg-indigo-200/50 font-black whitespace-nowrap border-l border-indigo-200">Total</th>
+                                    <th class="px-1.5 py-3 text-center border-l border-indigo-200 whitespace-nowrap">Sub</th>
+                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Msjd</th>
+                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Aula</th>
+                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Toilet (L/P)</th>
+                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Kmr MT</th>
+                                    <th class="px-1.5 py-3 text-center whitespace-nowrap">Kmr Tmu</th>
                                 </tr>
                             </thead>
-                            <tbody id="tbodyRekapKelompok" class="divide-y divide-orange-50 text-slate-700"></tbody>
-                            <tfoot id="tfootRekapKelompok" class="bg-orange-100/60 font-bold text-orange-950 border-t border-orange-200"></tfoot>
+                            <tbody id="tbodyRekapKelompok" class="divide-y divide-indigo-50/80 text-slate-700 bg-white/60"></tbody>
+                            <tfoot id="tfootRekapKelompok" class="bg-indigo-100/80 font-black text-indigo-950 border-t border-indigo-200"></tfoot>
                         </table>
                     </div>
                 </div>
@@ -780,17 +841,17 @@
     </div>
 
     <!-- CUSTOM MODAL NOTIFICATION -->
-    <div id="customModal" class="modal-backdrop fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="modal-content-card bg-white rounded-2xl p-5 sm:p-6 max-w-sm w-full shadow-2xl text-center space-y-4 border border-orange-100">
-            <div id="modalIcon" class="w-12 h-12 sm:w-14 sm:h-14 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto text-xl sm:text-2xl font-bold">
+    <div id="customModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+        <div class="modal-content-card glass-card rounded-[2rem] p-6 max-w-sm w-full text-center space-y-5 border border-white/60">
+            <div id="modalIcon" class="w-16 h-16 bg-gradient-to-br from-indigo-100 to-fuchsia-100 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto text-3xl font-bold shadow-inner">
                 💡
             </div>
             <div>
-                <h4 id="modalTitle" class="text-base sm:text-lg font-bold text-slate-800">Notifikasi</h4>
-                <p id="modalMessage" class="text-xs text-slate-600 mt-1 leading-relaxed"></p>
+                <h4 id="modalTitle" class="text-xl font-extrabold text-slate-800 tracking-tight">Notifikasi</h4>
+                <p id="modalMessage" class="text-xs text-slate-600 mt-2 font-medium leading-relaxed"></p>
             </div>
-            <div id="modalActions" class="flex gap-2 justify-center pt-2">
-                <button type="button" id="modalBtnOk" onclick="closeCustomModal()" class="w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold transition shadow-md">
+            <div id="modalActions" class="flex gap-3 justify-center pt-2">
+                <button type="button" id="modalBtnOk" onclick="closeCustomModal()" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-fuchsia-600 hover:from-indigo-700 hover:to-fuchsia-700 text-white rounded-xl text-sm font-bold transition-all duration-300 shadow-lg">
                     OK
                 </button>
             </div>
@@ -798,23 +859,23 @@
     </div>
 
     <!-- MODAL DETAIL OPERATOR WA -->
-    <div id="operatorDetailModal" class="modal-backdrop fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="modal-content-card bg-white rounded-2xl p-5 sm:p-6 max-w-sm w-full shadow-2xl text-center space-y-3 border border-blue-100">
-            <div class="w-11 h-11 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-lg font-bold">
+    <div id="operatorDetailModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+        <div class="modal-content-card glass-card rounded-[2rem] p-6 max-w-sm w-full text-center space-y-4 border border-blue-100/60">
+            <div class="w-14 h-14 bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-600 rounded-3xl flex items-center justify-center mx-auto text-2xl font-bold shadow-inner">
                 🎧
             </div>
             <div>
-                <h4 id="opModalTitle" class="text-base font-bold text-slate-800">Detail Operator</h4>
-                <p id="opModalSubtitle" class="text-xs text-slate-500 mt-0.5">Daftar kontak operator kelompok</p>
+                <h4 id="opModalTitle" class="text-lg font-extrabold text-slate-800">Detail Operator</h4>
+                <p id="opModalSubtitle" class="text-xs text-slate-500 mt-1 font-medium">Daftar kontak operator kelompok</p>
             </div>
             
-            <div class="relative text-left pt-1">
-                <input type="text" id="opSearchInput" oninput="filterOperatorList()" placeholder="🔍 Cari nama / kelompok / no. HP..." class="w-full text-xs p-2.5 pl-3 rounded-xl border border-blue-200 bg-blue-50/40 text-slate-800 font-medium focus:outline-none focus:border-blue-500 focus:bg-white transition shadow-inner">
+            <div class="relative text-left pt-2">
+                <input type="text" id="opSearchInput" oninput="filterOperatorList()" placeholder="🔍 Cari nama / kelompok / no. HP..." class="w-full text-xs p-3 pl-4 rounded-xl border-2 border-blue-200 bg-white text-blue-900 font-bold focus:outline-none focus:border-blue-500 transition-all shadow-inner">
             </div>
 
-            <div id="opModalList" class="max-h-60 overflow-y-auto space-y-2 text-left pr-0.5 scroll-container"></div>
+            <div id="opModalList" class="max-h-64 overflow-y-auto space-y-2.5 text-left pr-1 scroll-container py-1"></div>
 
-            <button type="button" onclick="closeModal('operatorDetailModal')" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition mt-2">
+            <button type="button" onclick="closeModal('operatorDetailModal')" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-extrabold transition-all duration-300 mt-3 border border-slate-200">
                 Tutup
             </button>
         </div>
@@ -850,7 +911,7 @@
             inputEl.disabled = true;
             btn.disabled = true;
             spinner.classList.remove('hidden');
-            btnText.textContent = "Mndeteksi Sandi...";
+            btnText.textContent = "Mendeteksi Sandi...";
 
             setTimeout(() => {
                 if (inputVal === APP_PASSWORD_SECRET) {
@@ -858,8 +919,8 @@
 
                     spinner.classList.add('hidden');
                     btnText.textContent = "Akses Diterima";
-                    btn.className = "w-full py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition duration-200";
-                    iconBox.className = "w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-inner transition-colors duration-300";
+                    btn.className = "w-full py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg flex items-center justify-center gap-2 transition duration-300 transform scale-105";
+                    iconBox.className = "w-20 h-20 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto text-4xl shadow-inner transition-colors duration-300";
                     iconBox.textContent = "🔓";
                     successEl.classList.remove('hidden');
 
@@ -868,8 +929,8 @@
                         modal.classList.add('opacity-0', 'pointer-events-none');
                         setTimeout(() => {
                             modal.classList.add('hidden');
-                        }, 300);
-                    }, 800);
+                        }, 400);
+                    }, 900);
 
                 } else {
                     inputEl.disabled = false;
@@ -979,7 +1040,7 @@
                 setTimeout(() => {
                     previousSection.classList.add('hidden');
                     activateNewSection(target, targetSection);
-                }, 200);
+                }, 350);
             } else {
                 activateNewSection(target, targetSection);
             }
@@ -990,7 +1051,7 @@
             
             setTimeout(() => {
                 targetSection.classList.add('section-active');
-            }, 20);
+            }, 30);
 
             activeSectionId = target;
 
@@ -1015,7 +1076,7 @@
             el.classList.remove('hidden');
             setTimeout(() => {
                 el.classList.add('active');
-            }, 10);
+            }, 20);
         }
 
         function closeModal(id) {
@@ -1024,7 +1085,7 @@
             el.classList.remove('active');
             setTimeout(() => {
                 el.classList.add('hidden');
-            }, 250);
+            }, 350);
         }
 
         function autoCapitalize(inputElement) {
@@ -1084,9 +1145,9 @@
                         if (isLoggedIn !== 'true') {
                             document.getElementById('appPasswordInput').focus();
                         }
-                    }, 200);
+                    }, 400);
                 }
-            }, 1800);
+            }, 2000);
         });
 
         function initDesaDropdowns() {
@@ -1124,11 +1185,11 @@
                 klp.innerHTML = '<option value="">-- Pilih Kelompok --</option>';
                 if(this.value && dataWilayah[this.value]) {
                     klp.disabled = false;
-                    klp.classList.remove('bg-slate-50');
+                    klp.classList.remove('bg-slate-100/50', 'text-slate-400');
                     dataWilayah[this.value].forEach(k => klp.add(new Option(k, k)));
                 } else {
                     klp.disabled = true;
-                    klp.classList.add('bg-slate-50');
+                    klp.classList.add('bg-slate-100/50', 'text-slate-400');
                 }
 
                 if (desaId === 'searchDesa') {
@@ -1153,7 +1214,7 @@
             if (showCancel) {
                 const btnCancel = document.createElement('button');
                 btnCancel.type = 'button';
-                btnCancel.className = 'w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition';
+                btnCancel.className = 'w-1/2 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-bold transition-all';
                 btnCancel.textContent = 'Batal';
                 btnCancel.onclick = () => {
                     closeCustomModal();
@@ -1164,7 +1225,7 @@
 
             const btnOk = document.createElement('button');
             btnOk.type = 'button';
-            btnOk.className = showCancel ? 'w-1/2 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold transition shadow-md' : 'w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold transition shadow-md';
+            btnOk.className = showCancel ? 'w-1/2 py-3 bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white rounded-xl text-sm font-bold transition-all shadow-md' : 'w-full py-3 bg-gradient-to-r from-indigo-600 to-fuchsia-600 hover:from-indigo-700 hover:to-fuchsia-700 text-white rounded-xl text-sm font-bold transition-all shadow-lg hover:shadow-[0_5px_15px_rgba(99,102,241,0.3)] hover:-translate-y-0.5';
             btnOk.textContent = showCancel ? 'Ya, Lanjutkan' : 'OK';
             btnOk.onclick = () => {
                 closeCustomModal();
@@ -1197,14 +1258,14 @@
                 const searchKlp = document.getElementById('searchKelompok');
                 searchKlp.innerHTML = '<option value="">-- Pilih Desa Dulu --</option>';
                 searchKlp.disabled = true;
-                searchKlp.classList.add('bg-slate-50');
+                searchKlp.classList.add('bg-slate-100/50', 'text-slate-400');
             }
 
             let mpOption = statusSelect.querySelector('option[value="Meninggal / Sambung Luar Daerah"]');
             
             if (mode === "UPDATE") {
-                document.getElementById('tabUpdate').className = "py-2 text-xs font-semibold rounded-lg bg-orange-500 text-white shadow-sm transition";
-                document.getElementById('tabDaftar').className = "py-2 text-xs font-semibold rounded-lg text-orange-800 hover:bg-orange-200/50 transition";
+                document.getElementById('tabUpdate').className = "py-2.5 text-xs font-bold rounded-xl bg-indigo-600 text-white shadow-md transition-all duration-300";
+                document.getElementById('tabDaftar').className = "py-2.5 text-xs font-bold rounded-xl text-indigo-800 hover:bg-indigo-200/50 transition-all duration-300";
                 searchSec.classList.remove('hidden');
                 formJamaah.classList.remove('hidden');
                 btnSubmit.textContent = "Perbarui Data Jamaah";
@@ -1213,12 +1274,12 @@
                     const opt = document.createElement('option');
                     opt.value = "Meninggal / Sambung Luar Daerah";
                     opt.textContent = "Meninggal / Sambung Luar Daerah";
-                    opt.className = "text-red-600 font-bold bg-red-50";
+                    opt.className = "text-red-600 font-extrabold bg-red-50";
                     statusSelect.appendChild(opt);
                 }
             } else {
-                document.getElementById('tabDaftar').className = "py-2 text-xs font-semibold rounded-lg bg-orange-500 text-white shadow-sm transition";
-                document.getElementById('tabUpdate').className = "py-2 text-xs font-semibold rounded-lg text-orange-800 hover:bg-orange-200/50 transition";
+                document.getElementById('tabDaftar').className = "py-2.5 text-xs font-bold rounded-xl bg-indigo-600 text-white shadow-md transition-all duration-300";
+                document.getElementById('tabUpdate').className = "py-2.5 text-xs font-bold rounded-xl text-indigo-800 hover:bg-indigo-200/50 transition-all duration-300";
                 searchSec.classList.add('hidden');
                 formJamaah.classList.remove('hidden');
                 btnSubmit.textContent = "Simpan Data Jamaah";
@@ -1239,8 +1300,8 @@
             }
 
             listEl.innerHTML = `
-                <div class="flex items-center justify-center gap-2 py-4 text-xs font-semibold text-orange-600 bg-orange-50/50 rounded-xl border border-orange-100">
-                    <svg class="animate-spin h-4 w-4 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <div class="flex items-center justify-center gap-2 py-5 text-xs font-bold text-indigo-600 bg-indigo-50/50 rounded-xl border border-indigo-100">
+                    <svg class="animate-spin h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -1258,7 +1319,7 @@
                     .order('nama', { ascending: true });
 
                 if(error || !data || data.length === 0) {
-                    listEl.innerHTML = `<div class="text-xs text-slate-500 bg-slate-50/80 p-3 rounded-xl text-center border border-slate-200/60">Belum ada jamaah/operator terdaftar di kelompok ini.</div>`;
+                    listEl.innerHTML = `<div class="text-xs text-slate-500 bg-slate-50/80 p-4 rounded-xl text-center border border-slate-200/60 font-medium">Belum ada jamaah/operator terdaftar di kelompok ini.</div>`;
                     return;
                 }
 
@@ -1267,23 +1328,23 @@
                 data.forEach((j) => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
-                    btn.className = "w-full text-left p-2.5 sm:p-3 rounded-xl border border-orange-200/80 hover:border-orange-400 bg-white hover:bg-orange-50/80 transition-all duration-200 flex justify-between items-center group cursor-pointer animate-fade-in-up";
+                    btn.className = "w-full text-left p-3 sm:p-4 rounded-xl border border-indigo-100 hover:border-indigo-400 bg-white hover:bg-indigo-50/50 transition-all duration-300 flex justify-between items-center group cursor-pointer animate-fade-in-up hover:shadow-md";
                     
-                    const noHpText = j.no_hp ? ` | WA: <span class="text-blue-600 font-bold">${j.no_hp}</span>` : '';
+                    const noHpText = j.no_hp ? ` | WA: <span class="text-blue-600 font-extrabold">${j.no_hp}</span>` : '';
 
                     btn.innerHTML = `
-                        <div class="flex items-center gap-2.5 sm:gap-3">
-                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full ${j.status === 'Operator' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'} font-bold text-xs flex items-center justify-center shrink-0">
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full ${j.status === 'Operator' ? 'bg-blue-100 text-blue-600' : 'bg-indigo-100 text-indigo-600'} font-bold text-sm sm:text-base flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-300">
                                 ${j.status === 'Operator' ? '🎧' : (j.jenis_kelamin === 'L' ? '👨' : '👩')}
                             </div>
                             <div>
-                                <div class="font-bold text-xs text-slate-800 group-hover:text-orange-700">${j.nama}</div>
+                                <div class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-indigo-700 transition-colors">${j.nama}</div>
                                 <div class="text-[10px] text-slate-500 mt-0.5">
                                     Status: <span class="font-bold ${j.status === 'Operator' ? 'text-blue-600' : 'text-slate-600'}">${j.status || '-'}</span>${noHpText}
                                 </div>
                             </div>
                         </div>
-                        <span class="text-[10px] sm:text-[11px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border border-orange-200 shrink-0">
+                        <span class="text-[10px] sm:text-[11px] font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg border border-indigo-200 shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300">
                             Edit &raquo;
                         </span>
                     `;
@@ -1292,7 +1353,7 @@
                     listEl.appendChild(btn);
                 });
             } catch (err) {
-                listEl.innerHTML = `<div class="text-xs text-red-500 p-3 text-center">Gagal memuat data: ${err.message}</div>`;
+                listEl.innerHTML = `<div class="text-xs text-red-500 p-4 text-center bg-red-50 rounded-xl border border-red-100">Gagal memuat data: ${err.message}</div>`;
             }
         }
 
@@ -1325,7 +1386,7 @@
                 dataWilayah[j.desa].forEach(k => elKlp.add(new Option(k, k)));
             }
             elKlp.disabled = false;
-            elKlp.classList.remove('bg-slate-50');
+            elKlp.classList.remove('bg-slate-100/50', 'text-slate-400');
             elKlp.value = j.kelompok;
 
             const stVal = j.status || "Menikah";
@@ -1457,7 +1518,7 @@
             kelompokEl.innerHTML = '<option value="">-- Pilih Kelompok --</option>';
             if (dataWilayah[data.desa]) dataWilayah[data.desa].forEach(k => kelompokEl.add(new Option(k, k)));
             kelompokEl.disabled = false;
-            kelompokEl.classList.remove('bg-slate-50');
+            kelompokEl.classList.remove('bg-slate-100/50', 'text-slate-400');
             kelompokEl.value = data.kelompok;
 
             document.getElementById('sarp_status_tanah').value = data.status_tanah || '';
@@ -1535,6 +1596,7 @@
             const klp = document.getElementById('abs_kelompok');
             klp.innerHTML = `<option value="${data.kelompok}">${data.kelompok}</option>`;
             klp.disabled = false;
+            klp.classList.remove('bg-slate-100/50', 'text-slate-400');
 
             document.getElementById('abs_laki').value = data.jumlah_laki ?? '';
             document.getElementById('abs_perempuan').value = data.jumlah_perempuan ?? '';
@@ -1552,13 +1614,13 @@
             const listSarp = document.getElementById('sectionListSarpras');
 
             if (tab === 'INPUT') {
-                tabIn.className = "py-2 px-3 sm:px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
-                tabUp.className = "py-2 px-3 sm:px-4 text-xs font-bold text-slate-400";
+                tabIn.className = "py-2.5 px-4 text-xs font-extrabold border-b-[3px] border-teal-500 text-teal-700 transition-colors";
+                tabUp.className = "py-2.5 px-4 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors";
                 formSarp.classList.remove('hidden');
                 listSarp.classList.add('hidden');
             } else {
-                tabUp.className = "py-2 px-3 sm:px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
-                tabIn.className = "py-2 px-3 sm:px-4 text-xs font-bold text-slate-400";
+                tabUp.className = "py-2.5 px-4 text-xs font-extrabold border-b-[3px] border-teal-500 text-teal-700 transition-colors";
+                tabIn.className = "py-2.5 px-4 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors";
                 formSarp.classList.add('hidden');
                 listSarp.classList.remove('hidden');
                 loadListSarpras();
@@ -1568,14 +1630,14 @@
         async function loadListSarpras() {
             const tbody = document.getElementById('tbodyListSarpras');
             const selectedDesa = document.getElementById('sarp_desa_update').value;
-            tbody.innerHTML = '<tr><td colspan="6" class="p-3 text-center">Memuat sarpras...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center font-bold text-teal-700">Memuat sarpras...</td></tr>';
 
             try {
                 let data = await fetchAllRows('fasilitas_kelompok', '*');
                 if (selectedDesa) data = data.filter(s => s.desa === selectedDesa);
 
                 if (!data || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-slate-400">Belum ada data sarpras.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400 font-medium">Belum ada data sarpras.</td></tr>';
                     return;
                 }
 
@@ -1583,18 +1645,19 @@
                 tbody.innerHTML = '';
                 data.forEach(s => {
                     const tr = document.createElement('tr');
+                    tr.className = "hover:bg-teal-50/50 transition-colors";
                     tr.innerHTML = `
-                        <td class="px-2 py-2 font-semibold text-slate-800 sticky-col" title="${s.kelompok}">${s.kelompok}</td>
-                        <td class="px-2 py-2 text-center text-slate-700 whitespace-nowrap">${s.status_tanah || '-'}</td>
-                        <td class="px-2 py-2 text-center whitespace-nowrap">${s.jumlah_masjid || 0} / ${s.jumlah_aula || 0}</td>
-                        <td class="px-2 py-2 text-center font-bold text-slate-700 whitespace-nowrap">${s.km_pria || 0}L / ${s.km_wanita || 0}P</td>
-                        <td class="px-2 py-2 text-center text-slate-700 whitespace-nowrap">${s.km_mt || 0} MT / ${s.km_tamu || 0} Tamu</td>
-                        <td class="px-2 py-2 text-center whitespace-nowrap no-print"><button type="button" onclick="editSarpras('${s.id}')" class="px-2.5 py-1 bg-amber-100 text-amber-800 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button></td>
+                        <td class="px-2 py-3 font-extrabold text-teal-900 sticky-col" title="${s.kelompok}">${s.kelompok}</td>
+                        <td class="px-2 py-3 text-center font-semibold text-slate-700 whitespace-nowrap">${s.status_tanah || '-'}</td>
+                        <td class="px-2 py-3 text-center font-bold whitespace-nowrap">${s.jumlah_masjid || 0} / ${s.jumlah_aula || 0}</td>
+                        <td class="px-2 py-3 text-center font-black text-teal-700 whitespace-nowrap">${s.km_pria || 0}L / ${s.km_wanita || 0}P</td>
+                        <td class="px-2 py-3 text-center font-semibold text-slate-700 whitespace-nowrap">${s.km_mt || 0} MT / ${s.km_tamu || 0} Tamu</td>
+                        <td class="px-2 py-3 text-center whitespace-nowrap no-print"><button type="button" onclick="editSarpras('${s.id}')" class="px-3 py-1.5 bg-fuchsia-100 text-fuchsia-800 hover:bg-fuchsia-200 rounded-lg font-bold text-[10px] transition-colors shadow-sm">Edit</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-red-500">Gagal memuat: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500 font-bold">Gagal memuat: ${err.message}</td></tr>`;
             }
         }
 
@@ -1608,18 +1671,18 @@
             const tabStatus = document.getElementById('tabStatusKeseluruhan');
             const tabKlp = document.getElementById('tabRekapKelompok');
 
-            [tabStatus, tabKlp].forEach(t => t.className = "py-2 px-2.5 sm:px-3 text-xs font-bold text-slate-400 flex items-center gap-1");
+            [tabStatus, tabKlp].forEach(t => t.className = "py-2.5 px-3 text-xs font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1.5 transition-colors");
             [secStatus, secRekapKlp].forEach(s => s.classList.add('hidden'));
 
             if (tab === 'STATUS_KESELURUHAN') {
                 secStatus.classList.remove('hidden');
-                tabStatus.className = "py-2 px-2.5 sm:px-3 text-xs font-bold border-b-2 border-orange-500 text-orange-600 flex items-center gap-1";
+                tabStatus.className = "py-2.5 px-3 text-xs font-extrabold border-b-[3px] border-amber-500 text-amber-700 flex items-center gap-1.5 transition-colors";
                 if(btnPrint) btnPrint.classList.remove('hidden');
                 if(btnExport) btnExport.classList.add('hidden');
                 loadRekapStatusKeseluruhan();
             } else if (tab === 'REKAP_KELOMPOK') {
                 secRekapKlp.classList.remove('hidden');
-                tabKlp.className = "py-2 px-2.5 sm:px-3 text-xs font-bold border-b-2 border-orange-500 text-orange-600 flex items-center gap-1";
+                tabKlp.className = "py-2.5 px-3 text-xs font-extrabold border-b-[3px] border-amber-500 text-amber-700 flex items-center gap-1.5 transition-colors";
                 if(btnPrint) btnPrint.classList.remove('hidden');
                 if(btnExport) btnExport.classList.remove('hidden');
                 loadRekapKelompokLengkap();
@@ -1639,14 +1702,14 @@
             if(tab === 'INPUT') {
                 document.getElementById('formAbsensiKegiatan').classList.remove('hidden');
                 document.getElementById('printableAbsensi').classList.add('hidden');
-                document.getElementById('tabInputAbsensi').className = "py-2 px-3 sm:px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
-                document.getElementById('tabRekapAbsensi').className = "py-2 px-3 sm:px-4 text-xs font-bold text-slate-400";
+                document.getElementById('tabInputAbsensi').className = "py-2.5 px-4 text-xs font-extrabold border-b-[3px] border-fuchsia-500 text-fuchsia-700 transition-colors";
+                document.getElementById('tabRekapAbsensi').className = "py-2.5 px-4 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors";
                 if(btnPrint) btnPrint.classList.add('hidden');
             } else {
                 document.getElementById('formAbsensiKegiatan').classList.add('hidden');
                 document.getElementById('printableAbsensi').classList.remove('hidden');
-                document.getElementById('tabRekapAbsensi').className = "py-2 px-3 sm:px-4 text-xs font-bold border-b-2 border-orange-500 text-orange-600";
-                document.getElementById('tabInputAbsensi').className = "py-2 px-3 sm:px-4 text-xs font-bold text-slate-400";
+                document.getElementById('tabRekapAbsensi').className = "py-2.5 px-4 text-xs font-extrabold border-b-[3px] border-fuchsia-500 text-fuchsia-700 transition-colors";
+                document.getElementById('tabInputAbsensi').className = "py-2.5 px-4 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors";
                 if(btnPrint) btnPrint.classList.remove('hidden');
                 populateKegiatanFilter();
                 loadRekapAbsensi();
@@ -1718,7 +1781,7 @@
                     console.warn("Gagal memuat data_generus:", gErr);
                 }
 
-                document.getElementById('stTotalAll').textContent = `${dataJamaah.length + totalGenerus} Data Terdaftar`;
+                document.getElementById('stTotalAll').textContent = `${dataJamaah.length + totalGenerus} Data`;
             } catch (err) {
                 console.error(err);
             }
@@ -1741,31 +1804,31 @@
             listEl.innerHTML = '';
 
             if (!listData || listData.length === 0) {
-                listEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Tidak ada data operator ditemukan.</p>`;
+                listEl.innerHTML = `<p class="text-xs text-slate-400 font-semibold text-center py-5">Tidak ada data operator ditemukan.</p>`;
                 return;
             }
 
             listData.forEach(op => {
                 const item = document.createElement('div');
-                item.className = "p-2.5 sm:p-3 bg-blue-50/70 border border-blue-200 rounded-xl flex items-center justify-between gap-2 animate-fade-in-up";
+                item.className = "p-3 sm:p-4 bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-100 rounded-2xl flex items-center justify-between gap-3 animate-fade-in-up hover:shadow-md transition-shadow";
 
                 const cleanHp = (op.no_hp || '').replace(/[^0-9]/g, '');
                 const waLink = cleanHp.startsWith('0') ? `62${cleanHp.slice(1)}` : cleanHp;
 
                 item.innerHTML = `
                     <div>
-                        <div class="font-bold text-xs text-slate-800">${op.nama}</div>
-                        <div class="text-[10px] font-semibold text-slate-500 mt-0.5">
-                            Klp. <span class="text-slate-700 font-bold">${op.kelompok || '-'}</span> (${op.desa || '-'})
+                        <div class="font-extrabold text-sm text-slate-800">${op.nama}</div>
+                        <div class="text-[11px] font-bold text-slate-500 mt-1">
+                            Klp. <span class="text-indigo-800 font-black">${op.kelompok || '-'}</span> (${op.desa || '-'})
                         </div>
-                        <div class="text-[10px] sm:text-[11px] font-semibold text-blue-600 mt-0.5">${op.no_hp || 'No HP belum diisi'}</div>
+                        <div class="text-[11px] sm:text-xs font-black text-blue-600 mt-1">${op.no_hp || 'No HP belum diisi'}</div>
                     </div>
                     ${op.no_hp ? `
-                        <a href="https://wa.me/${waLink}" target="_blank" class="px-2.5 py-1 sm:px-3 sm:py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-[11px] sm:text-xs rounded-lg shadow-sm transition flex items-center gap-1 shrink-0">
+                        <a href="https://wa.me/${waLink}" target="_blank" class="px-3 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-95 text-white font-extrabold text-[11px] sm:text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 shrink-0">
                             💬 WA
                         </a>
                     ` : `
-                        <span class="text-[9px] sm:text-[10px] text-slate-400 italic shrink-0">No HP kosong</span>
+                        <span class="text-[10px] text-slate-400 italic font-semibold shrink-0">No HP kosong</span>
                     `}
                 `;
                 listEl.appendChild(item);
@@ -1797,7 +1860,7 @@
             const tfoot = document.getElementById('tfootRekapKelompok');
             const selectedFilterDesa = document.getElementById('filterDesaRekap').value;
 
-            tbody.innerHTML = '<tr><td colspan="19" class="p-3 text-center">Memuat rekap...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="19" class="p-4 text-center font-bold text-indigo-700">Memuat rekap...</td></tr>';
             tfoot.innerHTML = '';
 
             try {
@@ -1925,55 +1988,56 @@
                     totKmTamu += item.kmTamu;
 
                     const tr = document.createElement('tr');
+                    tr.className = "hover:bg-indigo-50/50 transition-colors";
                     tr.innerHTML = `
-                        <td class="px-1.5 py-2 font-bold text-slate-800 sticky-col" title="${item.kelompok}">${item.kelompok}</td>
-                        <td class="px-1 py-2 text-center bg-amber-50/30 font-medium text-amber-900">${item.paud}</td>
-                        <td class="px-1 py-2 text-center bg-amber-50/30 font-medium text-amber-900">${item.tk}</td>
-                        <td class="px-1 py-2 text-center bg-amber-50/30 font-medium text-amber-900">${item.caberawit}</td>
-                        <td class="px-1 py-2 text-center bg-amber-50/30 font-medium text-amber-900">${item.praRemaja}</td>
-                        <td class="px-1 py-2 text-center bg-amber-50/30 font-medium text-amber-900">${item.remaja}</td>
-                        <td class="px-1 py-2 text-center bg-amber-50/30 font-medium text-amber-900">${item.usiaMandiri}</td>
-                        <td class="px-1 py-2 text-center">${item.menikah}</td>
-                        <td class="px-1 py-2 text-center">${item.duda}</td>
-                        <td class="px-1 py-2 text-center">${item.janda}</td>
-                        <td class="px-1 py-2 text-center">${item.manula}</td>
-                        <td class="px-1 py-2 text-center font-bold text-blue-700 bg-blue-50/40">${item.operator}</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-600 bg-orange-50/50">${item.totalJumlah}</td>
-                        <td class="px-1 py-2 text-center border-l border-orange-100">${item.subKlp}</td>
-                        <td class="px-1 py-2 text-center">${item.masjid}</td>
-                        <td class="px-1 py-2 text-center">${item.aula}</td>
-                        <td class="px-1 py-2 text-center font-semibold">${item.kmPria}L/${item.kmWanita}P</td>
-                        <td class="px-1 py-2 text-center font-semibold">${item.kmMt}</td>
-                        <td class="px-1 py-2 text-center font-semibold">${item.kmTamu}</td>
+                        <td class="px-2 py-3 font-extrabold text-indigo-900 sticky-col" title="${item.kelompok}">${item.kelompok}</td>
+                        <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900 border-l border-indigo-100">${item.paud}</td>
+                        <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.tk}</td>
+                        <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.caberawit}</td>
+                        <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.praRemaja}</td>
+                        <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.remaja}</td>
+                        <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900 border-r border-indigo-100">${item.usiaMandiri}</td>
+                        <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.menikah}</td>
+                        <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.duda}</td>
+                        <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.janda}</td>
+                        <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.manula}</td>
+                        <td class="px-1.5 py-3 text-center font-black text-blue-700 bg-blue-50/60">${item.operator}</td>
+                        <td class="px-2 py-3 text-center font-black text-indigo-700 bg-indigo-100/50 border-l border-indigo-200 text-[12px]">${item.totalJumlah}</td>
+                        <td class="px-1.5 py-3 text-center border-l border-indigo-200 font-bold">${item.subKlp}</td>
+                        <td class="px-1.5 py-3 text-center font-bold">${item.masjid}</td>
+                        <td class="px-1.5 py-3 text-center font-bold">${item.aula}</td>
+                        <td class="px-1.5 py-3 text-center font-extrabold text-slate-800">${item.kmPria}L/${item.kmWanita}P</td>
+                        <td class="px-1.5 py-3 text-center font-bold">${item.kmMt}</td>
+                        <td class="px-1.5 py-3 text-center font-bold">${item.kmTamu}</td>
                     `;
                     tbody.appendChild(tr);
                 });
 
                 tfoot.innerHTML = `
                     <tr>
-                        <td class="px-1.5 py-2 text-left font-extrabold uppercase sticky-col">TOTAL</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-amber-900 bg-amber-100/50">${totPaud}</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-amber-900 bg-amber-100/50">${totTk}</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-amber-900 bg-amber-100/50">${totCaberawit}</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-amber-900 bg-amber-100/50">${totPraRemaja}</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-amber-900 bg-amber-100/50">${totRemaja}</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-amber-900 bg-amber-100/50">${totUsiaMandiri}</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totMenikah}</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totDuda}</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totJanda}</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totManula}</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-blue-700 bg-blue-100/50">${totOperator}</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-600 bg-orange-200/50">${totAllJumlah}</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-orange-950 border-l border-orange-200">${totSub}</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totMasjid}</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totAula}</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totKmL}L/${totKmP}P</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totKmMt}</td>
-                        <td class="px-1 py-2 text-center font-extrabold text-orange-950">${totKmTamu}</td>
+                        <td class="px-2 py-4 text-left font-black uppercase sticky-col bg-indigo-200/50">TOTAL</td>
+                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/60 border-l border-indigo-200">${totPaud}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/60">${totTk}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/60">${totCaberawit}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/60">${totPraRemaja}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/60">${totRemaja}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/60 border-r border-indigo-200">${totUsiaMandiri}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totMenikah}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totDuda}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totJanda}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totManula}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-blue-800 bg-blue-100/70">${totOperator}</td>
+                        <td class="px-2 py-4 text-center font-black text-indigo-800 bg-indigo-300/50 border-l border-indigo-300 text-[13px]">${totAllJumlah}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-indigo-950 border-l border-indigo-300">${totSub}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totMasjid}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totAula}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totKmL}L/${totKmP}P</td>
+                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totKmMt}</td>
+                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totKmTamu}</td>
                     </tr>
                 `;
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="19" class="p-3 text-center text-red-500">Gagal memuat rekap: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="19" class="p-4 text-center text-red-500 font-bold">Gagal memuat rekap: ${err.message}</td></tr>`;
             }
         }
 
@@ -2008,7 +2072,7 @@
 
             const tbody = document.getElementById('tbodyRekapAbsensi');
             const tfoot = document.getElementById('tfootRekapAbsensi');
-            tbody.innerHTML = '<tr><td colspan="6" class="p-3 text-center">Memuat rekap...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center font-bold text-fuchsia-700">Memuat rekap...</td></tr>';
             tfoot.innerHTML = '';
 
             try {
@@ -2027,7 +2091,7 @@
                 });
 
                 if (filteredData.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-slate-400">Tidak ada data.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400 font-medium">Tidak ada data.</td></tr>';
                     return;
                 }
 
@@ -2047,28 +2111,29 @@
                     }
 
                     const tr = document.createElement('tr');
+                    tr.className = "hover:bg-fuchsia-50/50 transition-colors";
                     tr.innerHTML = `
-                        <td class="px-1.5 py-2 font-semibold text-slate-800 whitespace-nowrap sticky-col" title="${item.kelompok}">${item.kelompok}</td>
-                        <td class="px-1.5 py-2 text-center whitespace-nowrap text-slate-600">${tglFormatted}</td>
-                        <td class="px-1.5 py-2 text-center whitespace-nowrap">${item.jumlah_laki}L / ${item.jumlah_perempuan}P</td>
-                        <td class="px-1.5 py-2 text-center whitespace-nowrap font-medium text-amber-700">${item.jumlah_ijin || 0} Orang</td>
-                        <td class="px-1.5 py-2 text-right font-medium whitespace-nowrap">Rp${(item.infaq || 0).toLocaleString('id-ID')}</td>
-                        <td class="px-1.5 py-2 text-center whitespace-nowrap no-print"><button onclick="editAbsensi('${item.id}')" class="px-2 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded font-bold text-[10px] transition">Edit</button></td>
+                        <td class="px-2 py-3 font-extrabold text-fuchsia-900 whitespace-nowrap sticky-col" title="${item.kelompok}">${item.kelompok}</td>
+                        <td class="px-2 py-3 text-center whitespace-nowrap font-semibold text-slate-600">${tglFormatted}</td>
+                        <td class="px-2 py-3 text-center whitespace-nowrap font-bold">${item.jumlah_laki}L / ${item.jumlah_perempuan}P</td>
+                        <td class="px-2 py-3 text-center whitespace-nowrap font-bold text-pink-600">${item.jumlah_ijin || 0} Orang</td>
+                        <td class="px-2 py-3 text-right font-extrabold whitespace-nowrap text-slate-800">Rp${(item.infaq || 0).toLocaleString('id-ID')}</td>
+                        <td class="px-2 py-3 text-center whitespace-nowrap no-print"><button onclick="editAbsensi('${item.id}')" class="px-3 py-1.5 bg-fuchsia-100 text-fuchsia-700 hover:bg-fuchsia-200 rounded-lg font-extrabold text-[10px] transition-colors shadow-sm">Edit</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
 
                 tfoot.innerHTML = `
                     <tr>
-                        <td class="px-1.5 py-2 text-left font-extrabold uppercase whitespace-nowrap sticky-col" colspan="2">TOTAL KESELURUHAN</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-orange-900 whitespace-nowrap">${totalLaki}L / ${totalPerempuan}P</td>
-                        <td class="px-1.5 py-2 text-center font-extrabold text-amber-900 whitespace-nowrap">${totalIjin} Orang</td>
-                        <td class="px-1.5 py-2 text-right font-extrabold text-orange-900 whitespace-nowrap">Rp${totalInfaq.toLocaleString('id-ID')}</td>
-                        <td class="px-1.5 py-2 text-center no-print"></td>
+                        <td class="px-2 py-4 text-left font-black uppercase whitespace-nowrap sticky-col bg-fuchsia-200/50" colspan="2">TOTAL KESELURUHAN</td>
+                        <td class="px-2 py-4 text-center font-black text-fuchsia-950 whitespace-nowrap">${totalLaki}L / ${totalPerempuan}P</td>
+                        <td class="px-2 py-4 text-center font-black text-pink-800 whitespace-nowrap">${totalIjin} Orang</td>
+                        <td class="px-2 py-4 text-right font-black text-emerald-700 whitespace-nowrap text-[13px]">Rp${totalInfaq.toLocaleString('id-ID')}</td>
+                        <td class="px-2 py-4 text-center no-print"></td>
                     </tr>
                 `;
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-red-500">Gagal memuat rekap absensi: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500 font-bold">Gagal memuat rekap absensi: ${err.message}</td></tr>`;
             }
         }
 
