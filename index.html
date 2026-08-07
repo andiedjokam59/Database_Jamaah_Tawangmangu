@@ -1588,7 +1588,7 @@
                     document.getElementById('tgl_lahir_thn').value = parts[0];
                     document.getElementById('tgl_lahir_bln').value = parts[1];
                     document.getElementById('tgl_lahir_tgl').value = parts[2];
-                    hitungUmurOtomatis();
+                    hitungUmurOtotmatis();
                 }
             }
 
@@ -2761,7 +2761,12 @@
             const item = document.createElement('button');
             item.type = "button";
             const isSelected = (opt.value === select.value);
-            item.className = `w-full text-left p-3.5 sm:p-4 rounded-xl text-sm sm:text-base font-bold flex items-center justify-between cursor-pointer picker-option-item ${isSelected ? 'active-selected' : 'text-slate-700 bg-white/50 border border-white/70'}`;
+            
+            // Penambahan style teks merah untuk opsi "Meninggal / Sambung Luar Daerah"
+            const isRedOption = (opt.value === "Meninggal / Sambung Luar Daerah");
+            const colorClass = isRedOption ? "text-red-600 font-extrabold" : "text-slate-700";
+
+            item.className = `w-full text-left p-3.5 sm:p-4 rounded-xl text-sm sm:text-base font-bold flex items-center justify-between cursor-pointer picker-option-item ${isSelected ? 'active-selected' : `${colorClass} bg-white/50 border border-white/70`}`;
             
             item.innerHTML = `
                 <span class="leading-tight">${opt.text}</span>
