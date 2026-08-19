@@ -323,13 +323,22 @@
             border-right-color: #a855f7;
             animation: spinGradient 1s linear infinite;
         }
+
+        /* INDIKATOR AMBIL DATA OVERLAY */
+        #dataFetchOverlay {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        #dataFetchOverlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 sm:p-6 antialiased text-slate-800">
     <!-- ANIMATED BACKGROUND MESH & MOTIF -->
     <div class="animated-bg"></div>
 
-    <!-- ANIMASI LOADING -->
+    <!-- ANIMASI LOADING AWAL -->
     <div id="loadingScreen" class="fixed inset-0 bg-white/60 backdrop-blur-xl z-[100] flex flex-col items-center justify-center p-4">
         <div class="relative flex flex-col items-center">
             <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full p-2 bg-white/80 backdrop-blur-md shadow-[0_0_40px_rgba(99,102,241,0.4)] animate-pulse-glow flex items-center justify-center mb-8 overflow-hidden border border-indigo-200">
@@ -338,6 +347,17 @@
             <div class="w-10 h-10 sm:w-12 sm:h-12 loader-ring rounded-full mb-5"></div>
             <h3 class="text-base sm:text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-fuchsia-500 tracking-wider text-center">INSAN QUR'ANY TAWANGMANGU</h3>
             <p class="text-xs text-indigo-400 mt-2 font-semibold tracking-widest uppercase">Memuat Sistem Informasi...</p>
+        </div>
+    </div>
+
+    <!-- INDIKATOR SAAT PENGAMBILAN DATA (DATA FETCHING OVERLAY) -->
+    <div id="dataFetchOverlay" class="fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-[200] opacity-0 invisible flex flex-col items-center justify-center p-4 pointer-events-auto">
+        <div class="bg-white/90 border border-indigo-100 p-6 rounded-3xl shadow-2xl flex flex-col items-center max-w-xs w-full text-center space-y-3 animate-fade-in-up">
+            <div class="w-10 h-10 loader-ring rounded-full"></div>
+            <div>
+                <h4 class="text-sm font-extrabold text-indigo-900 tracking-tight">Mengambil Data...</h4>
+                <p id="dataFetchSubtext" class="text-[11px] text-slate-500 font-medium mt-0.5">Mohon tunggu sebentar</p>
+            </div>
         </div>
     </div>
 
@@ -355,7 +375,7 @@
                 <div>
                     <input type="password" id="appPasswordInput" required placeholder="Masukkan Password" class="rounded-box-input w-full p-3.5 text-center text-sm font-bold tracking-widest text-indigo-900 transition-all duration-300">
                     <p id="authErrorMsg" class="text-[11px] text-red-500 font-bold mt-2 hidden">⚠️ Password salah! Silakan coba lagi.</p>
-                    <p id="authSuccessMsg" class="text-[11px] text-emerald-500 font-bold mt-2 hidden">✅ Password Benar! Mengalihkan...</p>
+                    <p id="authSuccessMsg" class="text-[11px] text-emerald-500 font-bold mt-2 hidden">✅ Password Benar! Mengunduh Database...</p>
                 </div>
                 <button type="submit" id="authSubmitBtn" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-fuchsia-500 hover:from-indigo-700 hover:to-fuchsia-600 active:scale-[0.98] text-white rounded-xl text-sm font-bold transition-all duration-300 shadow-[0_8px_20px_rgba(99,102,241,0.3)] flex items-center justify-center gap-2">
                     <span id="authBtnSpinner" class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -408,30 +428,28 @@
                 <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-1 font-medium">Absensi Kegiatan</span>
             </button>
 
-            <!-- TOMBOL SARPRAS (COMING SOON) -->
-            <button type="button" onclick="showComingSoon('Sarpras')" class="glass-btn-menu flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl group opacity-80 hover:opacity-100">
-                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-teal-500 to-emerald-600 text-white rounded-[1.2rem] flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg relative">
+            <!-- MENU SARPRAS COMING SOON -->
+            <button type="button" onclick="showSarprasComingSoon()" class="glass-btn-menu flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl group relative overflow-hidden">
+                <span class="absolute top-3 right-3 bg-teal-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full tracking-wider uppercase shadow-xs">Coming Soon</span>
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-slate-400 to-teal-600 text-white rounded-[1.2rem] flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg opacity-80">
                     <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                         <path d="M3 21h13V9L9.5 4 3 9v12z"></path>
                         <path d="M7 13h5v8H7z"></path>
                         <path d="M16 21h5v-6l-2.5-2L16 15v6z"></path>
                     </svg>
-                    <span class="absolute -top-2 -right-2 bg-amber-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-tighter shadow-sm border border-white">Soon</span>
                 </div>
                 <span class="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-teal-700 tracking-wide">SARPRAS</span>
-                <span class="text-[9px] sm:text-[10px] text-amber-600 font-bold text-center mt-1">Segera Hadir</span>
+                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-1 font-medium">Belum Bisa Diakses</span>
             </button>
 
-            <!-- TOMBOL REKAP (COMING SOON) -->
-            <button type="button" onclick="showComingSoon('Rekapitulasi')" class="glass-btn-menu flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl group opacity-80 hover:opacity-100">
-                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-amber-500 to-orange-500 text-white rounded-[1.2rem] flex items-center justify-center mb-3 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 shadow-lg relative">
+            <button type="button" onclick="showSection('rekap')" class="glass-btn-menu flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl group">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-amber-500 to-orange-500 text-white rounded-[1.2rem] flex items-center justify-center mb-3 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 shadow-lg">
                     <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
-                    <span class="absolute -top-2 -right-2 bg-amber-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-tighter shadow-sm border border-white">Soon</span>
                 </div>
                 <span class="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-amber-700 tracking-wide">REKAP</span>
-                <span class="text-[9px] sm:text-[10px] text-amber-600 font-bold text-center mt-1">Segera Hadir</span>
+                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-1 font-medium">Data & Laporan</span>
             </button>
         </div>
 
@@ -587,12 +605,19 @@
                 <h3 class="font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-600 to-pink-500 text-base sm:text-lg">Absensi Kegiatan Jamaah</h3>
             </div>
 
-            <div class="flex justify-between items-center border-b border-slate-200/60 mb-5">
-                <div class="flex gap-2">
-                    <button onclick="switchTabAbsensi('INPUT')" id="tabInputAbsensi" class="py-2.5 px-4 text-xs font-extrabold border-b-[3px] border-fuchsia-500 text-fuchsia-700 transition-colors">Form Absensi</button>
-                    <button onclick="switchTabAbsensi('REKAP')" id="tabRekapAbsensi" class="py-2.5 px-4 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors">Rekapan</button>
+            <!-- TAB HEADER DENGAN BOKS CONTAINER LENGKAP -->
+            <div class="flex justify-between items-center mb-6 gap-3 flex-wrap">
+                <div class="bg-fuchsia-50/80 p-1.5 rounded-2xl flex gap-1.5 border border-fuchsia-200/80 shadow-inner">
+                    <button onclick="switchTabAbsensi('INPUT')" id="tabInputAbsensi" class="py-2 px-3.5 text-xs font-extrabold rounded-xl bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white shadow-md flex items-center gap-1.5 transition-all duration-300">
+                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        Form Absensi
+                    </button>
+                    <button onclick="switchTabAbsensi('REKAP')" id="tabRekapAbsensi" class="py-2 px-3.5 text-xs font-extrabold rounded-xl text-fuchsia-900 hover:bg-fuchsia-200/60 flex items-center gap-1.5 transition-all duration-300">
+                        Rekapan
+                    </button>
                 </div>
-                <button type="button" id="btnPrintAbsensi" onclick="printData('printableAbsensi', 'Laporan Absensi Kegiatan Jamaah')" class="hidden px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-1.5 hover:-translate-y-0.5">
+
+                <button type="button" id="btnPrintAbsensi" onclick="printData('printableAbsensi', 'Laporan Absensi Kegiatan Jamaah')" class="hidden px-3.5 py-2 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-bold text-xs rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-1.5">
                     🖨️ Print
                 </button>
             </div>
@@ -703,7 +728,7 @@
             </div>
         </div>
 
-        <!-- ================= SECTION SARPRAS ================= -->
+        <!-- ================= SECTION SARPRAS (HIDDEN/COMING SOON) ================= -->
         <div id="sectionSarpras" class="section-content hidden">
             <button type="button" onclick="showSection('home')" class="mb-5 inline-flex items-center gap-2 text-xs font-bold text-teal-600 hover:text-teal-700 bg-teal-50/80 px-4 py-2 rounded-xl border border-teal-200 transition-all hover:-translate-x-1 shadow-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
@@ -826,29 +851,29 @@
                 <h3 class="font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-500 text-base sm:text-lg">Rekapan Data Jamaah & Sarpras</h3>
             </div>
 
-            <div class="flex justify-between items-center border-b border-slate-200/60 mb-5 overflow-x-auto gap-3 pb-1">
-                <div class="flex whitespace-nowrap gap-2">
-                    <button onclick="switchTabRekap('STATUS_KESELURUHAN')" id="tabStatusKeseluruhan" class="py-2.5 px-3 text-xs font-extrabold border-b-[3px] border-amber-500 text-amber-700 flex items-center gap-1.5 transition-colors">
-                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path>
-                        </svg>
+            <!-- TAB HEADER DENGAN BOKS CONTAINER LENGKAP -->
+            <div class="flex justify-between items-center mb-6 overflow-x-auto gap-3 pb-1">
+                <div class="bg-amber-50/80 p-1.5 rounded-2xl flex gap-1.5 border border-amber-200/80 shadow-inner shrink-0">
+                    <button onclick="switchTabRekap('STATUS_KESELURUHAN')" id="tabStatusKeseluruhan" class="py-2 px-3.5 text-xs font-extrabold rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap">
+                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                         Status Jamaah
                     </button>
-                    <button onclick="switchTabRekap('REKAP_KELOMPOK')" id="tabRekapKelompok" class="py-2.5 px-3 text-xs font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1.5 transition-colors">
+                    <button onclick="switchTabRekap('REKAP_KELOMPOK')" id="tabRekapKelompok" class="py-2 px-3.5 text-xs font-extrabold rounded-xl text-amber-900 hover:bg-amber-200/60 flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap">
                         <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path>
                         </svg>
                         Rekap Per Klp
                     </button>
                 </div>
+
                 <div class="flex items-center gap-2 shrink-0">
-                    <button type="button" id="btnExportExcel" onclick="exportTableToExcel('tbodyRekapKelompok', 'tfootRekapKelompok')" class="px-3 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 active:scale-95 text-white font-bold text-[11px] rounded-xl transition-all shadow-md flex items-center gap-1.5">
+                    <button type="button" id="btnExportExcel" onclick="exportTableToExcel('tbodyRekapKelompok', 'tfootRekapKelompok')" class="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 active:scale-95 text-white font-bold text-[11px] rounded-xl transition-all shadow-md flex items-center gap-1.5">
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                             <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM6 20V4h7v5h5v11H6zm11.5-6l-2-2 2-2h-2.1l-1 1.2-1-1.2h-2.1l2 2-2 2h2.1l1-1.2 1 1.2h2.1z"/>
                         </svg>
                         <span>Excel</span>
                     </button>
-                    <button type="button" id="btnPrintRekap" onclick="triggerPrintRekapCurrentTab()" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-bold text-[11px] rounded-xl transition-all shadow-md flex items-center gap-1.5">
+                    <button type="button" id="btnPrintRekap" onclick="triggerPrintRekapCurrentTab()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-bold text-[11px] rounded-xl transition-all shadow-md flex items-center gap-1.5">
                         🖨️ Print
                     </button>
                 </div>
@@ -864,26 +889,26 @@
                         </h4>
                         
                         <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                            <div class="p-4 bg-white/60 border border-indigo-100 rounded-2xl text-center shadow-sm hover:shadow-md transition-shadow">
-                                <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Menikah</span>
-                                <span id="stMenikah" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500">0</span>
-                            </div>
-                            <div class="p-4 bg-white/60 border border-indigo-100 rounded-2xl text-center shadow-sm hover:shadow-md transition-shadow">
-                                <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Duda</span>
-                                <span id="stDuda" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500">0</span>
-                            </div>
-                            <div class="p-4 bg-white/60 border border-indigo-100 rounded-2xl text-center shadow-sm hover:shadow-md transition-shadow">
-                                <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Janda</span>
-                                <span id="stJanda" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500">0</span>
-                            </div>
-                            <div class="p-4 bg-white/60 border border-indigo-100 rounded-2xl text-center shadow-sm hover:shadow-md transition-shadow">
-                                <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Manula</span>
-                                <span id="stManula" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500">0</span>
-                            </div>
+                            <button type="button" onclick="showStatusDetailModal('Menikah')" class="p-4 bg-white/60 border border-indigo-100 hover:border-indigo-300 rounded-2xl text-center shadow-sm hover:shadow-md transition-all cursor-pointer group active:scale-95 flex flex-col justify-center items-center">
+                                <span class="block text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 uppercase tracking-widest">Menikah</span>
+                                <span id="stMenikah" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500 mt-1">0</span>
+                            </button>
+                            <button type="button" onclick="showStatusDetailModal('Duda')" class="p-4 bg-white/60 border border-indigo-100 hover:border-indigo-300 rounded-2xl text-center shadow-sm hover:shadow-md transition-all cursor-pointer group active:scale-95 flex flex-col justify-center items-center">
+                                <span class="block text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 uppercase tracking-widest">Duda</span>
+                                <span id="stDuda" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500 mt-1">0</span>
+                            </button>
+                            <button type="button" onclick="showStatusDetailModal('Janda')" class="p-4 bg-white/60 border border-indigo-100 hover:border-indigo-300 rounded-2xl text-center shadow-sm hover:shadow-md transition-all cursor-pointer group active:scale-95 flex flex-col justify-center items-center">
+                                <span class="block text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 uppercase tracking-widest">Janda</span>
+                                <span id="stJanda" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500 mt-1">0</span>
+                            </button>
+                            <button type="button" onclick="showStatusDetailModal('Manula')" class="p-4 bg-white/60 border border-indigo-100 hover:border-indigo-300 rounded-2xl text-center shadow-sm hover:shadow-md transition-all cursor-pointer group active:scale-95 flex flex-col justify-center items-center">
+                                <span class="block text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 uppercase tracking-widest">Manula</span>
+                                <span id="stManula" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500 mt-1">0</span>
+                            </button>
                             
-                            <button type="button" onclick="showAllOperatorsModal()" class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 active:scale-[0.98] border border-blue-200 hover:border-blue-300 rounded-2xl text-center col-span-2 sm:col-span-1 transition-all cursor-pointer shadow-sm group">
+                            <button type="button" onclick="showAllOperatorsModal()" class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 active:scale-[0.98] border border-blue-200 hover:border-blue-300 rounded-2xl text-center col-span-2 sm:col-span-1 transition-all cursor-pointer shadow-sm group flex flex-col justify-center items-center">
                                 <span class="block text-[10px] font-extrabold text-blue-600 uppercase tracking-widest group-hover:text-blue-700">OPERATOR</span>
-                                <span id="stOperator" class="text-2xl font-black text-blue-600 group-hover:text-blue-700">0</span>
+                                <span id="stOperator" class="text-2xl font-black text-blue-600 group-hover:text-blue-700 mt-1">0</span>
                             </button>
                         </div>
                     </div>
@@ -977,6 +1002,49 @@
             </div>
         </div>
 
+    </div>
+
+    <!-- MODAL RINCIAN STATUS JAMAAH -->
+    <div id="statusDetailModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+        <div class="modal-content-card glass-card rounded-[2rem] p-6 max-w-md w-full text-center space-y-4 border border-indigo-100/80">
+            <div>
+                <h4 id="statusDetailTitle" class="text-lg font-extrabold text-slate-800">Rincian Jamaah</h4>
+                <p id="statusDetailSubtitle" class="text-xs text-slate-500 mt-1 font-medium">Daftar jamaah berdasarkan kategori</p>
+            </div>
+            
+            <div class="relative text-left pt-2">
+                <input type="text" id="statusDetailSearch" oninput="filterStatusDetailList()" placeholder="🔍 Cari nama atau kelompok..." class="w-full text-xs p-3 pl-4 rounded-xl border-2 border-indigo-200 bg-white text-indigo-900 font-bold focus:outline-none focus:border-indigo-500 transition-all shadow-inner">
+            </div>
+
+            <div id="statusDetailList" class="max-h-64 overflow-y-auto space-y-2 text-left pr-1 scroll-container py-1"></div>
+
+            <button type="button" onclick="closeModal('statusDetailModal')" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-extrabold transition-all duration-300 mt-3 border border-slate-200">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL TERDAFTAR PER KELOMPOK -->
+    <div id="kelompokDetailModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+        <div class="modal-content-card glass-card rounded-[2rem] p-6 max-w-md w-full text-center space-y-4 border border-indigo-100/80">
+            <div class="w-14 h-14 bg-gradient-to-br from-indigo-100 to-blue-100 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto text-2xl font-bold shadow-inner">
+                🏛️
+            </div>
+            <div>
+                <h4 id="kelompokDetailTitle" class="text-lg font-extrabold text-slate-800">Anggota Kelompok</h4>
+                <p id="kelompokDetailSubtitle" class="text-xs text-slate-500 mt-1 font-medium">Daftar jamaah terdaftar</p>
+            </div>
+
+            <div class="relative text-left pt-2">
+                <input type="text" id="kelompokDetailSearch" oninput="filterKelompokDetailList()" placeholder="🔍 Cari nama atau status..." class="w-full text-xs p-3 pl-4 rounded-xl border-2 border-indigo-200 bg-white text-indigo-900 font-bold focus:outline-none focus:border-indigo-500 transition-all shadow-inner">
+            </div>
+
+            <div id="kelompokDetailList" class="max-h-64 overflow-y-auto space-y-2 text-left pr-1 scroll-container py-1"></div>
+
+            <button type="button" onclick="closeKelompokDetailModal()" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-extrabold transition-all duration-300 mt-3 border border-slate-200">
+                Tutup
+            </button>
+        </div>
     </div>
 
     <!-- MODAL EKSPOR DATA JAMAAH (EXCEL & CSV) -->
@@ -1151,14 +1219,92 @@
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhpamx5eWRmb2dia2NjdGx5Y3NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMzAxODYsImV4cCI6MjA5NzcwNjE4Nn0.JwqYXWEt2yiLioI1o9qZ3KRrak2rtzO1Tp0eN7AuAm4";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        /* =========================================================================
+           GLOBAL CACHE ENGINE - DATA DI-FETCH SEKALI SAAT APLIKASI DIBUKA
+           ========================================================================= */
+        let globalCache = {
+            jamaah: [],
+            generus: [],
+            sarpras: [],
+            absensi: [],
+            isLoaded: false
+        };
+
         let currentMode = "DAFTAR";
         let activeSectionId = 'home';
         let activeRekapSubTab = "STATUS_KESELURUHAN";
 
         window.allOperatorsCache = [];
         window.activeOperatorDataset = [];
+        window.activeStatusDataset = [];
+        window.activeKelompokDataset = [];
 
-        // MAPPER TEMA DENGAN STRUKTUR DINGKAS
+        function showDataLoading(message = "Mengambil data...") {
+            const overlay = document.getElementById('dataFetchOverlay');
+            const subtext = document.getElementById('dataFetchSubtext');
+            if (subtext) subtext.textContent = message;
+            if (overlay) overlay.classList.add('active');
+        }
+
+        function hideDataLoading() {
+            const overlay = document.getElementById('dataFetchOverlay');
+            if (overlay) overlay.classList.remove('active');
+        }
+
+        /* -------------------------------------------------------------
+           LOAD DENGAN QUERY PARALEL (HANYA SEKALI DI AWAL)
+           ------------------------------------------------------------- */
+        async function fetchAllRows(tableName, selectColumns = '*') {
+            let allData = [];
+            let page = 0;
+            const pageSize = 1000;
+            let hasMore = true;
+
+            while (hasMore) {
+                const { data: pageData, error } = await supabaseClient
+                    .from(tableName)
+                    .select(selectColumns)
+                    .range(page * pageSize, (page + 1) * pageSize - 1);
+
+                if (error) throw error;
+
+                if (pageData && pageData.length > 0) {
+                    allData = allData.concat(pageData);
+                }
+
+                if (!pageData || pageData.length < pageSize) {
+                    hasMore = false;
+                } else {
+                    page++;
+                }
+            }
+            return allData;
+        }
+
+        async function preloadAllApplicationData() {
+            if (globalCache.isLoaded) return;
+            showDataLoading("Mengunduh seluruh database...");
+            try {
+                const [dataJamaah, dataGenerus, dataSarpras, dataAbsensi] = await Promise.all([
+                    fetchAllRows('data_jamaah', '*'),
+                    fetchAllRows('data_generus', '*').catch(() => []),
+                    fetchAllRows('fasilitas_kelompok', '*').catch(() => []),
+                    fetchAllRows('absensi_kegiatan', '*').catch(() => [])
+                ]);
+
+                globalCache.jamaah = dataJamaah || [];
+                globalCache.generus = dataGenerus || [];
+                globalCache.sarpras = dataSarpras || [];
+                globalCache.absensi = dataAbsensi || [];
+                globalCache.isLoaded = true;
+            } catch (err) {
+                console.error("Gagal memuat awal data:", err);
+                showCustomModal("Peringatan", "Gagal memuat beberapa data dari server. Aplikasi akan mencoba menggunakan data terbaru saat ini.", "⚠️");
+            } finally {
+                hideDataLoading();
+            }
+        }
+
         const SECTION_THEMES = {
             absensi: {
                 btnGradient: 'from-fuchsia-600 to-pink-600 hover:from-fuchsia-700 hover:to-pink-700',
@@ -1196,15 +1342,6 @@
 
         const getIntVal = id => parseInt(document.getElementById(id)?.value, 10) || 0;
 
-        // FUNGSI NOTIFIKASI COMING SOON
-        function showComingSoon(namaFitur) {
-            showCustomModal(
-                "Segera Hadir! 🚀", 
-                `Fitur ${namaFitur} sedang dalam pemeliharaan/pengembangan dan akan segera hadir kembali.`, 
-                "⏳"
-            );
-        }
-
         function handleAuthSubmit(e) {
             e.preventDefault();
             const inputEl = document.getElementById('appPasswordInput');
@@ -1224,7 +1361,7 @@
             spinner.classList.remove('hidden');
             btnText.textContent = "Mendeteksi Sandi...";
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 if (inputVal === APP_PASSWORD_SECRET) {
                     sessionStorage.setItem('isAppLoggedIn', 'true');
 
@@ -1234,6 +1371,9 @@
                     iconBox.className = "w-20 h-20 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto text-4xl shadow-inner transition-colors duration-300";
                     iconBox.textContent = "🔓";
                     successEl.classList.remove('hidden');
+
+                    // LOAD DATA HANYA 1 KALI SAAT MASUK APLIKASI
+                    await preloadAllApplicationData();
 
                     setTimeout(() => {
                         const modal = document.getElementById('authModal');
@@ -1276,8 +1416,8 @@
 
         const rawDataWilayah = {
             "Bandardawung": ["Bandardawung Barat", "Bandardawung Timur", "Dawung Atas", "Dawung Bawah", "Dawung Tengah", "Gamping", "Gondang Barat", "Gondang Tengah", "Gondang Timur", "Ngasem", "Pelas Barat", "Pelas Timur"],
-            "Karanglo Selatan": ["Blimbing 1", "Blimbing 2", "Blimbing 3", "Jabal Kanil", "Karanglo", "Pedan Selatan", "Pedan Utara"],
-            "Karanglo Utara": ["Cepogo", "Dukuh", "Pandeyan", "Plombokan", "Sadakan Kidul 1", "Sadakan Kidul 2", "Sekuwung"],
+            "Karanglo Selatan": ["Blimbing 1", "Blimbing 2", "Blimbing 3", "Jabalkanil", "Karanglo", "Pedan Selatan", "Pedan Utara"],
+            "Karanglo Utara": ["Cepogo", "Dukuh", "Pandeyan", "Plombokan", "Sadakan Kidul 1", "Sadakan Kidul 2", "Sadakan Lor", "Sekuwung"],
             "Krangean": ["Gondang Boma", "Gondosuli", "Krangean Selatan", "Krangean Utara", "Nglegok Atas", "Nglegok Bawah", "Ngreso", "Somokado", "Tawang 1", "Tawang 2", "Watusambang"]
         };
 
@@ -1285,33 +1425,6 @@
         Object.keys(rawDataWilayah).sort().forEach(key => {
             dataWilayah[key] = rawDataWilayah[key].sort();
         });
-
-        async function fetchAllRows(tableName, selectColumns = '*') {
-            let allData = [];
-            let page = 0;
-            const pageSize = 1000;
-            let hasMore = true;
-
-            while (hasMore) {
-                const { data: pageData, error } = await supabaseClient
-                    .from(tableName)
-                    .select(selectColumns)
-                    .range(page * pageSize, (page + 1) * pageSize - 1);
-
-                if (error) throw error;
-
-                if (pageData && pageData.length > 0) {
-                    allData = allData.concat(pageData);
-                }
-
-                if (!pageData || pageData.length < pageSize) {
-                    hasMore = false;
-                } else {
-                    page++;
-                }
-            }
-            return allData;
-        }
 
         function toTitleCase(str) { 
             if (!str) return '';
@@ -1331,6 +1444,10 @@
             }
         }
 
+        function showSarprasComingSoon() {
+            showCustomModal("Menu Sarpras", "Menu Sarpras belum bisa diakses untuk sementara (Coming Soon).", "🚧");
+        }
+
         window.addEventListener('popstate', (event) => {
             const centerPicker = document.getElementById('centerPickerModal');
             if (centerPicker && !centerPicker.classList.contains('hidden')) {
@@ -1343,6 +1460,18 @@
                 closeModal('exportJamaahModal', false);
                 return;
             }
+
+            const statusModal = document.getElementById('statusDetailModal');
+            if (statusModal && statusModal.classList.contains('active')) {
+                closeModal('statusDetailModal', false);
+                return;
+            }
+
+            const klpModal = document.getElementById('kelompokDetailModal');
+			if (klpModal && klpModal.classList.contains('active')) {
+				closeKelompokDetailModal();
+				return;
+			}
 
             const opModal = document.getElementById('operatorDetailModal');
             if (opModal && opModal.classList.contains('active')) {
@@ -1357,9 +1486,9 @@
             }
 
             if (event.state && event.state.section) {
-                switchSectionView(event.state.section);
-            } else {
-                switchSectionView('home');
+				switchSectionView(event.state.section);
+			} else {
+				switchSectionView('home');
             }
         });
 
@@ -1436,6 +1565,18 @@
             }
         }
 
+        function closeKelompokDetailModal() {
+			const el = document.getElementById('kelompokDetailModal');
+			if (!el) return;
+			
+			el.classList.remove('active');
+			setTimeout(() => {
+				el.classList.add('hidden');
+			}, 300);
+
+			switchTabRekap('REKAP_KELOMPOK');
+		}
+
         function autoCapitalize(inputElement) {
             let start = inputElement.selectionStart;
             let end = inputElement.selectionEnd;
@@ -1472,7 +1613,7 @@
             return null;
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             history.replaceState({ section: 'home' }, '', '#home');
             initDateDropdowns();
             initDesaDropdowns();
@@ -1484,6 +1625,7 @@
 
             if (isLoggedIn === 'true') {
                 authModal.classList.add('hidden');
+                await preloadAllApplicationData();
             }
 
             setTimeout(() => {
@@ -1496,7 +1638,7 @@
                         }
                     }, 400);
                 }
-            }, 2000);
+            }, 1200);
         });
 
         function initDesaDropdowns() {
@@ -1656,7 +1798,10 @@
             }
         }
 
-        async function fetchAutoJamaahList(desa, kelompok) {
+        /* -------------------------------------------------------------
+           DARI CACHE - TANPA LOADING SAMA SEKALI
+           ------------------------------------------------------------- */
+        function fetchAutoJamaahList(desa, kelompok) {
             const listContainer = document.getElementById('autoJamaahListContainer');
             const listEl = document.getElementById('autoJamaahList');
 
@@ -1665,62 +1810,45 @@
                 return;
             }
 
-            listEl.innerHTML = `
-                <div class="flex items-center justify-center gap-2 py-5 text-xs font-bold text-indigo-600 bg-indigo-50/50 rounded-xl border border-indigo-100">
-                    <svg class="animate-spin h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span>Memuat data...</span>
-                </div>
-            `;
+            const filteredData = globalCache.jamaah.filter(j => j.desa === desa && j.kelompok === kelompok);
+            filteredData.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
+
             listContainer.classList.remove('hidden');
 
-            try {
-                const { data, error } = await supabaseClient
-                    .from('data_jamaah')
-                    .select('*')
-                    .eq('desa', desa)
-                    .eq('kelompok', kelompok)
-                    .order('nama', { ascending: true });
+            if (filteredData.length === 0) {
+                listEl.innerHTML = `<div class="text-xs text-slate-500 bg-slate-50/80 p-4 rounded-xl text-center border border-slate-200/60 font-medium">Belum ada jamaah/operator terdaftar di kelompok ini.</div>`;
+                return;
+            }
 
-                if(error || !data || data.length === 0) {
-                    listEl.innerHTML = `<div class="text-xs text-slate-500 bg-slate-50/80 p-4 rounded-xl text-center border border-slate-200/60 font-medium">Belum ada jamaah/operator terdaftar di kelompok ini.</div>`;
-                    return;
-                }
-
-                listEl.innerHTML = '';
+            listEl.innerHTML = '';
+            
+            filteredData.forEach((j) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = "w-full text-left p-3 sm:p-4 rounded-xl border border-indigo-100 hover:border-indigo-400 bg-white hover:bg-indigo-50/50 transition-all duration-300 flex justify-between items-center group cursor-pointer animate-fade-in-up hover:shadow-md";
                 
-                data.forEach((j) => {
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = "w-full text-left p-3 sm:p-4 rounded-xl border border-indigo-100 hover:border-indigo-400 bg-white hover:bg-indigo-50/50 transition-all duration-300 flex justify-between items-center group cursor-pointer animate-fade-in-up hover:shadow-md";
-                    
-                    const noHpText = j.no_hp ? ` | WA: <span class="text-blue-600 font-extrabold">${j.no_hp}</span>` : '';
+                const noHpText = j.no_hp ? ` | WA: <span class="text-blue-600 font-extrabold">${j.no_hp}</span>` : '';
 
-                    btn.innerHTML = `
-                        <div class="flex items-center gap-3 sm:gap-4">
-                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full ${j.status === 'Operator' ? 'bg-blue-100 text-blue-600' : 'bg-indigo-100 text-indigo-600'} font-bold text-sm sm:text-base flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-300">
-                                ${j.status === 'Operator' ? '🎧' : (j.jenis_kelamin === 'L' ? '👨' : '👩')}
-                            </div>
-                            <div>
-                                <div class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-indigo-700 transition-colors">${j.nama}</div>
-                                <div class="text-[10px] text-slate-500 mt-0.5">
-                                    Status: <span class="font-bold ${j.status === 'Operator' ? 'text-blue-600' : 'text-slate-600'}">${j.status || '-'}</span>${noHpText}
-                                </div>
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3 sm:gap-4">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full ${j.status === 'Operator' ? 'bg-blue-100 text-blue-600' : 'bg-indigo-100 text-indigo-600'} font-bold text-sm sm:text-base flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                            ${j.status === 'Operator' ? '🎧' : (j.jenis_kelamin === 'L' ? '👨' : '👩')}
+                        </div>
+                        <div>
+                            <div class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-indigo-700 transition-colors">${j.nama}</div>
+                            <div class="text-[10px] text-slate-500 mt-0.5">
+                                Status: <span class="font-bold ${j.status === 'Operator' ? 'text-blue-600' : 'text-slate-600'}">${j.status || '-'}</span>${noHpText}
                             </div>
                         </div>
-                        <span class="text-[10px] sm:text-[11px] font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg border border-indigo-200 shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300">
-                            Edit &raquo;
-                        </span>
-                    `;
-                    
-                    btn.onclick = () => selectJamaahToForm(j);
-                    listEl.appendChild(btn);
-                });
-            } catch (err) {
-                listEl.innerHTML = `<div class="text-xs text-red-500 p-4 text-center bg-red-50 rounded-xl border border-red-100">Gagal memuat data: ${err.message}</div>`;
-            }
+                    </div>
+                    <span class="text-[10px] sm:text-[11px] font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg border border-indigo-200 shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300">
+                        Edit &raquo;
+                    </span>
+                `;
+                
+                btn.onclick = () => selectJamaahToForm(j);
+                listEl.appendChild(btn);
+            });
         }
 
         document.getElementById('searchKelompok').addEventListener('change', function() {
@@ -1779,19 +1907,24 @@
                     "Konfirmasi Penghapusan",
                     "Data ini akan dihapus permanen dari database. Lanjutkan?",
                     "🗑️",
-                    () => {
+                    async () => {
                         const currentDesa = document.getElementById('searchDesa').value;
                         const currentKelompok = document.getElementById('searchKelompok').value;
-                        switchMode('UPDATE', true);
-
-                        (async () => {
+                        
+                        showDataLoading("Menghapus data jamaah...");
+                        try {
                             const { error } = await supabaseClient.from('data_jamaah').delete().eq('id', editId);
                             if (error) {
                                 showCustomModal("Gagal Hapus", error.message, "❌");
-                            } else if (currentDesa && currentKelompok) {
-                                fetchAutoJamaahList(currentDesa, currentKelompok);
+                            } else {
+                                // Update Cache secara lokal
+                                globalCache.jamaah = globalCache.jamaah.filter(j => String(j.id) !== String(editId));
+                                switchMode('UPDATE', true);
+                                if (currentDesa && currentKelompok) fetchAutoJamaahList(currentDesa, currentKelompok);
                             }
-                        })();
+                        } finally {
+                            hideDataLoading();
+                        }
                     },
                     true
                 );
@@ -1816,32 +1949,49 @@
                 status: statusValue
             };
 
-            showCustomModal("Sukses", editId ? "Data Berhasil Di-update!" : "Data Berhasil Disimpan!", "🎉", () => {
-                if (currentMode === "UPDATE") {
-                    const currentDesa = document.getElementById('searchDesa').value;
-                    const currentKelompok = document.getElementById('searchKelompok').value;
-                    switchMode('UPDATE', true);
-                    if (currentDesa && currentKelompok) fetchAutoJamaahList(currentDesa, currentKelompok);
-                } else {
-                    switchMode('DAFTAR');
-                }
-            });
-
             (async () => {
+                showDataLoading("Menyimpan data...");
                 try {
-                    let err = editId 
-                        ? (await supabaseClient.from('data_jamaah').update(payload).eq('id', editId)).error
-                        : (await supabaseClient.from('data_jamaah').insert([payload])).error;
+                    if (editId) {
+                        const { data, error } = await supabaseClient.from('data_jamaah').update(payload).eq('id', editId).select();
+                        if (error) throw error;
+                        
+                        // Update cache lokal
+                        const idx = globalCache.jamaah.findIndex(j => String(j.id) === String(editId));
+                        if (idx !== -1 && data && data.length > 0) {
+                            globalCache.jamaah[idx] = data[0];
+                        }
+                    } else {
+                        const { data, error } = await supabaseClient.from('data_jamaah').insert([payload]).select();
+                        if (error) throw error;
+                        
+                        // Insert ke cache lokal
+                        if (data && data.length > 0) {
+                            globalCache.jamaah.push(data[0]);
+                        }
+                    }
 
-                    if(err) showCustomModal("Gagal", err.message, "❌");
+                    showCustomModal("Sukses", editId ? "Data Berhasil Di-update!" : "Data Berhasil Disimpan!", "🎉", () => {
+                        if (currentMode === "UPDATE") {
+                            const currentDesa = document.getElementById('searchDesa').value;
+                            const currentKelompok = document.getElementById('searchKelompok').value;
+                            switchMode('UPDATE', true);
+                            if (currentDesa && currentKelompok) fetchAutoJamaahList(currentDesa, currentKelompok);
+                        } else {
+                            switchMode('DAFTAR');
+                        }
+                    });
+
                 } catch(e) {
-                    showCustomModal("Masalah Koneksi", "Gagal menyimpan data ke server.", "⚠️");
+                    showCustomModal("Gagal", e.message || "Gagal menyimpan data ke server.", "❌");
+                } finally {
+                    hideDataLoading();
                 }
             })();
         });
 
         /* =========================================================================
-           FUNGSI EKSPOR EXCEL & CSV DATA JAMAAH
+           FUNGSI EKSPOR EXCEL & CSV DATA JAMAAH (DARI CACHE)
            ========================================================================= */
         function openExportJamaahModal() {
             const searchDesa = document.getElementById('searchDesa').value;
@@ -1892,7 +2042,7 @@
             document.querySelectorAll('.export-col-cb').forEach(cb => cb.checked = checked);
         }
 
-        async function processExportJamaahData(exportType = 'excel') {
+        function processExportJamaahData(exportType = 'excel') {
             const mode = document.getElementById('exportScopeMode').value;
             const selectedDesa = document.getElementById('exportDesa').value;
             const selectedKelompok = document.getElementById('exportKelompok').value;
@@ -1918,7 +2068,7 @@
             closeModal('exportJamaahModal');
 
             try {
-                let data = await fetchAllRows('data_jamaah', '*');
+                let data = [...globalCache.jamaah];
 
                 if (mode === "DESA") {
                     data = data.filter(d => d.desa === selectedDesa);
@@ -2008,24 +2158,40 @@
                 km_tamu: getIntVal('sarp_km_tamu')
             };
 
-            showCustomModal("Sukses", "Data Sarpras Berhasil Diperbarui!", "🏛️", () => {
-                e.target.reset();
-                document.getElementById('edit_sarpras_id').value = "";
-                document.getElementById('sarpBtn').textContent = "Simpan Sarpras";
-                switchTabSarpras('UPDATE');
-            });
-
             (async () => {
-                if(editId) {
-                    await supabaseClient.from('fasilitas_kelompok').update(payload).eq('id', editId);
-                } else {
-                    await supabaseClient.from('fasilitas_kelompok').upsert([payload], { onConflict: 'desa,kelompok' });
+                showDataLoading("Menyimpan data sarpras...");
+                try {
+                    if(editId) {
+                        const { data, error } = await supabaseClient.from('fasilitas_kelompok').update(payload).eq('id', editId).select();
+                        if (error) throw error;
+                        const idx = globalCache.sarpras.findIndex(s => String(s.id) === String(editId));
+                        if (idx !== -1 && data && data.length > 0) globalCache.sarpras[idx] = data[0];
+                    } else {
+                        const { data, error } = await supabaseClient.from('fasilitas_kelompok').upsert([payload], { onConflict: 'desa,kelompok' }).select();
+                        if (error) throw error;
+                        if (data && data.length > 0) {
+                            const idx = globalCache.sarpras.findIndex(s => s.desa === payload.desa && s.kelompok === payload.kelompok);
+                            if (idx !== -1) globalCache.sarpras[idx] = data[0];
+                            else globalCache.sarpras.push(data[0]);
+                        }
+                    }
+
+                    showCustomModal("Sukses", "Data Sarpras Berhasil Diperbarui!", "🏛️", () => {
+                        e.target.reset();
+                        document.getElementById('edit_sarpras_id').value = "";
+                        document.getElementById('sarpBtn').textContent = "Simpan Sarpras";
+                        switchTabSarpras('UPDATE');
+                    });
+                } catch(e) {
+                    showCustomModal("Gagal", e.message || "Gagal menyimpan sarpras", "❌");
+                } finally {
+                    hideDataLoading();
                 }
             })();
         });
 
-        async function editSarpras(id) {
-            const { data } = await supabaseClient.from('fasilitas_kelompok').select('*').eq('id', id).single();
+        function editSarpras(id) {
+            const data = globalCache.sarpras.find(s => String(s.id) === String(id));
             if (!data) return;
 
             document.getElementById('edit_sarpras_id').value = data.id;
@@ -2071,24 +2237,36 @@
                 infaq: parseFloat(document.getElementById('abs_infaq').value) || 0
             };
 
-            showCustomModal("Sukses", "Data Absensi Berhasil Diperbarui!", "📋", () => {
-                e.target.reset();
-                document.getElementById('abs_nama_custom').classList.add('hidden');
-                document.getElementById('edit_absensi_id').value = "";
-                switchTabAbsensi('REKAP');
-            });
-
             (async () => {
-                if(editId) {
-                    await supabaseClient.from('absensi_kegiatan').update(payload).eq('id', editId);
-                } else {
-                    await supabaseClient.from('absensi_kegiatan').insert([payload]);
+                showDataLoading("Menyimpan data absensi...");
+                try {
+                    if(editId) {
+                        const { data, error } = await supabaseClient.from('absensi_kegiatan').update(payload).eq('id', editId).select();
+                        if (error) throw error;
+                        const idx = globalCache.absensi.findIndex(a => String(a.id) === String(editId));
+                        if (idx !== -1 && data && data.length > 0) globalCache.absensi[idx] = data[0];
+                    } else {
+                        const { data, error } = await supabaseClient.from('absensi_kegiatan').insert([payload]).select();
+                        if (error) throw error;
+                        if (data && data.length > 0) globalCache.absensi.push(data[0]);
+                    }
+
+                    showCustomModal("Sukses", "Data Absensi Berhasil Diperbarui!", "📋", () => {
+                        e.target.reset();
+                        document.getElementById('abs_nama_custom').classList.add('hidden');
+                        document.getElementById('edit_absensi_id').value = "";
+                        switchTabAbsensi('REKAP');
+                    });
+                } catch(e) {
+                    showCustomModal("Gagal", e.message || "Gagal menyimpan absensi", "❌");
+                } finally {
+                    hideDataLoading();
                 }
             })();
         });
 
-        async function editAbsensi(id) {
-            const { data } = await supabaseClient.from('absensi_kegiatan').select('*').eq('id', id).single();
+        function editAbsensi(id) {
+            const data = globalCache.absensi.find(a => String(a.id) === String(id));
             if(!data) return;
 
             document.getElementById('edit_absensi_id').value = data.id;
@@ -2144,61 +2322,57 @@
             }
         }
 
-        async function loadListSarpras() {
+        /* DARI CACHE SECARA INSTAN */
+        function loadListSarpras() {
             const tbody = document.getElementById('tbodyListSarpras');
             const tfoot = document.getElementById('tfootListSarpras');
             const selectedDesa = document.getElementById('sarp_desa_update').value;
-            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center font-bold text-teal-700">Memuat sarpras...</td></tr>';
-            tfoot.innerHTML = '';
 
-            try {
-                let data = await fetchAllRows('fasilitas_kelompok', '*');
-                if (selectedDesa) data = data.filter(s => s.desa === selectedDesa);
+            let data = [...globalCache.sarpras];
+            if (selectedDesa) data = data.filter(s => s.desa === selectedDesa);
 
-                if (!data || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400 font-medium">Belum ada data sarpras.</td></tr>';
-                    return;
-                }
-
-                data.sort((a, b) => (a.desa || '').localeCompare(b.desa || ''));
-                tbody.innerHTML = '';
-
-                let totalMasjid = 0, totalAula = 0, totalKmL = 0, totalKmP = 0, totalKmMt = 0, totalKmTamu = 0;
-
-                data.forEach(s => {
-                    totalMasjid += (s.jumlah_masjid || 0);
-                    totalAula += (s.jumlah_aula || 0);
-                    totalKmL += (s.km_pria || 0);
-                    totalKmP += (s.km_wanita || 0);
-                    totalKmMt += (s.km_mt || 0);
-                    totalKmTamu += (s.km_tamu || 0);
-
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-teal-50/50 transition-colors";
-                    tr.innerHTML = `
-                        <td class="px-2.5 py-3 font-extrabold text-teal-900 sticky-col" title="${s.kelompok}">${s.kelompok}</td>
-                        <td class="px-2 py-3 text-center font-semibold text-slate-700 whitespace-nowrap">${s.status_tanah || '-'}</td>
-                        <td class="px-2 py-3 text-center font-bold whitespace-nowrap">${s.jumlah_masjid || 0} / ${s.jumlah_aula || 0}</td>
-                        <td class="px-2 py-3 text-center font-black text-teal-700 whitespace-nowrap">${s.km_pria || 0}L / ${s.km_wanita || 0}P</td>
-                        <td class="px-2 py-3 text-center font-semibold text-slate-700 whitespace-nowrap">${s.km_mt || 0} MT / ${s.km_tamu || 0} Tamu</td>
-                        <td class="px-2 py-3 text-center whitespace-nowrap no-print"><button type="button" onclick="editSarpras('${s.id}')" class="px-3 py-1.5 bg-fuchsia-100 text-fuchsia-800 hover:bg-fuchsia-200 rounded-lg font-bold text-[10px] transition-colors shadow-sm">Edit</button></td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                tfoot.innerHTML = `
-                    <tr>
-                        <td class="px-2.5 py-4 text-left font-black uppercase whitespace-nowrap sticky-col bg-teal-200/90">TOTAL</td>
-                        <td class="px-2 py-4 text-center font-black text-teal-950 whitespace-nowrap">-</td>
-                        <td class="px-2 py-4 text-center font-black text-teal-950 whitespace-nowrap">${totalMasjid} Msjd / ${totalAula} Aula</td>
-                        <td class="px-2 py-4 text-center font-black text-teal-950 whitespace-nowrap">${totalKmL}L / ${totalKmP}P</td>
-                        <td class="px-2 py-4 text-center font-black text-teal-950 whitespace-nowrap">${totalKmMt} MT / ${totalKmTamu} Tamu</td>
-                        <td class="px-2 py-4 text-center no-print"></td>
-                    </tr>
-                `;
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500 font-bold">Gagal memuat: ${err.message}</td></tr>`;
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400 font-medium">Belum ada data sarpras.</td></tr>';
+                tfoot.innerHTML = '';
+                return;
             }
+
+            data.sort((a, b) => (a.desa || '').localeCompare(b.desa || ''));
+            tbody.innerHTML = '';
+
+            let totalMasjid = 0, totalAula = 0, totalKmL = 0, totalKmP = 0, totalKmMt = 0, totalKmTamu = 0;
+
+            data.forEach(s => {
+                totalMasjid += (s.jumlah_masjid || 0);
+                totalAula += (s.jumlah_aula || 0);
+                totalKmL += (s.km_pria || 0);
+                totalKmP += (s.km_wanita || 0);
+                totalKmMt += (s.km_mt || 0);
+                totalKmTamu += (s.km_tamu || 0);
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-teal-50/50 transition-colors";
+                tr.innerHTML = `
+                    <td class="px-2.5 py-3 font-extrabold text-teal-900 sticky-col" title="${s.kelompok}">${s.kelompok}</td>
+                    <td class="px-2 py-3 text-center font-semibold text-slate-700 whitespace-nowrap">${s.status_tanah || '-'}</td>
+                    <td class="px-2 py-3 text-center font-bold whitespace-nowrap">${s.jumlah_masjid || 0} / ${s.jumlah_aula || 0}</td>
+                    <td class="px-2 py-3 text-center font-black text-teal-700 whitespace-nowrap">${s.km_pria || 0}L / ${s.km_wanita || 0}P</td>
+                    <td class="px-2 py-3 text-center font-semibold text-slate-700 whitespace-nowrap">${s.km_mt || 0} MT / ${s.km_tamu || 0} Tamu</td>
+                    <td class="px-2 py-3 text-center whitespace-nowrap no-print"><button type="button" onclick="editSarpras('${s.id}')" class="px-3 py-1.5 bg-fuchsia-100 text-fuchsia-800 hover:bg-fuchsia-200 rounded-lg font-bold text-[10px] transition-colors shadow-sm">Edit</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            tfoot.innerHTML = `
+                <tr>
+                    <td class="px-2.5 py-4 text-left font-black uppercase whitespace-nowrap sticky-col bg-teal-200/90">TOTAL</td>
+                    <td class="px-2 py-4 text-center font-black text-teal-950 whitespace-nowrap">-</td>
+                    <td class="px-2 py-4 text-center font-black text-teal-950 whitespace-nowrap">${totalMasjid} Msjd / ${totalAula} Aula</td>
+                    <td class="px-2 py-4 text-center font-black text-teal-950 whitespace-nowrap">${totalKmL}L / ${totalKmP}P</td>
+                    <td class="px-2 py-4 text-center font-black text-teal-950 whitespace-nowrap">${totalKmMt} MT / ${totalKmTamu} Tamu</td>
+                    <td class="px-2 py-4 text-center no-print"></td>
+                </tr>
+            `;
         }
 
         function switchTabRekap(tab) {
@@ -2211,18 +2385,21 @@
             const tabStatus = document.getElementById('tabStatusKeseluruhan');
             const tabKlp = document.getElementById('tabRekapKelompok');
 
-            [tabStatus, tabKlp].forEach(t => t.className = "py-2.5 px-3 text-xs font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1.5 transition-colors");
             [secStatus, secRekapKlp].forEach(s => s.classList.add('hidden'));
 
             if (tab === 'STATUS_KESELURUHAN') {
                 secStatus.classList.remove('hidden');
-                tabStatus.className = "py-2.5 px-3 text-xs font-extrabold border-b-[3px] border-amber-500 text-amber-700 flex items-center gap-1.5 transition-colors";
+                tabStatus.className = "py-2 px-3.5 text-xs font-extrabold rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap";
+                tabKlp.className = "py-2 px-3.5 text-xs font-extrabold rounded-xl text-amber-900 hover:bg-amber-200/60 flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap";
+                
                 if(btnPrint) btnPrint.classList.remove('hidden');
                 if(btnExport) btnExport.classList.add('hidden');
                 loadRekapStatusKeseluruhan();
             } else if (tab === 'REKAP_KELOMPOK') {
                 secRekapKlp.classList.remove('hidden');
-                tabKlp.className = "py-2.5 px-3 text-xs font-extrabold border-b-[3px] border-amber-500 text-amber-700 flex items-center gap-1.5 transition-colors";
+                tabKlp.className = "py-2 px-3.5 text-xs font-extrabold rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap";
+                tabStatus.className = "py-2 px-3.5 text-xs font-extrabold rounded-xl text-amber-900 hover:bg-amber-200/60 flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap";
+
                 if(btnPrint) btnPrint.classList.remove('hidden');
                 if(btnExport) btnExport.classList.remove('hidden');
                 loadRekapKelompokLengkap();
@@ -2239,17 +2416,24 @@
 
         function switchTabAbsensi(tab) {
             const btnPrint = document.getElementById('btnPrintAbsensi');
+            const tabInput = document.getElementById('tabInputAbsensi');
+            const tabRekap = document.getElementById('tabRekapAbsensi');
+
             if(tab === 'INPUT') {
                 document.getElementById('formAbsensiKegiatan').classList.remove('hidden');
                 document.getElementById('printableAbsensi').classList.add('hidden');
-                document.getElementById('tabInputAbsensi').className = "py-2.5 px-4 text-xs font-extrabold border-b-[3px] border-fuchsia-500 text-fuchsia-700 transition-colors";
-                document.getElementById('tabRekapAbsensi').className = "py-2.5 px-4 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors";
+                
+                tabInput.className = "py-2 px-3.5 text-xs font-extrabold rounded-xl bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white shadow-md flex items-center gap-1.5 transition-all duration-300";
+                tabRekap.className = "py-2 px-3.5 text-xs font-extrabold rounded-xl text-fuchsia-900 hover:bg-fuchsia-200/60 flex items-center gap-1.5 transition-all duration-300";
+
                 if(btnPrint) btnPrint.classList.add('hidden');
             } else {
                 document.getElementById('formAbsensiKegiatan').classList.add('hidden');
                 document.getElementById('printableAbsensi').classList.remove('hidden');
-                document.getElementById('tabRekapAbsensi').className = "py-2.5 px-4 text-xs font-extrabold border-b-[3px] border-fuchsia-500 text-fuchsia-700 transition-colors";
-                document.getElementById('tabInputAbsensi').className = "py-2.5 px-4 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors";
+                
+                tabRekap.className = "py-2 px-3.5 text-xs font-extrabold rounded-xl bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white shadow-md flex items-center gap-1.5 transition-all duration-300";
+                tabInput.className = "py-2 px-3.5 text-xs font-extrabold rounded-xl text-fuchsia-900 hover:bg-fuchsia-200/60 flex items-center gap-1.5 transition-all duration-300";
+
                 if(btnPrint) btnPrint.classList.remove('hidden');
                 populateKegiatanFilter();
                 loadRekapAbsensi();
@@ -2267,62 +2451,186 @@
             return null;
         }
 
-        async function loadRekapStatusKeseluruhan() {
-            try {
-                const dataJamaah = await fetchAllRows('data_jamaah', 'status, nama, no_hp, desa, kelompok');
-                let menikah = 0, duda = 0, janda = 0, manula = 0, operator = 0;
-                
-                window.allOperatorsCache = [];
+        /* DARI CACHE - TANPA LOADING */
+        function loadRekapStatusKeseluruhan() {
+            const dataJamaah = globalCache.jamaah;
+            let menikah = 0, duda = 0, janda = 0, manula = 0, operator = 0;
+            
+            window.allOperatorsCache = [];
+            window.statusJamaahCache = {
+                'Menikah': [],
+                'Duda': [],
+                'Janda': [],
+                'Manula': []
+            };
 
-                dataJamaah.forEach(item => {
-                    const st = (item.status || "").toLowerCase();
-                    if (st === "menikah") menikah++;
-                    else if (st === "duda") duda++;
-                    else if (st === "janda") janda++;
-                    else if (st === "manula") manula++;
-                    else if (st === "operator") {
-                        operator++;
-                        window.allOperatorsCache.push({
-                            nama: item.nama,
-                            no_hp: item.no_hp,
-                            desa: item.desa,
-                            kelompok: item.kelompok
-                        });
-                    }
-                });
+            dataJamaah.forEach(item => {
+                const st = (item.status || "").toLowerCase();
+                const itemData = {
+                    nama: item.nama,
+                    kelompok: item.kelompok || '-',
+                    desa: item.desa || '-',
+                    umur: item.umur !== null && item.umur !== undefined ? `${item.umur} thn` : '-'
+                };
 
-                document.getElementById('stMenikah').textContent = menikah;
-                document.getElementById('stDuda').textContent = duda;
-                document.getElementById('stJanda').textContent = janda;
-                document.getElementById('stManula').textContent = manula;
-                document.getElementById('stOperator').textContent = operator;
-
-                let totalGenerus = 0;
-                try {
-                    const dataGenerus = await fetchAllRows('data_generus', 'kategori_usia');
-                    const genCounts = { paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0 };
-
-                    dataGenerus.forEach(g => {
-                        const key = parseKategoriGenerus(g.kategori_usia);
-                        if (key) genCounts[key]++;
+                if (st === "menikah") {
+                    menikah++;
+                    window.statusJamaahCache['Menikah'].push(itemData);
+                } else if (st === "duda") {
+                    duda++;
+                    window.statusJamaahCache['Duda'].push(itemData);
+                } else if (st === "janda") {
+                    janda++;
+                    window.statusJamaahCache['Janda'].push(itemData);
+                } else if (st === "manula") {
+                    manula++;
+                    window.statusJamaahCache['Manula'].push(itemData);
+                } else if (st === "operator") {
+                    operator++;
+                    window.allOperatorsCache.push({
+                        nama: item.nama,
+                        no_hp: item.no_hp,
+                        desa: item.desa,
+                        kelompok: item.kelompok
                     });
-
-                    document.getElementById('genPaud').textContent = genCounts.paud;
-                    document.getElementById('genTk').textContent = genCounts.tk;
-                    document.getElementById('genCaberawit').textContent = genCounts.caberawit;
-                    document.getElementById('genPraRemaja').textContent = genCounts.praRemaja;
-                    document.getElementById('genRemaja').textContent = genCounts.remaja;
-                    document.getElementById('genUsiaMandiri').textContent = genCounts.usiaMandiri;
-
-                    totalGenerus = dataGenerus.length;
-                } catch (gErr) {
-                    console.warn("Gagal memuat data_generus:", gErr);
                 }
+            });
 
-                document.getElementById('stTotalAll').textContent = `${dataJamaah.length + totalGenerus} Data`;
-            } catch (err) {
-                console.error(err);
+            document.getElementById('stMenikah').textContent = menikah;
+            document.getElementById('stDuda').textContent = duda;
+            document.getElementById('stJanda').textContent = janda;
+            document.getElementById('stManula').textContent = manula;
+            document.getElementById('stOperator').textContent = operator;
+
+            const dataGenerus = globalCache.generus;
+            const genCounts = { paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0 };
+
+            dataGenerus.forEach(g => {
+                const key = parseKategoriGenerus(g.kategori_usia);
+                if (key) genCounts[key]++;
+            });
+
+            document.getElementById('genPaud').textContent = genCounts.paud;
+            document.getElementById('genTk').textContent = genCounts.tk;
+            document.getElementById('genCaberawit').textContent = genCounts.caberawit;
+            document.getElementById('genPraRemaja').textContent = genCounts.praRemaja;
+            document.getElementById('genRemaja').textContent = genCounts.remaja;
+            document.getElementById('genUsiaMandiri').textContent = genCounts.usiaMandiri;
+
+            document.getElementById('stTotalAll').textContent = `${dataJamaah.length + dataGenerus.length} Data`;
+        }
+
+        function showStatusDetailModal(categoryName) {
+            document.getElementById('statusDetailTitle').textContent = `Rincian Kategori: ${categoryName}`;
+            const listData = window.statusJamaahCache && window.statusJamaahCache[categoryName] ? window.statusJamaahCache[categoryName] : [];
+            
+            window.activeStatusDataset = [...listData];
+            window.activeStatusDataset.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
+
+            const searchInput = document.getElementById('statusDetailSearch');
+            if (searchInput) searchInput.value = '';
+
+            renderStatusDetailList(window.activeStatusDataset);
+            openModal('statusDetailModal');
+        }
+
+        function renderStatusDetailList(listData) {
+            const listEl = document.getElementById('statusDetailList');
+            listEl.innerHTML = '';
+
+            if (!listData || listData.length === 0) {
+                listEl.innerHTML = `<p class="text-xs text-slate-400 font-semibold text-center py-5">Tidak ada data jamaah pada kategori ini.</p>`;
+                return;
             }
+
+            listData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "p-3 bg-white border border-indigo-100 rounded-2xl flex items-center justify-between gap-3 animate-fade-in-up hover:shadow-md transition-shadow";
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="font-extrabold text-xs sm:text-sm text-slate-800">${item.nama}</div>
+                        <div class="text-[11px] font-semibold text-slate-500 mt-0.5">
+                            Kelompok: <span class="text-indigo-700 font-bold">${item.kelompok}</span> (${item.desa})
+                        </div>
+                    </div>
+                    <div class="shrink-0 text-right">
+                        <span class="text-[10px] font-extrabold text-fuchsia-600 bg-fuchsia-50 border border-fuchsia-200 px-2 py-1 rounded-lg inline-block">
+                            ${item.umur}
+                        </span>
+                    </div>
+                `;
+                listEl.appendChild(card);
+            });
+        }
+
+        function filterStatusDetailList() {
+            const query = (document.getElementById('statusDetailSearch').value || '').toLowerCase().trim();
+            if (!query) {
+                renderStatusDetailList(window.activeStatusDataset);
+                return;
+            }
+            const filtered = window.activeStatusDataset.filter(item => {
+                return (item.nama || '').toLowerCase().includes(query) || (item.kelompok || '').toLowerCase().includes(query);
+            });
+            renderStatusDetailList(filtered);
+        }
+
+        /* DARI CACHE SECARA INSTAN */
+        function showKelompokDetailModal(kelompokNama) {
+            document.getElementById('kelompokDetailTitle').textContent = `Kelompok: ${kelompokNama}`;
+            const listEl = document.getElementById('kelompokDetailList');
+
+            const data = globalCache.jamaah.filter(j => j.kelompok === kelompokNama);
+            data.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
+
+            let combined = data.map(j => ({ nama: j.nama, status: j.status || 'Jamaah' }));
+            window.activeKelompokDataset = combined;
+
+            const searchInput = document.getElementById('kelompokDetailSearch');
+            if (searchInput) searchInput.value = '';
+
+            renderKelompokDetailList(window.activeKelompokDataset);
+            openModal('kelompokDetailModal', false);
+        }
+
+        function renderKelompokDetailList(listData) {
+            const listEl = document.getElementById('kelompokDetailList');
+            listEl.innerHTML = '';
+
+            if (!listData || listData.length === 0) {
+                listEl.innerHTML = `<p class="text-xs text-slate-400 font-semibold text-center py-5">Belum ada jamaah terdaftar di kelompok ini.</p>`;
+                return;
+            }
+
+            listData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "p-3 bg-white border border-indigo-100 rounded-2xl flex items-center justify-between gap-3 animate-fade-in-up hover:shadow-md transition-shadow";
+
+                card.innerHTML = `
+                    <div>
+                        <div class="font-extrabold text-xs sm:text-sm text-slate-800">${item.nama}</div>
+                    </div>
+                    <div class="shrink-0 text-right">
+                        <span class="text-[10px] font-extrabold border px-2.5 py-1 rounded-lg inline-block bg-indigo-50 text-indigo-700 border-indigo-200">
+                            ${item.status}
+                        </span>
+                    </div>
+                `;
+                listEl.appendChild(card);
+            });
+        }
+
+        function filterKelompokDetailList() {
+            const query = (document.getElementById('kelompokDetailSearch').value || '').toLowerCase().trim();
+            if (!query) {
+                renderKelompokDetailList(window.activeKelompokDataset);
+                return;
+            }
+            const filtered = window.activeKelompokDataset.filter(item => {
+                return (item.nama || '').toLowerCase().includes(query) || (item.status || '').toLowerCase().includes(query);
+            });
+            renderKelompokDetailList(filtered);
         }
 
         function showAllOperatorsModal() {
@@ -2400,181 +2708,174 @@
             renderOperatorModalList(filtered);
         }
 
-        async function loadRekapKelompokLengkap() {
+        /* DARI CACHE SECARA INSTAN */
+        function loadRekapKelompokLengkap() {
             const tbody = document.getElementById('tbodyRekapKelompok');
             const tfoot = document.getElementById('tfootRekapKelompok');
             const selectedFilterDesa = document.getElementById('filterDesaRekap').value;
 
-            tbody.innerHTML = '<tr><td colspan="19" class="p-4 text-center font-bold text-indigo-700">Memuat rekap...</td></tr>';
-            tfoot.innerHTML = '';
+            const jamaahData = globalCache.jamaah;
+            const sarprasData = globalCache.sarpras;
+            const generusData = globalCache.generus;
 
-            try {
-                const [jamaahData, sarprasData, generusData] = await Promise.all([
-                    fetchAllRows('data_jamaah', 'desa, kelompok, status, nama, no_hp'),
-                    fetchAllRows('fasilitas_kelompok', '*'),
-                    fetchAllRows('data_generus', 'desa, kelompok, kategori_usia').catch(() => [])
-                ]);
+            const rekapMap = {};
 
-                const rekapMap = {};
-
-                Object.keys(dataWilayah).forEach(desa => {
-                    if (!selectedFilterDesa || selectedFilterDesa === desa) {
-                        dataWilayah[desa].forEach(kelompok => {
-                            const key = `${desa}__${kelompok}`;
-                            rekapMap[key] = {
-                                desa, kelompok,
-                                paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0,
-                                menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJumlah: 0,
-                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
-                            };
-                        });
-                    }
-                });
-
-                if (generusData && generusData.length > 0) {
-                    generusData.forEach(g => {
-                        if (!selectedFilterDesa || selectedFilterDesa === g.desa) {
-                            const key = `${g.desa}__${g.kelompok}`;
-                            if (!rekapMap[key]) {
-                                rekapMap[key] = {
-                                    desa: g.desa, kelompok: g.kelompok,
-                                    paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0,
-                                    menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJumlah: 0,
-                                    subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
-                                };
-                            }
-                            const katKey = parseKategoriGenerus(g.kategori_usia);
-                            if (katKey) rekapMap[key][katKey]++;
-                            rekapMap[key].totalJumlah++;
-                        }
+            Object.keys(dataWilayah).forEach(desa => {
+                if (!selectedFilterDesa || selectedFilterDesa === desa) {
+                    dataWilayah[desa].forEach(kelompok => {
+                        const key = `${desa}__${kelompok}`;
+                        rekapMap[key] = {
+                            desa, kelompok,
+                            paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0,
+                            menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJumlah: 0,
+                            subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
+                        };
                     });
                 }
+            });
 
-                jamaahData.forEach(j => {
-                    if (!selectedFilterDesa || selectedFilterDesa === j.desa) {
-                        const key = `${j.desa}__${j.kelompok}`;
+            if (generusData && generusData.length > 0) {
+                generusData.forEach(g => {
+                    if (!selectedFilterDesa || selectedFilterDesa === g.desa) {
+                        const key = `${g.desa}__${g.kelompok}`;
                         if (!rekapMap[key]) {
                             rekapMap[key] = {
-                                desa: j.desa, kelompok: j.kelompok,
+                                desa: g.desa, kelompok: g.kelompok,
                                 paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0,
                                 menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJumlah: 0,
                                 subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
                             };
                         }
-                        const st = (j.status || "").toLowerCase();
-                        if (st === "menikah") rekapMap[key].menikah++;
-                        else if (st === "duda") rekapMap[key].duda++;
-                        else if (st === "janda") rekapMap[key].janda++;
-                        else if (st === "manula") rekapMap[key].manula++;
-                        else if (st === "operator") rekapMap[key].operator++;
-                        
+                        const katKey = parseKategoriGenerus(g.kategori_usia);
+                        if (katKey) rekapMap[key][katKey]++;
                         rekapMap[key].totalJumlah++;
                     }
                 });
-
-                sarprasData.forEach(s => {
-                    if (!selectedFilterDesa || selectedFilterDesa === s.desa) {
-                        const key = `${s.desa}__${s.kelompok}`;
-                        if (!rekapMap[key]) {
-                            rekapMap[key] = {
-                                desa: s.desa, kelompok: s.kelompok,
-                                paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0,
-                                menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJumlah: 0,
-                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
-                            };
-                        }
-                        rekapMap[key].subKlp = parseInt(s.jumlah_sub_kelompok, 10) || 0;
-                        rekapMap[key].masjid = parseInt(s.jumlah_masjid, 10) || 0;
-                        rekapMap[key].aula = parseInt(s.jumlah_aula, 10) || 0;
-                        rekapMap[key].kmPria = parseInt(s.km_pria, 10) || 0;
-                        rekapMap[key].kmWanita = parseInt(s.km_wanita, 10) || 0;
-                        rekapMap[key].kmMt = parseInt(s.km_mt, 10) || 0;
-                        rekapMap[key].kmTamu = parseInt(s.km_tamu, 10) || 0;
-                    }
-                });
-
-                tbody.innerHTML = '';
-                let totPaud = 0, totTk = 0, totCaberawit = 0, totPraRemaja = 0, totRemaja = 0, totUsiaMandiri = 0;
-                let totMenikah = 0, totDuda = 0, totJanda = 0, totManula = 0, totOperator = 0, totAllJumlah = 0;
-                let totSub = 0, totMasjid = 0, totAula = 0, totKmL = 0, totKmP = 0, totKmMt = 0, totKmTamu = 0;
-
-                const items = Object.values(rekapMap);
-
-                items.forEach((item) => {
-                    totPaud += item.paud;
-                    totTk += item.tk;
-                    totCaberawit += item.caberawit;
-                    totPraRemaja += item.praRemaja;
-                    totRemaja += item.remaja;
-                    totUsiaMandiri += item.usiaMandiri;
-
-                    totMenikah += item.menikah;
-                    totDuda += item.duda;
-                    totJanda += item.janda;
-                    totManula += item.manula;
-                    totOperator += item.operator;
-                    totAllJumlah += item.totalJumlah;
-
-                    totSub += item.subKlp;
-                    totMasjid += item.masjid;
-                    totAula += item.aula;
-                    totKmL += item.kmPria;
-                    totKmP += item.kmWanita;
-                    totKmMt += item.kmMt;
-                    totKmTamu += item.kmTamu;
-
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-indigo-50/50 transition-colors";
-                    tr.innerHTML = `
-                        <td class="px-2.5 py-3 font-extrabold text-indigo-900 sticky-col" title="${item.kelompok}">${item.kelompok}</td>
-                        <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900 border-l border-indigo-100">${item.paud}</td>
-                        <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.tk}</td>
-                        <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.caberawit}</td>
-                        <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.praRemaja}</td>
-                        <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.remaja}</td>
-                        <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900 border-r border-indigo-100">${item.usiaMandiri}</td>
-                        <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.menikah}</td>
-                        <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.duda}</td>
-                        <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.janda}</td>
-                        <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.manula}</td>
-                        <td class="px-1.5 py-3 text-center font-black text-blue-700 bg-blue-50/60">${item.operator}</td>
-                        <td class="px-2 py-3 text-center font-black text-indigo-700 bg-indigo-100/50 border-l border-indigo-200 text-[12px]">${item.totalJumlah}</td>
-                        <td class="px-1.5 py-3 text-center border-l border-indigo-200 font-bold">${item.subKlp}</td>
-                        <td class="px-1.5 py-3 text-center font-bold">${item.masjid}</td>
-                        <td class="px-1.5 py-3 text-center font-bold">${item.aula}</td>
-                        <td class="px-1.5 py-3 text-center font-extrabold text-slate-800">${item.kmPria}L/${item.kmWanita}P</td>
-                        <td class="px-1.5 py-3 text-center font-bold">${item.kmMt}</td>
-                        <td class="px-1.5 py-3 text-center font-bold">${item.kmTamu}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                tfoot.innerHTML = `
-                    <tr>
-                        <td class="px-2.5 py-4 text-left font-black uppercase sticky-col bg-indigo-200/90">TOTAL</td>
-                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80 border-l border-indigo-200">${totPaud}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-200/80">${totTk}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totCaberawit}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totPraRemaja}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totRemaja}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80 border-r border-indigo-200">${totUsiaMandiri}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totMenikah}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totDuda}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totJanda}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totManula}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-blue-800 bg-blue-100/90">${totOperator}</td>
-                        <td class="px-2 py-4 text-center font-black text-indigo-800 bg-indigo-300/80 border-l border-indigo-300 text-[13px]">${totAllJumlah}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-indigo-950 border-l border-indigo-300">${totSub}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totMasjid}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totAula}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totKmL}L/${totKmP}P</td>
-                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totKmMt}</td>
-                        <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totKmTamu}</td>
-                    </tr>
-                `;
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="19" class="p-4 text-center text-red-500 font-bold">Gagal memuat rekap: ${err.message}</td></tr>`;
             }
+
+            jamaahData.forEach(j => {
+                if (!selectedFilterDesa || selectedFilterDesa === j.desa) {
+                    const key = `${j.desa}__${j.kelompok}`;
+                    if (!rekapMap[key]) {
+                        rekapMap[key] = {
+                            desa: j.desa, kelompok: j.kelompok,
+                            paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0,
+                            menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJumlah: 0,
+                            subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
+                        };
+                    }
+                    const st = (j.status || "").toLowerCase();
+                    if (st === "menikah") rekapMap[key].menikah++;
+                    else if (st === "duda") rekapMap[key].duda++;
+                    else if (st === "janda") rekapMap[key].janda++;
+                    else if (st === "manula") rekapMap[key].manula++;
+                    else if (st === "operator") rekapMap[key].operator++;
+                    
+                    rekapMap[key].totalJumlah++;
+                }
+            });
+
+            sarprasData.forEach(s => {
+                if (!selectedFilterDesa || selectedFilterDesa === s.desa) {
+                    const key = `${s.desa}__${s.kelompok}`;
+                    if (!rekapMap[key]) {
+                        rekapMap[key] = {
+                            desa: s.desa, kelompok: s.kelompok,
+                            paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0,
+                            menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJumlah: 0,
+                            subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
+                        };
+                    }
+                    rekapMap[key].subKlp = parseInt(s.jumlah_sub_kelompok, 10) || 0;
+                    rekapMap[key].masjid = parseInt(s.jumlah_masjid, 10) || 0;
+                    rekapMap[key].aula = parseInt(s.jumlah_aula, 10) || 0;
+                    rekapMap[key].kmPria = parseInt(s.km_pria, 10) || 0;
+                    rekapMap[key].kmWanita = parseInt(s.km_wanita, 10) || 0;
+                    rekapMap[key].kmMt = parseInt(s.km_mt, 10) || 0;
+                    rekapMap[key].kmTamu = parseInt(s.km_tamu, 10) || 0;
+                }
+            });
+
+            tbody.innerHTML = '';
+            let totPaud = 0, totTk = 0, totCaberawit = 0, totPraRemaja = 0, totRemaja = 0, totUsiaMandiri = 0;
+            let totMenikah = 0, totDuda = 0, totJanda = 0, totManula = 0, totOperator = 0, totAllJumlah = 0;
+            let totSub = 0, totMasjid = 0, totAula = 0, totKmL = 0, totKmP = 0, totKmMt = 0, totKmTamu = 0;
+
+            const items = Object.values(rekapMap);
+
+            items.forEach((item) => {
+                totPaud += item.paud;
+                totTk += item.tk;
+                totCaberawit += item.caberawit;
+                totPraRemaja += item.praRemaja;
+                totRemaja += item.remaja;
+                totUsiaMandiri += item.usiaMandiri;
+
+                totMenikah += item.menikah;
+                totDuda += item.duda;
+                totJanda += item.janda;
+                totManula += item.manula;
+                totOperator += item.operator;
+                totAllJumlah += item.totalJumlah;
+
+                totSub += item.subKlp;
+                totMasjid += item.masjid;
+                totAula += item.aula;
+                totKmL += item.kmPria;
+                totKmP += item.kmWanita;
+                totKmMt += item.kmMt;
+                totKmTamu += item.kmTamu;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-indigo-50/50 transition-colors";
+                
+                tr.innerHTML = `
+                    <td class="px-2.5 py-3 font-extrabold text-indigo-900 hover:text-indigo-600 hover:underline cursor-pointer sticky-col" onclick="showKelompokDetailModal('${item.kelompok}')" title="Klik untuk lihat anggota ${item.kelompok}">${item.kelompok}</td>
+                    <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900 border-l border-indigo-100">${item.paud}</td>
+                    <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.tk}</td>
+                    <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.caberawit}</td>
+                    <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.praRemaja}</td>
+                    <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.remaja}</td>
+                    <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900 border-r border-indigo-100">${item.usiaMandiri}</td>
+                    <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.menikah}</td>
+                    <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.duda}</td>
+                    <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.janda}</td>
+                    <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.manula}</td>
+                    <td class="px-1.5 py-3 text-center font-black text-blue-700 bg-blue-50/60">${item.operator}</td>
+                    <td class="px-2 py-3 text-center font-black text-indigo-700 bg-indigo-100/50 border-l border-indigo-200 text-[12px]">${item.totalJumlah}</td>
+                    <td class="px-1.5 py-3 text-center border-l border-indigo-200 font-bold">${item.subKlp}</td>
+                    <td class="px-1.5 py-3 text-center font-bold">${item.masjid}</td>
+                    <td class="px-1.5 py-3 text-center font-bold">${item.aula}</td>
+                    <td class="px-1.5 py-3 text-center font-extrabold text-slate-800">${item.kmPria}L/${item.kmWanita}P</td>
+                    <td class="px-1.5 py-3 text-center font-bold">${item.kmMt}</td>
+                    <td class="px-1.5 py-3 text-center font-bold">${item.kmTamu}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            tfoot.innerHTML = `
+                <tr>
+                    <td class="px-2.5 py-4 text-left font-black uppercase sticky-col bg-indigo-200/90">TOTAL</td>
+                    <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80 border-l border-indigo-200">${totPaud}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-fuchsia-200/80">${totTk}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totCaberawit}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totPraRemaja}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totRemaja}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80 border-r border-indigo-200">${totUsiaMandiri}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totMenikah}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totDuda}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totJanda}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totManula}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-blue-800 bg-blue-100/90">${totOperator}</td>
+                    <td class="px-2 py-4 text-center font-black text-indigo-800 bg-indigo-300/80 border-l border-indigo-300 text-[13px]">${totAllJumlah}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-indigo-950 border-l border-indigo-300">${totSub}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totMasjid}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totAula}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totKmL}L/${totKmP}P</td>
+                    <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totKmMt}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totKmTamu}</td>
+                </tr>
+            `;
         }
 
         function setupYearFilter() {
@@ -2584,23 +2885,21 @@
             for(let i = now; i >= now - 3; i--) sel.add(new Option(`Tahun ${i}`, i));
         }
 
-        async function populateKegiatanFilter() {
+        /* DARI CACHE SECARA INSTAN */
+        function populateKegiatanFilter() {
             const selKegiatan = document.getElementById('filterKegiatanAbsensi');
             if (!selKegiatan) return;
 
             const currentValue = selKegiatan.value;
-            try {
-                const data = await fetchAllRows('absensi_kegiatan', 'nama_kegiatan');
-                const uniqueKegiatan = [...new Set(data.map(item => item.nama_kegiatan))].filter(Boolean).sort();
-                selKegiatan.innerHTML = '<option value="">-- Semua Kegiatan --</option>';
-                uniqueKegiatan.forEach(nama => selKegiatan.add(new Option(nama, nama)));
-                if (currentValue && uniqueKegiatan.includes(currentValue)) selKegiatan.value = currentValue;
-            } catch (err) {
-                console.error(err);
-            }
+            const uniqueKegiatan = [...new Set(globalCache.absensi.map(item => item.nama_kegiatan))].filter(Boolean).sort();
+            
+            selKegiatan.innerHTML = '<option value="">-- Semua Kegiatan --</option>';
+            uniqueKegiatan.forEach(nama => selKegiatan.add(new Option(nama, nama)));
+            if (currentValue && uniqueKegiatan.includes(currentValue)) selKegiatan.value = currentValue;
         }
 
-        async function loadRekapAbsensi() {
+        /* DARI CACHE SECARA INSTAN */
+        function loadRekapAbsensi() {
             const desa = document.getElementById('filterDesaAbsensi')?.value || '';
             const tahun = document.getElementById('filterTahun').value;
             const bulan = document.getElementById('filterBulanAbsensi').value;
@@ -2608,70 +2907,65 @@
 
             const tbody = document.getElementById('tbodyRekapAbsensi');
             const tfoot = document.getElementById('tfootRekapAbsensi');
-            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center font-bold text-fuchsia-700">Memuat rekap...</td></tr>';
-            tfoot.innerHTML = '';
 
-            try {
-                let data = await fetchAllRows('absensi_kegiatan', '*');
-                if (kegiatan) data = data.filter(item => item.nama_kegiatan === kegiatan);
-                data.sort((a, b) => (b.tanggal_kegiatan || '').localeCompare(a.tanggal_kegiatan || ''));
+            let data = [...globalCache.absensi];
+            if (kegiatan) data = data.filter(item => item.nama_kegiatan === kegiatan);
+            data.sort((a, b) => (b.tanggal_kegiatan || '').localeCompare(a.tanggal_kegiatan || ''));
 
-                const filteredData = data.filter(item => {
-                    if (desa && item.desa !== desa) return false;
-                    if (!item.tanggal_kegiatan) return false;
-                    const parts = item.tanggal_kegiatan.split('-');
-                    if (parts.length < 2) return false;
-                    if (tahun && parts[0] !== tahun) return false;
-                    if (bulan && parts[1] !== bulan) return false;
-                    return true;
-                });
+            const filteredData = data.filter(item => {
+                if (desa && item.desa !== desa) return false;
+                if (!item.tanggal_kegiatan) return false;
+                const parts = item.tanggal_kegiatan.split('-');
+                if (parts.length < 2) return false;
+                if (tahun && parts[0] !== tahun) return false;
+                if (bulan && parts[1] !== bulan) return false;
+                return true;
+            });
 
-                if (filteredData.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400 font-medium">Tidak ada data.</td></tr>';
-                    return;
+            if (filteredData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400 font-medium">Tidak ada data.</td></tr>';
+                tfoot.innerHTML = '';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            let totalLaki = 0, totalPerempuan = 0, totalIjin = 0, totalInfaq = 0;
+
+            filteredData.forEach(item => {
+                totalLaki += (item.jumlah_laki || 0);
+                totalPerempuan += (item.jumlah_perempuan || 0);
+                totalIjin += (item.jumlah_ijin || 0);
+                totalInfaq += (item.infaq || 0);
+
+                let tglFormatted = '-';
+                if (item.tanggal_kegiatan) {
+                    const p = item.tanggal_kegiatan.split('-');
+                    if (p.length === 3) tglFormatted = `${p[2]}/${p[1]}/${p[0]}`;
                 }
 
-                tbody.innerHTML = '';
-                let totalLaki = 0, totalPerempuan = 0, totalIjin = 0, totalInfaq = 0;
-
-                filteredData.forEach(item => {
-                    totalLaki += (item.jumlah_laki || 0);
-                    totalPerempuan += (item.jumlah_perempuan || 0);
-                    totalIjin += (item.jumlah_ijin || 0);
-                    totalInfaq += (item.infaq || 0);
-
-                    let tglFormatted = '-';
-                    if (item.tanggal_kegiatan) {
-                        const p = item.tanggal_kegiatan.split('-');
-                        if (p.length === 3) tglFormatted = `${p[2]}/${p[1]}/${p[0]}`;
-                    }
-
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-fuchsia-50/50 transition-colors";
-                    tr.innerHTML = `
-                        <td class="px-2.5 py-3 font-extrabold text-fuchsia-900 whitespace-nowrap sticky-col" title="${item.kelompok}">${item.kelompok}</td>
-                        <td class="px-2 py-3 text-center whitespace-nowrap font-semibold text-slate-600">${tglFormatted}</td>
-                        <td class="px-2 py-3 text-center whitespace-nowrap font-bold">${item.jumlah_laki}L / ${item.jumlah_perempuan}P</td>
-                        <td class="px-2 py-3 text-center whitespace-nowrap font-bold text-pink-600">${item.jumlah_ijin || 0} Orang</td>
-                        <td class="px-2 py-3 text-right font-extrabold whitespace-nowrap text-slate-800">Rp${(item.infaq || 0).toLocaleString('id-ID')}</td>
-                        <td class="px-2 py-3 text-center whitespace-nowrap no-print"><button onclick="editAbsensi('${item.id}')" class="px-3 py-1.5 bg-fuchsia-100 text-fuchsia-700 hover:bg-fuchsia-200 rounded-lg font-extrabold text-[10px] transition-colors shadow-sm">Edit</button></td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                tfoot.innerHTML = `
-                    <tr>
-                        <td class="px-2.5 py-4 text-left font-black uppercase whitespace-nowrap sticky-col bg-fuchsia-200/90">TOTAL</td>
-                        <td class="px-2 py-4 text-center font-black text-fuchsia-950 whitespace-nowrap">-</td>
-                        <td class="px-2 py-4 text-center font-black text-fuchsia-950 whitespace-nowrap">${totalLaki}L / ${totalPerempuan}P</td>
-                        <td class="px-2 py-4 text-center font-black text-pink-800 whitespace-nowrap">${totalIjin} Orang</td>
-                        <td class="px-2 py-4 text-right font-black text-emerald-700 whitespace-nowrap text-[13px]">Rp${totalInfaq.toLocaleString('id-ID')}</td>
-                        <td class="px-2 py-4 text-center no-print"></td>
-                    </tr>
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-fuchsia-50/50 transition-colors";
+                tr.innerHTML = `
+                    <td class="px-2.5 py-3 font-extrabold text-fuchsia-900 whitespace-nowrap sticky-col" title="${item.kelompok}">${item.kelompok}</td>
+                    <td class="px-2 py-3 text-center whitespace-nowrap font-semibold text-slate-600">${tglFormatted}</td>
+                    <td class="px-2 py-3 text-center whitespace-nowrap font-bold">${item.jumlah_laki}L / ${item.jumlah_perempuan}P</td>
+                    <td class="px-2 py-3 text-center whitespace-nowrap font-bold text-pink-600">${item.jumlah_ijin || 0} Orang</td>
+                    <td class="px-2 py-3 text-right font-extrabold whitespace-nowrap text-slate-800">Rp${(item.infaq || 0).toLocaleString('id-ID')}</td>
+                    <td class="px-2 py-3 text-center whitespace-nowrap no-print"><button onclick="editAbsensi('${item.id}')" class="px-3 py-1.5 bg-fuchsia-100 text-fuchsia-700 hover:bg-fuchsia-200 rounded-lg font-extrabold text-[10px] transition-colors shadow-sm">Edit</button></td>
                 `;
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500 font-bold">Gagal memuat rekap absensi: ${err.message}</td></tr>`;
-            }
+                tbody.appendChild(tr);
+            });
+
+            tfoot.innerHTML = `
+                <tr>
+                    <td class="px-2.5 py-4 text-left font-black uppercase whitespace-nowrap sticky-col bg-fuchsia-200/90">TOTAL</td>
+                    <td class="px-2 py-4 text-center font-black text-fuchsia-950 whitespace-nowrap">-</td>
+                    <td class="px-2 py-4 text-center font-black text-fuchsia-950 whitespace-nowrap">${totalLaki}L / ${totalPerempuan}P</td>
+                    <td class="px-2 py-4 text-center font-black text-pink-800 whitespace-nowrap">${totalIjin} Orang</td>
+                    <td class="px-2 py-4 text-right font-black text-emerald-700 whitespace-nowrap text-[13px]">Rp${totalInfaq.toLocaleString('id-ID')}</td>
+                    <td class="px-2 py-4 text-center no-print"></td>
+                </tr>
+            `;
         }
 
         function toggleNamaKegiatanLainnya(selectEl) {
