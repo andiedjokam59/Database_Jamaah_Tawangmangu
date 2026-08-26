@@ -636,6 +636,7 @@
                         <option value="Pengajian umum daerah">Pengajian umum daerah</option>
                         <option value="Pengajian remaja daerah">Pengajian remaja daerah</option>
                         <option value="Penyampaian CAI">Penyampaian CAI</option>
+						<option value="Asrama K. Khotbah">Asrama K. Khotbah</option>
                         <option value="LAINNYA">-- Ketik Lainnya --</option>
                     </select>
                     <input type="text" id="abs_nama_custom" placeholder="Ketik nama kegiatan lainnya..." oninput="autoCapitalize(this)" class="hidden rounded-box-input w-full p-3 text-sm font-semibold mt-2 border-fuchsia-300 focus:border-fuchsia-500">
@@ -671,7 +672,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1 text-emerald-600">Infaq (Rp)</label>
-                    <input type="number" id="abs_infaq" min="0" placeholder="0" class="rounded-box-input input-transparent-zero w-full p-3 text-sm font-extrabold text-emerald-700 border-emerald-200 focus:border-emerald-500">
+                    <input type="text" id="abs_infaq" placeholder="0" oninput="formatRupiahInput(this)" class="rounded-box-input input-transparent-zero w-full p-3 text-sm font-extrabold text-emerald-700 border-emerald-200 focus:border-emerald-500">
                 </div>
                 <button type="submit" id="absBtn" class="w-full py-3.5 bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white rounded-xl font-extrabold text-sm hover:shadow-[0_8px_20px_rgba(219,39,119,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 mt-2">
                     Simpan Absensi
@@ -1344,6 +1345,15 @@
 
         const getIntVal = id => parseInt(document.getElementById(id)?.value, 10) || 0;
 
+        function formatRupiahInput(input) {
+            let numberString = input.value.replace(/[^0-9]/g, '');
+            if (numberString === '') {
+                input.value = '';
+                return;
+            }
+            input.value = parseInt(numberString, 10).toLocaleString('id-ID');
+        }
+
         function handleAuthSubmit(e) {
             e.preventDefault();
             const inputEl = document.getElementById('appPasswordInput');
@@ -1361,7 +1371,7 @@
             inputEl.disabled = true;
             btn.disabled = true;
             spinner.classList.remove('hidden');
-            btnText.textContent = "Mendeteksi Sandi...";
+            btnText.textContent = "Mndeteksi Sandi...";
 
             setTimeout(async () => {
                 if (inputVal === APP_PASSWORD_SECRET) {
@@ -2220,52 +2230,62 @@
         }
 
         document.getElementById('formAbsensiKegiatan').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const editId = document.getElementById('edit_absensi_id').value;
-            const selectNama = document.getElementById('abs_nama').value;
-            const customNama = toTitleCase(document.getElementById('abs_nama_custom').value.trim());
-            const finalNamaKegiatan = selectNama === 'LAINNYA' ? customNama : selectNama;
-            
-            let tanggalKegiatan = editId ? document.getElementById('edit_tanggal_kegiatan').value : new Date().toISOString().slice(0, 10);
+			e.preventDefault();
+			const editId = document.getElementById('edit_absensi_id').value;
+			const selectNama = document.getElementById('abs_nama').value;
+			const customNama = toTitleCase(document.getElementById('abs_nama_custom').value.trim());
+			const finalNamaKegiatan = selectNama === 'LAINNYA' ? customNama : selectNama;
+			
+			// PERBAIKAN: Mengambil tanggal lokal perangkat (WIB) secara tepat
+			const today = new Date();
+			const year = today.getFullYear();
+			const month = String(today.getMonth() + 1).padStart(2, '0');
+			const day = String(today.getDate()).padStart(2, '0');
+			const todayStr = `${year}-${month}-${day}`;
+			
+			let tanggalKegiatan = editId ? document.getElementById('edit_tanggal_kegiatan').value : todayStr;
 
-            const payload = {
-                nama_kegiatan: finalNamaKegiatan,
-                tanggal_kegiatan: tanggalKegiatan,
-                desa: document.getElementById('abs_desa').value,
-                kelompok: document.getElementById('abs_kelompok').value,
-                jumlah_laki: getIntVal('abs_laki'),
-                jumlah_perempuan: getIntVal('abs_perempuan'),
-                jumlah_ijin: getIntVal('abs_ijin'),
-                infaq: parseFloat(document.getElementById('abs_infaq').value) || 0
-            };
+			const infaqRaw = document.getElementById('abs_infaq').value.replace(/[^0-9]/g, '');
 
-            (async () => {
-                showDataLoading("Menyimpan data absensi...");
-                try {
-                    if(editId) {
-                        const { data, error } = await supabaseClient.from('absensi_kegiatan').update(payload).eq('id', editId).select();
-                        if (error) throw error;
-                        const idx = globalCache.absensi.findIndex(a => String(a.id) === String(editId));
-                        if (idx !== -1 && data && data.length > 0) globalCache.absensi[idx] = data[0];
-                    } else {
-                        const { data, error } = await supabaseClient.from('absensi_kegiatan').insert([payload]).select();
-                        if (error) throw error;
-                        if (data && data.length > 0) globalCache.absensi.push(data[0]);
-                    }
+			const payload = {
+				nama_kegiatan: finalNamaKegiatan,
+				tanggal_kegiatan: tanggalKegiatan,
+				desa: document.getElementById('abs_desa').value,
+				kelompok: document.getElementById('abs_kelompok').value,
+				jumlah_laki: getIntVal('abs_laki'),
+				jumlah_perempuan: getIntVal('abs_perempuan'),
+				jumlah_ijin: getIntVal('abs_ijin'),
+				infaq: parseFloat(infaqRaw) || 0
+			};
 
-                    showCustomModal("Sukses", "Data Absensi Berhasil Diperbarui!", "📋", () => {
-                        e.target.reset();
-                        document.getElementById('abs_nama_custom').classList.add('hidden');
-                        document.getElementById('edit_absensi_id').value = "";
-                        switchTabAbsensi('REKAP');
-                    });
-                } catch(e) {
-                    showCustomModal("Gagal", e.message || "Gagal menyimpan absensi", "❌");
-                } finally {
-                    hideDataLoading();
-                }
-            })();
-        });
+			(async () => {
+				showDataLoading("Menyimpan data absensi...");
+				try {
+					if(editId) {
+						const { data, error } = await supabaseClient.from('absensi_kegiatan').update(payload).eq('id', editId).select();
+						if (error) throw error;
+						const idx = globalCache.absensi.findIndex(a => String(a.id) === String(editId));
+						if (idx !== -1 && data && data.length > 0) globalCache.absensi[idx] = data[0];
+					} else {
+						const { data, error } = await supabaseClient.from('absensi_kegiatan').insert([payload]).select();
+						if (error) throw error;
+						if (data && data.length > 0) globalCache.absensi.push(data[0]);
+					}
+
+					showCustomModal("Sukses", "Data Absensi Berhasil Diperbarui!", "📋", () => {
+						e.target.reset();
+						document.getElementById('abs_nama_custom').classList.add('hidden');
+						document.getElementById('edit_absensi_id').value = "";
+						
+						switchTabAbsensi('REKAP');
+					});
+				} catch(e) {
+					showCustomModal("Gagal", e.message || "Gagal menyimpan absensi", "❌");
+				} finally {
+					hideDataLoading();
+				}
+			})();
+		});
 
         function editAbsensi(id) {
             const data = globalCache.absensi.find(a => String(a.id) === String(id));
@@ -2277,7 +2297,7 @@
             const selectNama = document.getElementById('abs_nama');
             const customInput = document.getElementById('abs_nama_custom');
 
-            const standardOptions = ["Penyampaian materi PPG pusat", "Pengajian ibu-ibu daerah", "Pengajian umum daerah", "Pengajian remaja daerah", "Penyampaian CAI"];
+            const standardOptions = ["Penyampaian materi PPG pusat", "Pengajian ibu-ibu daerah", "Pengajian umum daerah", "Pengajian remaja daerah", "Penyampaian CAI", "Asrama K. Khotbah"];
 
             if (standardOptions.includes(data.nama_kegiatan)) {
                 selectNama.value = data.nama_kegiatan;
@@ -2298,7 +2318,8 @@
             document.getElementById('abs_laki').value = data.jumlah_laki ?? '';
             document.getElementById('abs_perempuan').value = data.jumlah_perempuan ?? '';
             document.getElementById('abs_ijin').value = data.jumlah_ijin ?? '';
-            document.getElementById('abs_infaq').value = data.infaq ?? '';
+            const infaqEl = document.getElementById('abs_infaq');
+            infaqEl.value = data.infaq ? (parseInt(data.infaq, 10) || 0).toLocaleString('id-ID') : '';
 
             document.getElementById('absBtn').textContent = "Update Absensi";
             switchTabAbsensi('INPUT');
@@ -2881,10 +2902,25 @@
         }
 
         function setupYearFilter() {
-            const sel = document.getElementById('filterTahun');
-            const now = new Date().getFullYear();
-            sel.innerHTML = '';
-            for(let i = now; i >= now - 3; i--) sel.add(new Option(`Tahun ${i}`, i));
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonthStr = String(now.getMonth() + 1).padStart(2, '0');
+
+            // Set Opsi dan Default Tahun untuk Filter Rekapan Absensi
+            const selTahunFilter = document.getElementById('filterTahun');
+            if (selTahunFilter) {
+                selTahunFilter.innerHTML = '';
+                for(let i = currentYear; i >= currentYear - 3; i--) {
+                    selTahunFilter.add(new Option(`Tahun ${i}`, i));
+                }
+                selTahunFilter.value = currentYear;
+            }
+
+            // Set Default Bulan Filter Rekapan Absensi
+            const selBulanFilter = document.getElementById('filterBulanAbsensi');
+            if (selBulanFilter) {
+                selBulanFilter.value = currentMonthStr;
+            }
         }
 
         /* DARI CACHE SECARA INSTAN */
