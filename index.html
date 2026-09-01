@@ -1940,18 +1940,18 @@
             document.getElementById('formJamaah').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        document.getElementById('formJamaah').addEventListener('submit', function(e) {
+        document.getElementById('formJamaah').addEventListener('submit', async function(e) {
 			e.preventDefault();
+
 			const editId = document.getElementById('edit_jamaah_id').value;
 			const statusValue = document.getElementById('status').value;
-
-			// 1. Kunci nilai Desa dan Kelompok secara presisi sebelum melakukan operasi form
 			const desaEl = document.getElementById('desa');
 			const kelompokEl = document.getElementById('kelompok');
 			
 			const savedDesa = desaEl.value;
 			const savedKelompok = kelompokEl.value;
 
+			// Aksi hapus data jika status dipilih Meninggal/Sambung Luar
 			if (currentMode === "UPDATE" && statusValue === "Meninggal / Sambung Luar Daerah") {
 				if (!editId) {
 					showCustomModal("Peringatan", "Silakan cari dan pilih data terlebih dahulu.", "⚠️");
@@ -2003,71 +2003,92 @@
 				status: statusValue
 			};
 
-			(async () => {
-				showDataLoading("Menyimpan data...");
-				try {
-					if (editId) {
-						const { data, error } = await supabaseClient.from('data_jamaah').update(payload).eq('id', editId).select();
-						if (error) throw error;
-						
-						const idx = globalCache.jamaah.findIndex(j => String(j.id) === String(editId));
-						if (idx !== -1 && data && data.length > 0) {
-							globalCache.jamaah[idx] = data[0];
-						}
-					} else {
-						const { data, error } = await supabaseClient.from('data_jamaah').insert([payload]).select();
-						if (error) throw error;
-						
-						if (data && data.length > 0) {
-							globalCache.jamaah.push(data[0]);
-						}
+			// --- PENGECEKAN DUPLIKAT (HANYA SAAT DAFTAR BARU) ---
+			if (!editId) {
+				const isDuplicate = globalCache.jamaah.some(j => 
+					(j.nama || '').trim().toLowerCase() === payload.nama.toLowerCase() &&
+					(j.tempat_lahir || '').trim().toLowerCase() === payload.tempat_lahir.toLowerCase() &&
+					(j.tanggal_lahir || '') === payload.tanggal_lahir &&
+					(j.kelompok || '').trim().toLowerCase() === payload.kelompok.toLowerCase() &&
+					(j.desa || '').trim().toLowerCase() === payload.desa.toLowerCase()
+				);
+
+				if (isDuplicate) {
+					const userChoice = await showDuplicateConfirmModal(
+						payload.nama, 
+						payload.tempat_lahir, 
+						payload.tanggal_lahir, 
+						payload.kelompok, 
+						payload.desa
+					);
+
+					if (!userChoice) {
+						return; // User klik Batal
 					}
-
-					showCustomModal("Sukses", editId ? "Data Berhasil Di-update!" : "Data Berhasil Disimpan!", "🎉", () => {
-						if (currentMode === "UPDATE") {
-							const currentDesa = document.getElementById('searchDesa').value;
-							const currentKelompok = document.getElementById('searchKelompok').value;
-							switchMode('UPDATE', true);
-							if (currentDesa && currentKelompok) fetchAutoJamaahList(currentDesa, currentKelompok);
-						} else {
-							// 2. Kosongkan HANYA field data jamaah, tanpa mereset form secara keseluruhan
-							document.getElementById('edit_jamaah_id').value = "";
-							document.getElementById('nama').value = "";
-							document.getElementById('jenis_kelamin').value = "";
-							document.getElementById('tempat_lahir').value = "";
-							document.getElementById('tgl_lahir_tgl').value = "";
-							document.getElementById('tgl_lahir_bln').value = "";
-							document.getElementById('tgl_lahir_thn').value = "";
-							document.getElementById('status').value = "Menikah";
-							toggleNoHpInput("Menikah");
-							document.getElementById('displayUmur').classList.add('hidden');
-
-							// 3. Pasang & Pertahankan nilai Desa dan Kelompok secara konsisten
-							if (savedDesa) {
-								desaEl.value = savedDesa;
-
-								// Bangun ulang opsi kelompok
-								kelompokEl.innerHTML = '<option value="">-- Pilih Kelompok --</option>';
-								if (dataWilayah[savedDesa]) {
-									dataWilayah[savedDesa].forEach(k => kelompokEl.add(new Option(k, k)));
-								}
-								
-								kelompokEl.disabled = false;
-								kelompokEl.classList.remove('bg-slate-100/50', 'text-slate-400');
-								kelompokEl.value = savedKelompok;
-							}
-
-							// 4. Arahkan fokus pengguna langsung ke field nama untuk pengisian data berikutnya
-							document.getElementById('nama').focus();
-						}
-					});
-
-				} catch(e) {
-					showCustomModal("Gagal", e.message || "Gagal menyimpan data ke server.", "❌");
-				} finally {
-					hideDataLoading();
 				}
-			})();
+			}
+
+			// --- PROSES SIMPAN / UPDATE ---
+			showDataLoading("Menyimpan data...");
+
+			try {
+				if (editId) {
+					const { data, error } = await supabaseClient.from('data_jamaah').update(payload).eq('id', editId).select();
+					if (error) throw error;
+					
+					const idx = globalCache.jamaah.findIndex(j => String(j.id) === String(editId));
+					if (idx !== -1 && data && data.length > 0) {
+						globalCache.jamaah[idx] = data[0];
+					}
+				} else {
+					const { data, error } = await supabaseClient.from('data_jamaah').insert([payload]).select();
+					if (error) throw error;
+					
+					if (data && data.length > 0) {
+						globalCache.jamaah.push(data[0]);
+					}
+				}
+
+				showCustomModal("Sukses", editId ? "Data Berhasil Di-update!" : "Data Berhasil Disimpan!", "🎉", () => {
+					if (currentMode === "UPDATE") {
+						const currentDesa = document.getElementById('searchDesa').value;
+						const currentKelompok = document.getElementById('searchKelompok').value;
+						switchMode('UPDATE', true);
+						if (currentDesa && currentKelompok) fetchAutoJamaahList(currentDesa, currentKelompok);
+					} else {
+						// Reset input jamaah saja
+						document.getElementById('edit_jamaah_id').value = "";
+						document.getElementById('nama').value = "";
+						document.getElementById('jenis_kelamin').value = "";
+						document.getElementById('tempat_lahir').value = "";
+						document.getElementById('tgl_lahir_tgl').value = "";
+						document.getElementById('tgl_lahir_bln').value = "";
+						document.getElementById('tgl_lahir_thn').value = "";
+						document.getElementById('status').value = "Menikah";
+						toggleNoHpInput("Menikah");
+						document.getElementById('displayUmur').classList.add('hidden');
+
+						// Pertahankan Pilihan Desa & Kelompok
+						if (savedDesa) {
+							desaEl.value = savedDesa;
+							kelompokEl.innerHTML = '<option value="">-- Pilih Kelompok --</option>';
+							if (dataWilayah[savedDesa]) {
+								dataWilayah[savedDesa].forEach(k => kelompokEl.add(new Option(k, k)));
+							}
+							kelompokEl.disabled = false;
+							kelompokEl.classList.remove('bg-slate-100/50', 'text-slate-400');
+							kelompokEl.value = savedKelompok;
+						}
+
+						document.getElementById('nama').focus();
+					}
+				});
+
+			} catch(err) {
+				showCustomModal("Gagal", err.message || "Gagal menyimpan data ke server.", "❌");
+			} finally {
+				hideDataLoading();
+			}
 		});
 
         /* =========================================================================
@@ -3469,6 +3490,64 @@
                 window.history.back();
             }
         }
+		
+		// Modal konfirmasi duplikat dengan janji (Promise)
+		function showDuplicateConfirmModal(nama, tempat, tgl, kelompok, desa) {
+			return new Promise((resolve) => {
+				// Buat elemen modal jika belum ada di DOM
+				let modal = document.getElementById('duplicateConfirmModal');
+				if (!modal) {
+					modal = document.createElement('div');
+					modal.id = 'duplicateConfirmModal';
+					modal.className = 'fixed inset-0 bg-slate-900/50 backdrop-blur-md z-[250] flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none';
+					modal.innerHTML = `
+						<div class="bg-white/90 border border-amber-200 glass-card rounded-[2rem] p-6 max-w-sm w-full text-center space-y-4 shadow-2xl transform scale-95 transition-all duration-300">
+							<div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-inner">
+								⚠️
+							</div>
+							<div>
+								<h3 class="text-lg font-extrabold text-slate-800 tracking-tight">Data Jamaah Sama Terdeteksi</h3>
+								<p id="duplicateModalText" class="text-xs text-slate-600 mt-2 font-medium leading-relaxed"></p>
+							</div>
+							<div class="flex gap-3 pt-2">
+								<button id="btnCancelDup" class="flex-1 py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-extrabold text-xs transition-colors">
+									❌ Batal
+								</button>
+								<button id="btnContinueDup" class="flex-1 py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-xl font-extrabold text-xs shadow-md transition-all">
+									⏩ Lanjutkan
+								</button>
+							</div>
+						</div>
+					`;
+					document.body.appendChild(modal);
+				}
+
+				// Tampilkan pesan detail data duplikat
+				document.getElementById('duplicateModalText').innerHTML = 
+					`Jamaah dengan nama <b>"${nama}"</b>, lahir di <b>${tempat} (${tgl})</b>, kelompok <b>${kelompok}</b> (${desa}) sudah ada di database.<br><br>Apakah Anda tetap ingin menyimpan data ini?`;
+
+				// Tampilkan modal
+				modal.classList.remove('opacity-0', 'pointer-events-none');
+				modal.classList.add('opacity-100');
+
+				const btnCancel = document.getElementById('btnCancelDup');
+				const btnContinue = document.getElementById('btnContinueDup');
+
+				function cleanup(result) {
+					modal.classList.remove('opacity-100');
+					modal.classList.add('opacity-0', 'pointer-events-none');
+					btnCancel.removeEventListener('click', onCancel);
+					btnContinue.removeEventListener('click', onContinue);
+					resolve(result);
+				}
+
+				function onCancel() { cleanup(false); }
+				function onContinue() { cleanup(true); }
+
+				btnCancel.addEventListener('click', onCancel);
+				btnContinue.addEventListener('click', onContinue);
+			});
+		}
     </script>
 </body>
 </html>
