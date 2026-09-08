@@ -542,7 +542,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Desa</label>
                         <select id="desa" required class="rounded-box-input w-full p-3 text-sm font-semibold">
@@ -568,40 +568,81 @@
                     </select>
                 </div>
 
-                <!-- CHECKBOX DISABILITAS OPSIONAL -->
-                <div class="p-4 bg-indigo-50/50 border border-indigo-100 rounded-2xl space-y-3 transition-all duration-300">
-                    <label class="flex items-center gap-2.5 cursor-pointer">
-                        <input type="checkbox" id="is_disabilitas" onchange="toggleDisabilitasOptions(this.checked)" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 transition-all cursor-pointer">
-                        <span class="text-xs font-bold text-slate-700 select-none">Penyandang Disabilitas (Opsional)</span>
+                <!-- KOMPONEN FORMULIR CHECKBOX DISABILITAS LENGKAP DENGAN SUB-TEXT / ISTILAH DESA (SAMAM PERASIS DENGAN INDEX) -->
+                <div id="formDisabilitasSection" class="space-y-3 bg-teal-50/50 border border-teal-100 p-4 rounded-2xl backdrop-blur-sm">
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" id="is_disabilitas" onchange="toggleDisabilitasOptionsForm()" class="rounded text-teal-600 focus:ring-teal-500 w-5 h-5 accent-teal-600 cursor-pointer">
+                        <span class="text-xs sm:text-sm font-extrabold text-teal-900">♿ Penyandang Disabilitas (ABK / ABK Khusus)</span>
                     </label>
 
-                    <div id="boxKategoriDisabilitas" class="hidden space-y-2 pt-2 border-t border-indigo-100/80 animate-fade-in-up">
-                        <p class="text-[11px] font-extrabold text-indigo-900 uppercase tracking-wide">Pilih Kategori Disabilitas:</p>
-                        <div class="grid grid-cols-2 gap-2">
-                            <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer bg-white p-2 rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-colors">
-                                <input type="checkbox" name="kat_disabilitas" value="Fisik" class="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300">
-                                <span>Disabilitas Fisik</span>
+                    <div id="wrapperKategoriDisabilitas" class="hidden space-y-2 pt-2 border-t border-teal-200/60">
+                        <label class="block text-[10px] font-extrabold uppercase tracking-wide text-teal-800 mb-1">Ragam Disabilitas (Bisa pilih >1)</label>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-bold text-slate-700">
+                            
+                            <!-- 1. SENSORIK MATA -->
+                            <label class="flex items-start space-x-2.5 bg-white/80 p-2.5 rounded-xl border border-teal-100 hover:bg-white shadow-xs cursor-pointer">
+                                <input type="checkbox" name="kategori_disabilitas" value="Sensorik Mata (Penglihatan)" class="rounded text-teal-600 focus:ring-teal-500 w-4 h-4 mt-0.5 accent-teal-600">
+                                <div>
+                                    <span class="block text-slate-800 font-extrabold">Penglihatan (Mata)</span>
+                                    <span class="block text-[10px] text-slate-400 font-normal leading-tight">Buta total, Tunanetra, Penglihatan sangat kabur</span>
+                                </div>
                             </label>
-                            <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer bg-white p-2 rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-colors">
-                                <input type="checkbox" name="kat_disabilitas" value="Intelektual" class="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300">
-                                <span>Disabilitas Intelektual</span>
+
+                            <!-- 2. SENSORIK TELINGA -->
+                            <label class="flex items-start space-x-2.5 bg-white/80 p-2.5 rounded-xl border border-teal-100 hover:bg-white shadow-xs cursor-pointer">
+                                <input type="checkbox" name="kategori_disabilitas" value="Sensorik Telinga (Pendengaran)" class="rounded text-teal-600 focus:ring-teal-500 w-4 h-4 mt-0.5 accent-teal-600">
+                                <div>
+                                    <span class="block text-slate-800 font-extrabold">Pendengaran (Telinga)</span>
+                                    <span class="block text-[10px] text-slate-400 font-normal leading-tight">Tuli total, Tunarungu, Kurang pendengaran</span>
+                                </div>
                             </label>
-                            <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer bg-white p-2 rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-colors">
-                                <input type="checkbox" name="kat_disabilitas" value="Mental" class="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300">
-                                <span>Disabilitas Mental</span>
+
+                            <!-- 3. SENSORIK BICARA -->
+                            <label class="flex items-start space-x-2.5 bg-white/80 p-2.5 rounded-xl border border-teal-100 hover:bg-white shadow-xs cursor-pointer">
+                                <input type="checkbox" name="kategori_disabilitas" value="Sensorik Bicara (Komunikasi)" class="rounded text-teal-600 focus:ring-teal-500 w-4 h-4 mt-0.5 accent-teal-600">
+                                <div>
+                                    <span class="block text-slate-800 font-extrabold">Bicara (Komunikasi)</span>
+                                    <span class="block text-[10px] text-slate-400 font-normal leading-tight">Bisu, Tunawicara, Sulit bicara/pelo</span>
+                                </div>
                             </label>
-                            <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer bg-white p-2 rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-colors">
-                                <input type="checkbox" name="kat_disabilitas" value="Sensorik Netra" class="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300">
-                                <span>Sensorik Netra</span>
+
+                            <!-- 4. FISIK / ANGGOTA TUBUH -->
+                            <label class="flex items-start space-x-2.5 bg-white/80 p-2.5 rounded-xl border border-teal-100 hover:bg-white shadow-xs cursor-pointer">
+                                <input type="checkbox" name="kategori_disabilitas" value="Fisik (Anggota Tubuh)" class="rounded text-teal-600 focus:ring-teal-500 w-4 h-4 mt-0.5 accent-teal-600">
+                                <div>
+                                    <span class="block text-slate-800 font-extrabold">Fisik (Anggota Badan)</span>
+                                    <span class="block text-[10px] text-slate-400 font-normal leading-tight">Amputasi, Lumpuh, Layu, Polio, Kusta, Cerebral Palsy</span>
+                                </div>
                             </label>
-                            <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer bg-white p-2 rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-colors">
-                                <input type="checkbox" name="kat_disabilitas" value="Sensorik Rungu/Wicara" class="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300">
-                                <span>Sensorik Rungu/Wicara</span>
+
+                            <!-- 5. INTELEKTUAL / DAYA TANGKAP -->
+                            <label class="flex items-start space-x-2.5 bg-white/80 p-2.5 rounded-xl border border-teal-100 hover:bg-white shadow-xs cursor-pointer">
+                                <input type="checkbox" name="kategori_disabilitas" value="Intelektual (Daya Tangkap)" class="rounded text-teal-600 focus:ring-teal-500 w-4 h-4 mt-0.5 accent-teal-600">
+                                <div>
+                                    <span class="block text-slate-800 font-extrabold">Intelektual (Daya Pikir)</span>
+                                    <span class="block text-[10px] text-slate-400 font-normal leading-tight">Down Syndrome, Lambat belajar (Slow Learner)</span>
+                                </div>
                             </label>
-                            <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer bg-white p-2 rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-colors">
-                                <input type="checkbox" name="kat_disabilitas" value="Lainnya" class="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300">
-                                <span>Lainnya</span>
+
+                            <!-- 6. MENTAL / PERILAKU -->
+                            <label class="flex items-start space-x-2.5 bg-white/80 p-2.5 rounded-xl border border-teal-100 hover:bg-white shadow-xs cursor-pointer">
+                                <input type="checkbox" name="kategori_disabilitas" value="Mental & Perilaku" class="rounded text-teal-600 focus:ring-teal-500 w-4 h-4 mt-0.5 accent-teal-600">
+                                <div>
+                                    <span class="block text-slate-800 font-extrabold">Mental & Perilaku</span>
+                                    <span class="block text-[10px] text-slate-400 font-normal leading-tight">Autis, Hiperaktif (ADHD), Gangguan Jiwa (ODGJ)</span>
+                                </div>
                             </label>
+
+                            <!-- 7. DISABILITAS GANDA / KOMBO -->
+                            <label class="flex items-start space-x-2.5 bg-white/80 p-2.5 rounded-xl border border-teal-100 hover:bg-white shadow-xs cursor-pointer sm:col-span-2">
+                                <input type="checkbox" name="kategori_disabilitas" value="Disabilitas Ganda" class="rounded text-teal-600 focus:ring-teal-500 w-4 h-4 mt-0.5 accent-teal-600">
+                                <div>
+                                    <span class="block text-slate-800 font-extrabold">Disabilitas Ganda (Kombinasi)</span>
+                                    <span class="block text-[10px] text-slate-400 font-normal leading-tight">Memiliki 2 atau lebih kondisi di atas sekaligus (Contoh: Bisu sekaligus Tuli)</span>
+                                </div>
+                            </label>
+
                         </div>
                     </div>
                 </div>
@@ -996,9 +1037,6 @@
 					<button type="button" onclick="showDisabilitasDetailModal()" class="w-full text-left p-2.5 sm:p-3 bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 active:scale-[0.99] text-white rounded-xl flex justify-between items-center shadow-md transition-all cursor-pointer border border-slate-700 group">
 						<span class="text-xs font-extrabold uppercase tracking-wider flex items-center gap-2">
 							♿ Total Penyandang Disabilitas
-							<span class="text-[9px] bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-md border border-teal-500/30 font-normal normal-case group-hover:bg-teal-500 group-hover:text-white transition-all">
-								Klik untuk Rincian &raquo;
-							</span>
 						</span>
 						<span id="stTotalDisabilitas" class="text-sm sm:text-base font-black bg-clip-text text-transparent bg-gradient-to-l from-teal-300 to-emerald-300">0 Orang</span>
 					</button>
@@ -1535,14 +1573,25 @@
             }
         }
 
-        function toggleDisabilitasOptions(checked) {
-            const box = document.getElementById('boxKategoriDisabilitas');
-            if (checked) {
-                box.classList.remove('hidden');
+        /* HELPER FUNCTION DISABILITAS LENGKAP (SESUAI INDEX) */
+        function toggleDisabilitasOptionsForm() {
+            const isDis = document.getElementById('is_disabilitas').checked;
+            const wrap = document.getElementById('wrapperKategoriDisabilitas');
+            if (isDis) {
+                wrap.classList.remove('hidden');
+                wrap.classList.add('animate-fade-in-up');
             } else {
-                box.classList.add('hidden');
-                document.querySelectorAll('input[name="kat_disabilitas"]').forEach(cb => cb.checked = false);
+                wrap.classList.add('hidden');
+                resetDisabilitasCheckboxes();
             }
+        }
+
+        function resetDisabilitasCheckboxes() {
+            document.querySelectorAll('input[name="kategori_disabilitas"]').forEach(cb => cb.checked = false);
+        }
+
+        function getSelectedKategoriDisabilitasForm() {
+            return Array.from(document.querySelectorAll('input[name="kategori_disabilitas"]:checked')).map(cb => cb.value);
         }
 
         function showSarprasComingSoon() {
@@ -1872,7 +1921,8 @@
             document.getElementById('edit_jamaah_id').value = "";
             document.getElementById('displayUmur').classList.add('hidden');
             toggleNoHpInput(statusSelect.value);
-            toggleDisabilitasOptions(false);
+            document.getElementById('is_disabilitas').checked = false;
+            toggleDisabilitasOptionsForm();
 
             if (!keepSearchFilters) {
                 document.getElementById('autoJamaahListContainer').classList.add('hidden');
@@ -1966,13 +2016,14 @@
             toggleNoHpInput(stVal);
             document.getElementById('no_hp').value = j.no_hp || '';
 
-            const isDis = !!j.is_disabilitas;
-            document.getElementById('is_disabilitas').checked = isDis;
-            toggleDisabilitasOptions(isDis);
-
-            if (isDis && Array.isArray(j.kategori_disabilitas)) {
-                document.querySelectorAll('input[name="kat_disabilitas"]').forEach(cb => {
-                    cb.checked = j.kategori_disabilitas.includes(cb.value);
+            document.getElementById('is_disabilitas').checked = j.is_disabilitas ? true : false;
+            toggleDisabilitasOptionsForm();
+            resetDisabilitasCheckboxes();
+            if(j.is_disabilitas && j.kategori_disabilitas) {
+                let katList = Array.isArray(j.kategori_disabilitas) ? j.kategori_disabilitas : j.kategori_disabilitas.split(',');
+                katList.forEach(k => {
+                    const cb = document.querySelector(`input[name="kategori_disabilitas"][value="${k.trim()}"]`);
+                    if(cb) cb.checked = true;
                 });
             }
 
@@ -2030,13 +2081,8 @@
 			const fullDate = `${thn}-${bln}-${tgl}`;
 			const calculatedAge = hitungUmurOtomatis();
 
-            const isDisabilitasChecked = document.getElementById('is_disabilitas').checked;
-            const katDisabilitasSelected = [];
-            if (isDisabilitasChecked) {
-                document.querySelectorAll('input[name="kat_disabilitas"]:checked').forEach(cb => {
-                    katDisabilitasSelected.push(cb.value);
-                });
-            }
+            const isDis = document.getElementById('is_disabilitas').checked;
+            const katDis = isDis ? getSelectedKategoriDisabilitasForm() : [];
 
 			const payload = {
 				nama: toTitleCase(document.getElementById('nama').value.trim()),
@@ -2048,8 +2094,8 @@
 				desa: savedDesa,
 				kelompok: savedKelompok,
 				status: statusValue,
-                is_disabilitas: isDisabilitasChecked,
-                kategori_disabilitas: katDisabilitasSelected
+                is_disabilitas: isDis,
+                kategori_disabilitas: katDis
 			};
 
 			if (!editId) {
@@ -2112,7 +2158,8 @@
 						document.getElementById('tgl_lahir_thn').value = "";
 						document.getElementById('status').value = "Menikah";
 						toggleNoHpInput("Menikah");
-                        toggleDisabilitasOptions(false);
+                        document.getElementById('is_disabilitas').checked = false;
+                        toggleDisabilitasOptionsForm();
 						document.getElementById('displayUmur').classList.add('hidden');
 
 						if (savedDesa) {
@@ -2257,10 +2304,10 @@
                             if (item.is_disabilitas) {
                                 const kats = Array.isArray(item.kategori_disabilitas) && item.kategori_disabilitas.length > 0 
                                     ? item.kategori_disabilitas.join(', ') 
-                                    : 'Ya';
+                                    : 'Penyandang Disabilitas';
                                 val = `Penyandang (${kats})`;
                             } else {
-                                val = 'Tidak';
+                                val = 'Bukan Penyandang Disabilitas';
                             }
                         }
 
@@ -2615,88 +2662,139 @@
         }
 
         function loadRekapStatusKeseluruhan() {
-            const dataJamaah = globalCache.jamaah;
-            let menikah = 0, duda = 0, janda = 0, manula = 0, operator = 0, totalDisabilitas = 0;
-            
-            window.allOperatorsCache = [];
-            window.activeDisabilitasDataset = [];
-            window.statusJamaahCache = {
-                'Menikah': [],
-                'Duda': [],
-                'Janda': [],
-                'Manula': []
-            };
+			const dataJamaah = globalCache.jamaah;
+			const dataGenerus = globalCache.generus;
 
-            dataJamaah.forEach(item => {
-                const st = (item.status || "").toLowerCase();
-                const itemData = {
-                    nama: item.nama,
-                    kelompok: item.kelompok || '-',
-                    desa: item.desa || '-',
-                    umur: item.umur !== null && item.umur !== undefined ? `${item.umur} thn` : '-'
-                };
+			let menikah = 0, duda = 0, janda = 0, manula = 0, operator = 0, totalDisabilitas = 0;
+			
+			window.allOperatorsCache = [];
+			window.activeDisabilitasDataset = [];
+			window.statusJamaahCache = {
+				'Menikah': [],
+				'Duda': [],
+				'Janda': [],
+				'Manula': []
+			};
 
-                if (item.is_disabilitas) {
-                    totalDisabilitas++;
-                    window.activeDisabilitasDataset.push({
-                        nama: item.nama,
-                        kelompok: item.kelompok || '-',
-                        desa: item.desa || '-',
-                        kategori: Array.isArray(item.kategori_disabilitas) && item.kategori_disabilitas.length > 0 
-                            ? item.kategori_disabilitas.join(', ') 
-                            : 'Penyandang Disabilitas'
-                    });
-                }
+			// 1. PROSES DATA JAMAAH DEWASA
+			dataJamaah.forEach(item => {
+				const st = (item.status || "").toLowerCase();
+				const itemData = {
+					nama: item.nama,
+					kelompok: item.kelompok || '-',
+					desa: item.desa || '-',
+					umur: item.umur !== null && item.umur !== undefined && item.umur !== '' ? `${item.umur} thn` : '-'
+				};
 
-                if (st === "menikah") {
-                    menikah++;
-                    window.statusJamaahCache['Menikah'].push(itemData);
-                } else if (st === "duda") {
-                    duda++;
-                    window.statusJamaahCache['Duda'].push(itemData);
-                } else if (st === "janda") {
-                    janda++;
-                    window.statusJamaahCache['Janda'].push(itemData);
-                } else if (st === "manula") {
-                    manula++;
-                    window.statusJamaahCache['Manula'].push(itemData);
-                } else if (st === "operator") {
-                    operator++;
-                    window.allOperatorsCache.push({
-                        nama: item.nama,
-                        no_hp: item.no_hp,
-                        desa: item.desa,
-                        kelompok: item.kelompok
-                    });
-                }
-            });
+				if (item.is_disabilitas) {
+					totalDisabilitas++;
+					window.activeDisabilitasDataset.push({
+						nama: item.nama,
+						kelompok: item.kelompok || '-',
+						desa: item.desa || '-',
+						umur: itemData.umur,
+						kategoriRaw: item.kategori_disabilitas,
+						kategori: Array.isArray(item.kategori_disabilitas) && item.kategori_disabilitas.length > 0 
+							? item.kategori_disabilitas 
+							: (item.kategori_disabilitas ? item.kategori_disabilitas.split(',') : ['Penyandang Disabilitas'])
+					});
+				}
 
-            document.getElementById('stMenikah').textContent = menikah;
-            document.getElementById('stDuda').textContent = duda;
-            document.getElementById('stJanda').textContent = janda;
-            document.getElementById('stManula').textContent = manula;
-            document.getElementById('stOperator').textContent = operator;
-            document.getElementById('stTotalJamaahDewasa').textContent = `${dataJamaah.length} Orang`;
-            document.getElementById('stTotalDisabilitas').textContent = `${totalDisabilitas} Orang`;
+				if (st === "menikah") {
+					menikah++;
+					window.statusJamaahCache['Menikah'].push(itemData);
+				} else if (st === "duda") {
+					duda++;
+					window.statusJamaahCache['Duda'].push(itemData);
+				} else if (st === "janda") {
+					janda++;
+					window.statusJamaahCache['Janda'].push(itemData);
+				} else if (st === "manula") {
+					manula++;
+					window.statusJamaahCache['Manula'].push(itemData);
+				} else if (st === "operator") {
+					operator++;
+					window.allOperatorsCache.push({
+						nama: item.nama,
+						no_hp: item.no_hp,
+						desa: item.desa,
+						kelompok: item.kelompok
+					});
+				}
+			});
 
-            const dataGenerus = globalCache.generus;
-            const genCounts = { paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0 };
+			// 2. PROSES DATA GENERUS (TERMASUK DISABILITAS & HITUNG USIA)
+			const genCounts = { paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0 };
 
-            dataGenerus.forEach(g => {
-                const key = parseKategoriGenerus(g.kategori_usia);
-                if (key) genCounts[key]++;
-            });
+			dataGenerus.forEach(g => {
+				const key = parseKategoriGenerus(g.kategori_usia);
+				if (key) genCounts[key]++;
 
-            document.getElementById('genPaud').textContent = genCounts.paud;
-            document.getElementById('genTk').textContent = genCounts.tk;
-            document.getElementById('genCaberawit').textContent = genCounts.caberawit;
-            document.getElementById('genPraRemaja').textContent = genCounts.praRemaja;
-            document.getElementById('genRemaja').textContent = genCounts.remaja;
-            document.getElementById('genUsiaMandiri').textContent = genCounts.usiaMandiri;
+				if (g.is_disabilitas) {
+					totalDisabilitas++;
 
-            document.getElementById('stTotalGenerus').textContent = `${dataGenerus.length} Orang`;
-            document.getElementById('stTotalAll').textContent = `${dataJamaah.length + dataGenerus.length} Data`;
-        }
+					// Logika Fleksibel Penentuan Umur Generus
+					let calculatedAge = null;
+
+					// 1. Cek dari field 'umur' atau 'usia'
+					if (g.umur !== null && g.umur !== undefined && g.umur !== '') {
+						calculatedAge = g.umur;
+					} else if (g.usia !== null && g.usia !== undefined && g.usia !== '') {
+						calculatedAge = g.usia;
+					} 
+					// 2. Hitung dari tanggal_lahir jika umur/usia belum ada
+					else if (g.tanggal_lahir) {
+						const parts = g.tanggal_lahir.split('-');
+						if (parts.length === 3) {
+							const birthDate = new Date(`${parts[0]}-${parts[1]}-${parts[2]}`);
+							const today = new Date();
+							let age = today.getFullYear() - birthDate.getFullYear();
+							const m = today.getMonth() - birthDate.getMonth();
+							if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+								age--;
+							}
+							if (!isNaN(age) && age >= 0) {
+								calculatedAge = age;
+							}
+						}
+					}
+
+					const umurTxt = calculatedAge !== null ? `${calculatedAge} thn` : '-';
+
+					window.activeDisabilitasDataset.push({
+						nama: g.nama,
+						kelompok: g.kelompok || '-',
+						desa: g.desa || '-',
+						umur: umurTxt,
+						kategoriRaw: g.kategori_disabilitas,
+						kategori: Array.isArray(g.kategori_disabilitas) && g.kategori_disabilitas.length > 0 
+							? g.kategori_disabilitas 
+							: (g.kategori_disabilitas ? g.kategori_disabilitas.split(',') : ['Penyandang Disabilitas'])
+					});
+				}
+			});
+
+			// UPDATE TAMPILAN ELEMEN HTML
+			document.getElementById('stMenikah').textContent = menikah;
+			document.getElementById('stDuda').textContent = duda;
+			document.getElementById('stJanda').textContent = janda;
+			document.getElementById('stManula').textContent = manula;
+			document.getElementById('stOperator').textContent = operator;
+			document.getElementById('stTotalJamaahDewasa').textContent = `${dataJamaah.length} Orang`;
+			
+			// TAMPILKAN TOTAL AKUMULASI JAMAAH + GENERUS DISABILITAS
+			document.getElementById('stTotalDisabilitas').textContent = `${totalDisabilitas} Orang`;
+
+			document.getElementById('genPaud').textContent = genCounts.paud;
+			document.getElementById('genTk').textContent = genCounts.tk;
+			document.getElementById('genCaberawit').textContent = genCounts.caberawit;
+			document.getElementById('genPraRemaja').textContent = genCounts.praRemaja;
+			document.getElementById('genRemaja').textContent = genCounts.remaja;
+			document.getElementById('genUsiaMandiri').textContent = genCounts.usiaMandiri;
+
+			document.getElementById('stTotalGenerus').textContent = `${dataGenerus.length} Orang`;
+			document.getElementById('stTotalAll').textContent = `${dataJamaah.length + dataGenerus.length} Data`;
+		}
 
         /* MODAL CUSTOM DISABILITAS */
 		function showDisabilitasDetailModal() {
@@ -2758,19 +2856,41 @@
 
 			listData.forEach(item => {
 				const card = document.createElement('div');
-				card.className = "p-2.5 sm:p-3 bg-gradient-to-r from-teal-50/80 to-emerald-50/80 border border-teal-100 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 animate-fade-in-up hover:shadow-md transition-shadow";
+				card.className = "p-3 bg-gradient-to-r from-teal-50/90 to-emerald-50/90 border border-teal-200/80 rounded-2xl flex flex-col sm:flex-row sm:items-start justify-between gap-2.5 animate-fade-in-up hover:shadow-md transition-all";
 				
+				// Ambil daftar kategori disabilitas
+				let katArray = [];
+				if (Array.isArray(item.kategoriRaw) && item.kategoriRaw.length > 0) {
+					katArray = item.kategoriRaw;
+				} else if (Array.isArray(item.kategori)) {
+					katArray = item.kategori;
+				} else if (typeof item.kategori === 'string') {
+					katArray = item.kategori.split(',').map(s => s.trim());
+				}
+
+				// Render badge kategori bertumpuk ke bawah (flex-col)
+				let badgesHtml = katArray.map(k => `
+					<span class="text-[10px] font-extrabold text-teal-800 bg-teal-100/90 border border-teal-300/60 px-2.5 py-1 rounded-lg inline-block shadow-2xs">
+						${k.trim()}
+					</span>
+				`).join('');
+
 				card.innerHTML = `
-					<div>
-						<div class="font-extrabold text-xs sm:text-sm text-slate-800">${item.nama}</div>
-						<div class="text-[10px] font-bold text-slate-500 mt-0.5">
-							Klp. <span class="text-teal-800 font-black">${item.kelompok}</span> (${item.desa})
+					<div class="space-y-1">
+						<div class="font-extrabold text-xs sm:text-sm text-slate-800 flex items-center gap-2">
+							<span>${item.nama}</span>
+							<span class="text-[10px] font-extrabold text-teal-700 bg-teal-100 px-2 py-0.5 rounded-md border border-teal-200 shrink-0">
+								${item.umur}
+							</span>
+						</div>
+						<div class="text-[11px] font-semibold text-slate-500">
+							Klp. <span class="text-teal-900 font-black">${item.kelompok}</span> (${item.desa})
 						</div>
 					</div>
-					<div class="shrink-0 text-left sm:text-right">
-						<span class="text-[9px] font-extrabold text-teal-800 bg-teal-100 border border-teal-200 px-2 py-0.5 rounded-lg inline-block">
-							${item.kategori}
-						</span>
+					
+					<!-- Container Kategori Disabilitas (Tersusun ke bawah) -->
+					<div class="flex flex-col items-start sm:items-end gap-1 shrink-0 pt-1 sm:pt-0 border-t sm:border-t-0 border-teal-200/50">
+						${badgesHtml}
 					</div>
 				`;
 				listEl.appendChild(card);
@@ -2784,9 +2904,11 @@
 				return;
 			}
 			const filtered = window.activeDisabilitasDataset.filter(item => {
+				const katString = Array.isArray(item.kategori) ? item.kategori.join(' ') : (item.kategori || '');
 				return (item.nama || '').toLowerCase().includes(query) || 
 					   (item.kelompok || '').toLowerCase().includes(query) ||
-					   (item.kategori || '').toLowerCase().includes(query);
+					   (item.desa || '').toLowerCase().includes(query) ||
+					   katString.toLowerCase().includes(query);
 			});
 			renderDisabilitasDetailList(filtered);
 		}
@@ -3628,7 +3750,7 @@
             if (theme.pickerThemeClass) modal.classList.add(theme.pickerThemeClass);
             titleEl.className = `text-xs font-extrabold uppercase tracking-widest ${theme.pickerTitleClass}`;
 
-            let labelText = "Pilih Opsi";
+            let labelText = "Pilih Ospi";
             const parent = select.closest('div');
             if (parent) {
                 const label = parent.querySelector('label');
