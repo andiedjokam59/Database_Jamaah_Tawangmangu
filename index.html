@@ -572,7 +572,7 @@
                 <div id="formDisabilitasSection" class="space-y-3 bg-teal-50/50 border border-teal-100 p-4 rounded-2xl backdrop-blur-sm">
                     <label class="flex items-center space-x-3 cursor-pointer">
                         <input type="checkbox" id="is_disabilitas" onchange="toggleDisabilitasOptionsForm()" class="rounded text-teal-600 focus:ring-teal-500 w-5 h-5 accent-teal-600 cursor-pointer">
-                        <span class="text-xs sm:text-sm font-extrabold text-teal-900">♿ Penyandang Disabilitas (ABK / ABK Khusus)</span>
+                        <span class="text-xs sm:text-sm font-extrabold text-teal-900">♿ Penyandang Disabilitas (Optional)</span>
                     </label>
 
                     <div id="wrapperKategoriDisabilitas" class="hidden space-y-2 pt-2 border-t border-teal-200/60">
@@ -2725,41 +2725,23 @@
 
 			// 2. PROSES DATA GENERUS (TERMASUK DISABILITAS & HITUNG USIA)
 			const genCounts = { paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0 };
+			let totalGenerusMurni = 0; // Hanya menghitung 6 kategori utama
 
 			dataGenerus.forEach(g => {
 				const key = parseKategoriGenerus(g.kategori_usia);
-				if (key) genCounts[key]++;
+				if (key && genCounts.hasOwnProperty(key)) {
+					genCounts[key]++;
+					totalGenerusMurni++; // Hanya bertambah jika masuk dalam 6 kategori
+				}
 
 				if (g.is_disabilitas) {
 					totalDisabilitas++;
-
-					// Logika Fleksibel Penentuan Umur Generus
-					let calculatedAge = null;
-
-					// 1. Cek dari field 'umur' atau 'usia'
+					let umurTxt = '-';
 					if (g.umur !== null && g.umur !== undefined && g.umur !== '') {
-						calculatedAge = g.umur;
+						umurTxt = `${g.umur} thn`;
 					} else if (g.usia !== null && g.usia !== undefined && g.usia !== '') {
-						calculatedAge = g.usia;
-					} 
-					// 2. Hitung dari tanggal_lahir jika umur/usia belum ada
-					else if (g.tanggal_lahir) {
-						const parts = g.tanggal_lahir.split('-');
-						if (parts.length === 3) {
-							const birthDate = new Date(`${parts[0]}-${parts[1]}-${parts[2]}`);
-							const today = new Date();
-							let age = today.getFullYear() - birthDate.getFullYear();
-							const m = today.getMonth() - birthDate.getMonth();
-							if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-								age--;
-							}
-							if (!isNaN(age) && age >= 0) {
-								calculatedAge = age;
-							}
-						}
+						umurTxt = `${g.usia} thn`;
 					}
-
-					const umurTxt = calculatedAge !== null ? `${calculatedAge} thn` : '-';
 
 					window.activeDisabilitasDataset.push({
 						nama: g.nama,
@@ -2792,8 +2774,8 @@
 			document.getElementById('genRemaja').textContent = genCounts.remaja;
 			document.getElementById('genUsiaMandiri').textContent = genCounts.usiaMandiri;
 
-			document.getElementById('stTotalGenerus').textContent = `${dataGenerus.length} Orang`;
-			document.getElementById('stTotalAll').textContent = `${dataJamaah.length + dataGenerus.length} Data`;
+			document.getElementById('stTotalGenerus').textContent = `${totalGenerusMurni} Orang`;
+			document.getElementById('stTotalAll').textContent = `${dataJamaah.length + totalGenerusMurni} Data`;
 		}
 
         /* MODAL CUSTOM DISABILITAS */
@@ -3196,24 +3178,28 @@
             });
 
             if (generusData && generusData.length > 0) {
-                generusData.forEach(g => {
-                    if (!selectedFilterDesa || selectedFilterDesa === g.desa) {
-                        const key = `${g.desa}__${g.kelompok}`;
-                        if (!rekapMap[key]) {
-                            rekapMap[key] = {
-                                desa: g.desa, kelompok: g.kelompok,
-                                paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0, totalGenerus: 0,
-                                menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJamaah: 0, totalKeseluruhan: 0,
-                                subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
-                            };
-                        }
-                        const katKey = parseKategoriGenerus(g.kategori_usia);
-                        if (katKey) rekapMap[key][katKey]++;
-                        rekapMap[key].totalGenerus++;
-                        rekapMap[key].totalKeseluruhan++;
-                    }
-                });
-            }
+				generusData.forEach(g => {
+					if (!selectedFilterDesa || selectedFilterDesa === g.desa) {
+						const key = `${g.desa}__${g.kelompok}`;
+						if (!rekapMap[key]) {
+							rekapMap[key] = {
+								desa: g.desa, kelompok: g.kelompok,
+								paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0, totalGenerus: 0,
+								menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJamaah: 0, totalKeseluruhan: 0,
+								subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
+							};
+						}
+						const katKey = parseKategoriGenerus(g.kategori_usia);
+						
+						// Cek jika kategori masuk ke salah satu dari 6 kategori utama
+						if (katKey && rekapMap[key].hasOwnProperty(katKey)) {
+							rekapMap[key][katKey]++;
+							rekapMap[key].totalGenerus++; // Ditambahkan hanya jika kategori valid
+							rekapMap[key].totalKeseluruhan++;
+						}
+					}
+				});
+			}
 
             jamaahData.forEach(j => {
                 if (!selectedFilterDesa || selectedFilterDesa === j.desa) {
