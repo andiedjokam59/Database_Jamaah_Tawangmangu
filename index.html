@@ -23,7 +23,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* ANIMATED BACKGROUND MESH & PATTERN */
         .animated-bg {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -55,7 +54,6 @@
             100% { transform: translate(500px, 500px); }
         }
 
-        /* GLASSMORPHISM CARD */
         .glass-card {
             background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(20px) saturate(180%);
@@ -64,7 +62,6 @@
             box-shadow: 0 10px 40px rgba(79, 70, 229, 0.1);
         }
 
-        /* DASHBOARD GLASS BUTTONS */
         .glass-btn-menu {
             background: rgba(255, 255, 255, 0.45);
             backdrop-filter: blur(14px) saturate(160%);
@@ -83,7 +80,6 @@
             transform: translateY(-1px);
         }
         
-        /* PREMIUM INPUTS */
         .rounded-box-input {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background-color: rgba(255, 255, 255, 0.8);
@@ -104,7 +100,6 @@
             opacity: 1;
         }
 
-        /* WRAPPER SCROLL VERTIKAL & HORISONTAL */
         .table-vertical-scroll {
             max-height: 60vh;
             overflow-y: auto;
@@ -121,7 +116,6 @@
             border-spacing: 0;
         }
 
-        /* HEADER STICKY */
         thead tr th {
             position: sticky !important;
             top: 0 !important;
@@ -150,7 +144,6 @@
         #sectionRekap thead tr th { background-color: rgba(238, 242, 255, 0.98) !important; }
         #sectionRekap tfoot tr td { background-color: rgba(224, 231, 255, 0.98) !important; }
 
-        /* KOLOM STICKY KELOMPOK */
         .sticky-col {
             position: sticky !important;
             left: 0 !important;
@@ -188,7 +181,6 @@
         #sectionSarpras thead .sticky-col, #sectionSarpras tfoot .sticky-col { background-color: rgba(204, 251, 241, 0.98) !important; }
         #sectionRekap thead .sticky-col, #sectionRekap tfoot .sticky-col { background-color: rgba(224, 231, 255, 0.98) !important; }
 
-        /* MODAL ANIMATIONS */
         .modal-backdrop {
             transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0;
@@ -209,7 +201,6 @@
             opacity: 1;
         }
 
-        /* POPUP CENTER PICKER OPTION GLASSMORPHISM */
         #centerPickerModal {
             transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             background: rgba(15, 23, 42, 0.5);
@@ -239,7 +230,6 @@
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
 
-        /* DYNAMIC PICKER STYLES PER THEME */
         .theme-absensi .picker-option-item:hover, .theme-absensi .picker-option-item:active {
             background: rgba(217, 70, 239, 0.12);
             color: #a21caf;
@@ -265,7 +255,6 @@
             box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
 
-        /* SECTION ANIMATIONS */
         .section-content {
             opacity: 0;
             transform: translateY(20px) scale(0.98);
@@ -286,7 +275,6 @@
 			animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 		}
 
-        /* CUSTOM SCROLLBAR */
 		#autoJamaahList::-webkit-scrollbar, .scroll-container::-webkit-scrollbar, .table-vertical-scroll::-webkit-scrollbar, #centerPickerOptions::-webkit-scrollbar {
 			height: 6px;
 			width: 6px;
@@ -324,7 +312,6 @@
             animation: spinGradient 1s linear infinite;
         }
 
-        /* INDIKATOR AMBIL DATA OVERLAY */
         #dataFetchOverlay {
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }
@@ -335,10 +322,8 @@
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 sm:p-6 antialiased text-slate-800">
-    <!-- ANIMATED BACKGROUND MESH & MOTIF -->
     <div class="animated-bg"></div>
 
-    <!-- ANIMASI LOADING AWAL -->
     <div id="loadingScreen" class="fixed inset-0 bg-white/60 backdrop-blur-xl z-[100] flex flex-col items-center justify-center p-4">
         <div class="relative flex flex-col items-center">
             <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full p-2 bg-white/80 backdrop-blur-md shadow-[0_0_40px_rgba(99,102,241,0.4)] animate-pulse-glow flex items-center justify-center mb-8 overflow-hidden border border-indigo-200">
@@ -350,7 +335,6 @@
         </div>
     </div>
 
-    <!-- INDIKATOR SAAT PENGAMBILAN DATA (DATA FETCHING OVERLAY) -->
     <div id="dataFetchOverlay" class="fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-[200] opacity-0 invisible flex flex-col items-center justify-center p-4 pointer-events-auto">
         <div class="bg-white/90 border border-indigo-100 p-6 rounded-3xl shadow-2xl flex flex-col items-center max-w-xs w-full text-center space-y-3 animate-fade-in-up">
             <div class="w-10 h-10 loader-ring rounded-full"></div>
@@ -361,7 +345,6 @@
         </div>
     </div>
 
-    <!-- MODAL AUTHENTICATION -->
     <div id="authModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[90] flex items-center justify-center p-4 transition-all duration-300">
         <div class="glass-card rounded-[2rem] p-6 sm:p-8 max-w-sm w-full text-center space-y-6 animate-fade-in-up">
             <div id="authIconBox" class="w-20 h-20 bg-gradient-to-br from-indigo-100 to-fuchsia-100 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto text-4xl shadow-inner transition-colors duration-300 transform hover:scale-105 hover:rotate-3">
@@ -385,7 +368,6 @@
         </div>
     </div>
 
-    <!-- CONTAINER UTAMA -->
     <div class="glass-card p-4 sm:p-8 rounded-[2rem] w-full max-w-2xl my-2 sm:my-4 relative transition-all duration-500 hover:shadow-[0_15px_50px_rgba(99,102,241,0.15)]">
         
         <button type="button" onclick="window.location.reload()" title="Refresh Halaman" aria-label="Refresh Halaman" class="absolute top-4 left-4 sm:top-6 sm:left-6 p-2.5 bg-white/60 hover:bg-white active:scale-90 text-indigo-600 border border-indigo-100 rounded-xl transition duration-300 shadow-sm hover:shadow-md z-20 flex items-center justify-center backdrop-blur-md">
@@ -444,18 +426,15 @@
 				<span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-1 font-medium">Belum Bisa Diakses</span>
 			</button>
 
-            <!-- MENU REKAP COMING SOON -->
-            <button type="button" onclick="showRekapComingSoon()" class="glass-btn-menu flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl group relative overflow-hidden pt-8 sm:pt-9">
-				<span class="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 z-10 bg-amber-500 text-white text-[8px] sm:text-[9px] font-black px-2 py-0.5 rounded-full tracking-wider uppercase shadow-sm">
-					Coming Soon
-				</span>
-                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-slate-400 to-amber-600 text-white rounded-[1.2rem] flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 shadow-lg opacity-80">
+            <!-- MENU REKAP -->
+            <button type="button" onclick="showSection('rekap')" class="glass-btn-menu flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl group">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-amber-500 to-orange-600 text-white rounded-[1.2rem] flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 shadow-lg">
                     <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                 </div>
                 <span class="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-amber-700 tracking-wide">REKAP</span>
-                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-1 font-medium">Belum Bisa Diakses</span>
+                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-1 font-medium">Rekapitulasi Jamaah & Sarpras</span>
             </button>
         </div>
 
@@ -500,7 +479,6 @@
                 <div id="autoJamaahListContainer" class="hidden mt-4 pt-4 border-t border-indigo-100 border-dashed">
 					<p class="text-[11px] font-semibold text-slate-600 mb-2 ml-1">Pilih nama jamaah di bawah ini untuk mengedit data:</p>
 					
-					<!-- Input Pencarian Nama -->
 					<div class="mb-3">
 						<input type="text" id="searchNamaJamaah" oninput="filterJamaahByNama()" placeholder="🔍 Cari nama jamaah..." class="w-full text-xs p-2.5 rounded-xl border border-indigo-200 bg-white text-indigo-900 font-bold focus:outline-none focus:border-indigo-500 transition-all shadow-inner">
 					</div>
@@ -590,6 +568,44 @@
                     </select>
                 </div>
 
+                <!-- CHECKBOX DISABILITAS OPSIONAL -->
+                <div class="p-4 bg-indigo-50/50 border border-indigo-100 rounded-2xl space-y-3 transition-all duration-300">
+                    <label class="flex items-center gap-2.5 cursor-pointer">
+                        <input type="checkbox" id="is_disabilitas" onchange="toggleDisabilitasOptions(this.checked)" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 transition-all cursor-pointer">
+                        <span class="text-xs font-bold text-slate-700 select-none">Penyandang Disabilitas (Opsional)</span>
+                    </label>
+
+                    <div id="boxKategoriDisabilitas" class="hidden space-y-2 pt-2 border-t border-indigo-100/80 animate-fade-in-up">
+                        <p class="text-[11px] font-extrabold text-indigo-900 uppercase tracking-wide">Pilih Kategori Disabilitas:</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer bg-white p-2 rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-colors">
+                                <input type="checkbox" name="kat_disabilitas" value="Fisik" class="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300">
+                                <span>Disabilitas Fisik</span>
+                            </label>
+                            <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer bg-white p-2 rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-colors">
+                                <input type="checkbox" name="kat_disabilitas" value="Intelektual" class="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300">
+                                <span>Disabilitas Intelektual</span>
+                            </label>
+                            <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer bg-white p-2 rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-colors">
+                                <input type="checkbox" name="kat_disabilitas" value="Mental" class="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300">
+                                <span>Disabilitas Mental</span>
+                            </label>
+                            <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer bg-white p-2 rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-colors">
+                                <input type="checkbox" name="kat_disabilitas" value="Sensorik Netra" class="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300">
+                                <span>Sensorik Netra</span>
+                            </label>
+                            <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer bg-white p-2 rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-colors">
+                                <input type="checkbox" name="kat_disabilitas" value="Sensorik Rungu/Wicara" class="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300">
+                                <span>Sensorik Rungu/Wicara</span>
+                            </label>
+                            <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer bg-white p-2 rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-colors">
+                                <input type="checkbox" name="kat_disabilitas" value="Lainnya" class="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300">
+                                <span>Lainnya</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- INPUT NOMOR HP OPERATOR -->
                 <div id="boxNoHpOperator" class="hidden animate-fade-in-up bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-2xl border border-blue-200 shadow-inner">
                     <label class="block text-xs font-extrabold text-blue-800 mb-2 flex items-center gap-1.5">
@@ -617,7 +633,6 @@
                 <h3 class="font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-600 to-pink-500 text-base sm:text-lg">Absensi Kegiatan Jamaah</h3>
             </div>
 
-            <!-- TAB HEADER DENGAN BOKS CONTAINER LENGKAP -->
             <div class="flex justify-between items-center mb-6 gap-3 flex-wrap">
                 <div class="bg-fuchsia-50/80 p-1.5 rounded-2xl flex gap-1.5 border border-fuchsia-200/80 shadow-inner">
                     <button onclick="switchTabAbsensi('INPUT')" id="tabInputAbsensi" class="py-2 px-3.5 text-xs font-extrabold rounded-xl bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white shadow-md flex items-center gap-1.5 transition-all duration-300">
@@ -864,7 +879,6 @@
                 <h3 class="font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-500 text-base sm:text-lg">Rekapan Data Jamaah & Sarpras</h3>
             </div>
 
-            <!-- TAB HEADER DENGAN BOKS CONTAINER LENGKAP -->
             <div class="flex justify-between items-center mb-6 overflow-x-auto gap-3 pb-1">
                 <div class="bg-amber-50/80 p-1.5 rounded-2xl flex gap-1.5 border border-amber-200/80 shadow-inner shrink-0">
                     <button onclick="switchTabRekap('STATUS_KESELURUHAN')" id="tabStatusKeseluruhan" class="py-2 px-3.5 text-xs font-extrabold rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap">
@@ -894,84 +908,115 @@
 
             <div id="printableRekapContent">
                 <!-- REKAP STATUS KESELURUHAN -->
-                <div id="sectionStatusKeseluruhan" class="space-y-6">
-                    <div>
-                        <h4 class="text-xs font-extrabold text-indigo-900 uppercase mb-3 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-indigo-500 inline-block"></span>
-                            Rekapitulasi Status Jamaah Keseluruhan
-                        </h4>
-                        
-                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                            <button type="button" onclick="showStatusDetailModal('Menikah')" class="p-4 bg-white/60 border border-indigo-100 hover:border-indigo-300 rounded-2xl text-center shadow-sm hover:shadow-md transition-all cursor-pointer group active:scale-95 flex flex-col justify-center items-center">
-                                <span class="block text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 uppercase tracking-widest">Menikah</span>
-                                <span id="stMenikah" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500 mt-1">0</span>
-                            </button>
-                            <button type="button" onclick="showStatusDetailModal('Duda')" class="p-4 bg-white/60 border border-indigo-100 hover:border-indigo-300 rounded-2xl text-center shadow-sm hover:shadow-md transition-all cursor-pointer group active:scale-95 flex flex-col justify-center items-center">
-                                <span class="block text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 uppercase tracking-widest">Duda</span>
-                                <span id="stDuda" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500 mt-1">0</span>
-                            </button>
-                            <button type="button" onclick="showStatusDetailModal('Janda')" class="p-4 bg-white/60 border border-indigo-100 hover:border-indigo-300 rounded-2xl text-center shadow-sm hover:shadow-md transition-all cursor-pointer group active:scale-95 flex flex-col justify-center items-center">
-                                <span class="block text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 uppercase tracking-widest">Janda</span>
-                                <span id="stJanda" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500 mt-1">0</span>
-                            </button>
-                            <button type="button" onclick="showStatusDetailModal('Manula')" class="p-4 bg-white/60 border border-indigo-100 hover:border-indigo-300 rounded-2xl text-center shadow-sm hover:shadow-md transition-all cursor-pointer group active:scale-95 flex flex-col justify-center items-center">
-                                <span class="block text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 uppercase tracking-widest">Manula</span>
-                                <span id="stManula" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500 mt-1">0</span>
-                            </button>
-                            
-                            <button type="button" onclick="showAllOperatorsModal()" class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 active:scale-[0.98] border border-blue-200 hover:border-blue-300 rounded-2xl text-center col-span-2 sm:col-span-1 transition-all cursor-pointer shadow-sm group flex flex-col justify-center items-center">
-                                <span class="block text-[10px] font-extrabold text-blue-600 uppercase tracking-widest group-hover:text-blue-700">OPERATOR</span>
-                                <span id="stOperator" class="text-2xl font-black text-blue-600 group-hover:text-blue-700 mt-1">0</span>
-                            </button>
-                        </div>
-                    </div>
+				<div id="sectionStatusKeseluruhan" class="space-y-3">
+					<!-- 1. KATEGORI STATUS JAMAAH DEWASA -->
+					<div class="space-y-2">
+						<h4 class="text-xs font-extrabold text-indigo-900 uppercase flex items-center gap-2">
+							<span class="w-2 h-2 rounded-full bg-indigo-500 inline-block"></span>
+							Rekapitulasi Status Jamaah Keseluruhan
+						</h4>
+						
+						<div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+							<button type="button" onclick="showStatusDetailModal('Menikah')" class="p-3 bg-white/60 border border-indigo-100 hover:border-indigo-300 rounded-2xl text-center shadow-sm hover:shadow-md transition-all cursor-pointer group active:scale-95 flex flex-col justify-center items-center">
+								<span class="block text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 uppercase tracking-widest">Menikah</span>
+								<span id="stMenikah" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500 mt-1">0</span>
+							</button>
+							<button type="button" onclick="showStatusDetailModal('Duda')" class="p-3 bg-white/60 border border-indigo-100 hover:border-indigo-300 rounded-2xl text-center shadow-sm hover:shadow-md transition-all cursor-pointer group active:scale-95 flex flex-col justify-center items-center">
+								<span class="block text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 uppercase tracking-widest">Duda</span>
+								<span id="stDuda" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500 mt-1">0</span>
+							</button>
+							<button type="button" onclick="showStatusDetailModal('Janda')" class="p-3 bg-white/60 border border-indigo-100 hover:border-indigo-300 rounded-2xl text-center shadow-sm hover:shadow-md transition-all cursor-pointer group active:scale-95 flex flex-col justify-center items-center">
+								<span class="block text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 uppercase tracking-widest">Janda</span>
+								<span id="stJanda" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500 mt-1">0</span>
+							</button>
+							<button type="button" onclick="showStatusDetailModal('Manula')" class="p-3 bg-white/60 border border-indigo-100 hover:border-indigo-300 rounded-2xl text-center shadow-sm hover:shadow-md transition-all cursor-pointer group active:scale-95 flex flex-col justify-center items-center">
+								<span class="block text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 uppercase tracking-widest">Manula</span>
+								<span id="stManula" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500 mt-1">0</span>
+							</button>
+							
+							<button type="button" onclick="showAllOperatorsModal()" class="p-3 bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 active:scale-[0.98] border border-blue-200 hover:border-blue-300 rounded-2xl text-center col-span-2 sm:col-span-1 transition-all cursor-pointer shadow-sm group flex flex-col justify-center items-center">
+								<span class="block text-[10px] font-extrabold text-blue-600 uppercase tracking-widest group-hover:text-blue-700">OPERATOR</span>
+								<span id="stOperator" class="text-2xl font-black text-blue-600 group-hover:text-blue-700 mt-1">0</span>
+							</button>
+						</div>
 
-                    <div>
-                        <h4 class="text-xs font-extrabold text-fuchsia-900 uppercase mb-3 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-fuchsia-500 inline-block"></span>
-                            Rekapitulasi Data Generus
-                        </h4>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                            <div class="p-3 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
-                                <span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">PAUD</span>
-                                <span id="genPaud" class="text-xl font-black text-fuchsia-600">0</span>
-                            </div>
-                            <div class="p-3 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
-                                <span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">TK</span>
-                                <span id="genTk" class="text-xl font-black text-fuchsia-600">0</span>
-                            </div>
-                            <div class="p-3 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
-                                <span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">Caberawit</span>
-                                <span id="genCaberawit" class="text-xl font-black text-fuchsia-600">0</span>
-                            </div>
-                            <div class="p-3 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
-                                <span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">Pra Remaja</span>
-                                <span id="genPraRemaja" class="text-xl font-black text-fuchsia-600">0</span>
-                            </div>
-                            <div class="p-3 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
-                                <span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">Remaja</span>
-                                <span id="genRemaja" class="text-xl font-black text-fuchsia-600">0</span>
-                            </div>
-                            <div class="p-3 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
-                                <span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">Usia Mandiri</span>
-                                <span id="genUsiaMandiri" class="text-xl font-black text-fuchsia-600">0</span>
-                            </div>
-                        </div>
-                    </div>
+						<!-- PAPAN TOTAL JAMAAH RAMPING -->
+						<div class="p-2.5 sm:p-3 bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-xl flex justify-between items-center shadow-md border border-slate-700">
+							<span class="text-xs font-extrabold uppercase tracking-wider flex items-center gap-2">
+								<svg class="w-4 h-4 text-indigo-400 no-print" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+								Jumlah Jamaah (Dewasa/Pengguna)
+							</span>
+							<span id="stTotalJamaahDewasa" class="text-sm sm:text-base font-black bg-clip-text text-transparent bg-gradient-to-l from-indigo-300 to-fuchsia-300">0 Orang</span>
+						</div>
+					</div>
 
-                    <div class="p-4 sm:p-5 bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-2xl flex justify-between items-center shadow-xl transform hover:scale-[1.01] transition-transform duration-300 border border-slate-700">
-                        <span class="text-xs sm:text-sm font-extrabold uppercase tracking-wider flex items-center gap-2">
-                            <svg class="w-5 h-5 text-indigo-400 no-print" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                            Total Keseluruhan Terdaftar
-                        </span>
-                        <span id="stTotalAll" class="text-lg sm:text-xl font-black bg-clip-text text-transparent bg-gradient-to-l from-indigo-300 to-fuchsia-300">0 Data</span>
-                    </div>
-                </div>
+					<!-- 2. KATEGORI GENERUS -->
+					<div class="space-y-2">
+						<h4 class="text-xs font-extrabold text-fuchsia-900 uppercase flex items-center gap-2">
+							<span class="w-2 h-2 rounded-full bg-fuchsia-500 inline-block"></span>
+							Rekapitulasi Data Generus
+						</h4>
+						<div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+							<div class="p-2.5 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
+								<span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">PAUD</span>
+								<span id="genPaud" class="text-xl font-black text-fuchsia-600">0</span>
+							</div>
+							<div class="p-2.5 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
+								<span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">TK</span>
+								<span id="genTk" class="text-xl font-black text-fuchsia-600">0</span>
+							</div>
+							<div class="p-2.5 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
+								<span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">Caberawit</span>
+								<span id="genCaberawit" class="text-xl font-black text-fuchsia-600">0</span>
+							</div>
+							<div class="p-2.5 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
+								<span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">Pra Remaja</span>
+								<span id="genPraRemaja" class="text-xl font-black text-fuchsia-600">0</span>
+							</div>
+							<div class="p-2.5 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
+								<span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">Remaja</span>
+								<span id="genRemaja" class="text-xl font-black text-fuchsia-600">0</span>
+							</div>
+							<div class="p-2.5 bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl text-center hover:bg-fuchsia-50 transition-colors">
+								<span class="block text-[10px] font-bold text-fuchsia-800 uppercase tracking-wide">Usia Mandiri</span>
+								<span id="genUsiaMandiri" class="text-xl font-black text-fuchsia-600">0</span>
+							</div>
+						</div>
+
+						<!-- PAPAN TOTAL GENERUS RAMPING -->
+						<div class="p-2.5 sm:p-3 bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-xl flex justify-between items-center shadow-md border border-slate-700">
+							<span class="text-xs font-extrabold uppercase tracking-wider flex items-center gap-2">
+								🌱 Jumlah Generus
+							</span>
+							<span id="stTotalGenerus" class="text-sm sm:text-base font-black bg-clip-text text-transparent bg-gradient-to-l from-fuchsia-300 to-pink-300">0 Orang</span>
+						</div>
+					</div>
+
+					<!-- 3. PAPAN DISABILITAS RAMPING -->
+					<button type="button" onclick="showDisabilitasDetailModal()" class="w-full text-left p-2.5 sm:p-3 bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 active:scale-[0.99] text-white rounded-xl flex justify-between items-center shadow-md transition-all cursor-pointer border border-slate-700 group">
+						<span class="text-xs font-extrabold uppercase tracking-wider flex items-center gap-2">
+							♿ Total Penyandang Disabilitas
+							<span class="text-[9px] bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-md border border-teal-500/30 font-normal normal-case group-hover:bg-teal-500 group-hover:text-white transition-all">
+								Klik untuk Rincian &raquo;
+							</span>
+						</span>
+						<span id="stTotalDisabilitas" class="text-sm sm:text-base font-black bg-clip-text text-transparent bg-gradient-to-l from-teal-300 to-emerald-300">0 Orang</span>
+					</button>
+
+					<!-- 4. TOTAL KESELURUHAN TERDAFTAR (TETAP UTUH TEBAL) -->
+					<div class="p-4 sm:p-5 bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-2xl flex justify-between items-center shadow-xl border border-slate-700">
+						<span class="text-xs sm:text-sm font-extrabold uppercase tracking-wider flex items-center gap-2">
+							<svg class="w-5 h-5 text-indigo-400 no-print" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+							Total Keseluruhan Terdaftar
+						</span>
+						<span id="stTotalAll" class="text-lg sm:text-xl font-black bg-clip-text text-transparent bg-gradient-to-l from-indigo-300 to-fuchsia-300">0 Data</span>
+					</div>
+				</div>
 
                 <!-- REKAPAN KELOMPOK -->
                 <div id="sectionRekapKelompok" class="hidden space-y-4">
                     <div class="flex justify-between items-center flex-wrap gap-3 bg-white/50 p-3 rounded-2xl border border-indigo-100">
-                        <h4 class="text-xs font-extrabold text-indigo-900 uppercase ml-1">Rekap Jamaah & Sarpras Per Kelompok</h4>
+                        <h4 class="text-xs font-extrabold text-indigo-900 uppercase ml-1">Rekap Jamaah, Generus & Sarpras Per Kelompok</h4>
                         <div class="flex items-center gap-2 no-print">
                             <span class="text-xs text-indigo-600 font-bold">Filter:</span>
                             <select id="filterDesaRekap" onchange="loadRekapKelompokLengkap()" class="text-[11px] sm:text-xs px-3 py-2 rounded-xl border-[2px] border-indigo-200 bg-white font-bold text-indigo-900 focus:outline-none focus:border-indigo-500 shadow-sm">
@@ -992,12 +1037,14 @@
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">Pra Rem</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">Rem</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950 border-r border-indigo-200">Usman</th>
+                                        <th class="px-1.5 py-3 text-center bg-fuchsia-200/80 text-fuchsia-950 font-extrabold whitespace-nowrap border-r border-indigo-300">Jml Generus</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap">Nikah</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap">Duda</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap">Janda</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap">Manula</th>
                                         <th class="px-1.5 py-3 text-center text-blue-800 bg-blue-100/80 whitespace-nowrap">Opr.</th>
-                                        <th class="px-2 py-3 text-center bg-indigo-200/80 font-black whitespace-nowrap border-l border-indigo-300">Total</th>
+                                        <th class="px-1.5 py-3 text-center bg-indigo-100/80 font-black whitespace-nowrap border-l border-indigo-200">Jml Jamaah</th>
+                                        <th class="px-2 py-3 text-center bg-indigo-200 font-black whitespace-nowrap border-l border-indigo-300 text-indigo-950">Total</th>
                                         <th class="px-1.5 py-3 text-center border-l border-indigo-300 whitespace-nowrap">Sub</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap">Msjd</th>
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap">Aula</th>
@@ -1036,6 +1083,34 @@
             </button>
         </div>
     </div>
+
+    <!-- MODAL CUSTOM RINCIAN DISABILITAS -->
+	<div id="disabilitasDetailModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+		<div class="modal-content-card glass-card rounded-[2rem] p-5 sm:p-6 max-w-md w-full text-center space-y-3 border border-teal-200">
+			<div class="w-12 h-12 bg-gradient-to-br from-teal-100 to-emerald-100 text-teal-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold shadow-inner">
+				♿
+			</div>
+			<div>
+				<h4 class="text-base sm:text-lg font-extrabold text-slate-800">Daftar Penyandang Disabilitas</h4>
+				<p class="text-[11px] text-slate-500 font-medium">Rincian jamaah & generus penyandang disabilitas</p>
+			</div>
+
+			<!-- RINGKASAN JUMLAH PER KATEGORI DISABILITAS -->
+			<div id="disabilitasCategorySummary" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 p-2 bg-teal-50/60 rounded-2xl border border-teal-100/80 text-left">
+				<!-- Diisi otomatis via JavaScript -->
+			</div>
+
+			<div class="relative text-left pt-1">
+				<input type="text" id="disabilitasDetailSearch" oninput="filterDisabilitasDetailList()" placeholder="🔍 Cari nama, kelompok, atau kategori..." class="w-full text-xs p-2.5 pl-3.5 rounded-xl border-2 border-teal-200 bg-white text-teal-900 font-bold focus:outline-none focus:border-teal-500 transition-all shadow-inner">
+			</div>
+
+			<div id="disabilitasDetailList" class="max-h-56 overflow-y-auto space-y-2 text-left pr-1 scroll-container py-1"></div>
+
+			<button type="button" onclick="closeModal('disabilitasDetailModal')" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-extrabold transition-all duration-300 border border-slate-200">
+				Tutup
+			</button>
+		</div>
+	</div>
 
     <!-- MODAL DETAIL TERDAFTAR PER KELOMPOK -->
     <div id="kelompokDetailModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
@@ -1078,7 +1153,6 @@
 				</button>
 			</div>
 
-			<!-- FILTER WILAYAH -->
 			<div class="space-y-3">
 				<div>
 					<label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">1. Pilihan Mode Export</label>
@@ -1089,7 +1163,6 @@
 					</select>
 				</div>
 
-				<!-- SUB-DROPDOWN UNTUK PER DESA -->
 				<div id="exportBoxDesa" class="hidden space-y-1 animate-fade-in-up">
 					<label class="block text-[10px] font-bold uppercase text-slate-500 ml-1">Pilih Desa</label>
 					<select id="exportDesa" class="rounded-box-input w-full p-2.5 text-xs font-semibold">
@@ -1097,7 +1170,6 @@
 					</select>
 				</div>
 
-				<!-- SUB-DROPDOWN UNTUK PER KELOMPOK -->
 				<div id="exportBoxKelompok" class="hidden space-y-1 animate-fade-in-up">
 					<label class="block text-[10px] font-bold uppercase text-slate-500 ml-1">Pilih Kelompok</label>
 					<select id="exportKelompok" disabled class="rounded-box-input w-full p-2.5 text-xs font-semibold bg-slate-100/50 text-slate-400">
@@ -1106,7 +1178,6 @@
 				</div>
 			</div>
 
-			<!-- PILIH KOLOM CHECKBOX -->
 			<div class="space-y-2">
 				<div class="flex justify-between items-center">
 					<label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">2. Pilih Kolom Data</label>
@@ -1151,13 +1222,16 @@
 						<span>Status Jamaah</span>
 					</label>
 					<label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer p-1.5 hover:bg-indigo-50/50 rounded-lg transition-colors">
+						<input type="checkbox" class="export-col-cb w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500" value="disabilitas" checked>
+						<span>Disabilitas</span>
+					</label>
+					<label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer p-1.5 hover:bg-indigo-50/50 rounded-lg transition-colors">
 						<input type="checkbox" class="export-col-cb w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500" value="no_hp" checked>
 						<span>No HP / WhatsApp</span>
 					</label>
 				</div>
 			</div>
 
-			<!-- TOMBOL AKSI SIMETRIS 3 KOLOM -->
 			<div class="grid grid-cols-3 gap-2.5 pt-2">
 				<button type="button" onclick="closeModal('exportJamaahModal')" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-extrabold transition-all border border-slate-200 active:scale-95">
 					Batal
@@ -1232,9 +1306,6 @@
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhpamx5eWRmb2dia2NjdGx5Y3NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMzAxODYsImV4cCI6MjA5NzcwNjE4Nn0.JwqYXWEt2yiLioI1o9qZ3KRrak2rtzO1Tp0eN7AuAm4";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        /* =========================================================================
-           GLOBAL CACHE ENGINE - DATA DI-FETCH SEKALI SAAT APLIKASI DIBUKA
-           ========================================================================= */
         let globalCache = {
             jamaah: [],
             generus: [],
@@ -1251,6 +1322,8 @@
         window.activeOperatorDataset = [];
         window.activeStatusDataset = [];
         window.activeKelompokDataset = [];
+        window.activeDisabilitasDataset = [];
+        window.currentGroupJamaahData = [];
 
         function showDataLoading(message = "Mengambil data...") {
             const overlay = document.getElementById('dataFetchOverlay');
@@ -1264,9 +1337,6 @@
             if (overlay) overlay.classList.remove('active');
         }
 
-        /* -------------------------------------------------------------
-           LOAD DENGAN QUERY PARALEL (HANYA SEKALI DI AWAL)
-           ------------------------------------------------------------- */
         async function fetchAllRows(tableName, selectColumns = '*') {
             let allData = [];
             let page = 0;
@@ -1394,7 +1464,6 @@
                     iconBox.textContent = "🔓";
                     successEl.classList.remove('hidden');
 
-                    // LOAD DATA HANYA 1 KALI SAAT MASUK APLIKASI
                     await preloadAllApplicationData();
 
                     setTimeout(() => {
@@ -1466,12 +1535,18 @@
             }
         }
 
-        function showSarprasComingSoon() {
-            showCustomModal("Menu Sarpras", "Menu Sarpras belum bisa diakses untuk sementara (Coming Soon).", "🚧");
+        function toggleDisabilitasOptions(checked) {
+            const box = document.getElementById('boxKategoriDisabilitas');
+            if (checked) {
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+                document.querySelectorAll('input[name="kat_disabilitas"]').forEach(cb => cb.checked = false);
+            }
         }
 
-        function showRekapComingSoon() {
-            showCustomModal("Menu Rekap", "Menu Rekap belum bisa diakses untuk sementara (Coming Soon).", "🚧");
+        function showSarprasComingSoon() {
+            showCustomModal("Menu Sarpras", "Menu Sarpras belum bisa diakses untuk sementara (Coming Soon).", "🚧");
         }
 
         window.addEventListener('popstate', (event) => {
@@ -1490,6 +1565,12 @@
             const statusModal = document.getElementById('statusDetailModal');
             if (statusModal && statusModal.classList.contains('active')) {
                 closeModal('statusDetailModal', false);
+                return;
+            }
+
+            const disModal = document.getElementById('disabilitasDetailModal');
+            if (disModal && disModal.classList.contains('active')) {
+                closeModal('disabilitasDetailModal', false);
                 return;
             }
 
@@ -1784,7 +1865,6 @@
             const btnSubmit = document.getElementById('submitJamaahBtn');
             const statusSelect = document.getElementById('status');
 
-            // Simpan sementara pilihan desa & kelompok sebelum reset form
             const currentDesa = document.getElementById('desa').value;
             const currentKelompok = document.getElementById('kelompok').value;
 
@@ -1792,6 +1872,7 @@
             document.getElementById('edit_jamaah_id').value = "";
             document.getElementById('displayUmur').classList.add('hidden');
             toggleNoHpInput(statusSelect.value);
+            toggleDisabilitasOptions(false);
 
             if (!keepSearchFilters) {
                 document.getElementById('autoJamaahListContainer').classList.add('hidden');
@@ -1808,7 +1889,7 @@
                 document.getElementById('tabUpdate').className = "py-2.5 text-xs font-bold rounded-xl bg-indigo-600 text-white shadow-md transition-all duration-300";
                 document.getElementById('tabDaftar').className = "py-2.5 text-xs font-bold rounded-xl text-indigo-800 hover:bg-indigo-200/50 transition-all duration-300";
                 searchSec.classList.remove('hidden');
-                formJamaah.classList.add('hidden'); // Sembunyikan form secara default saat masuk tab Update
+                formJamaah.classList.add('hidden');
                 btnSubmit.textContent = "Perbarui Data Jamaah";
 
                 if (!mpOption) {
@@ -1829,7 +1910,6 @@
                     mpOption.remove();
                 }
 
-                // Kembalikan Desa & Kelompok yang terpilih saat kembali ke Daftar Baru
                 if (currentDesa) {
                     const desaEl = document.getElementById('desa');
                     const kelompokEl = document.getElementById('kelompok');
@@ -1844,59 +1924,6 @@
                     kelompokEl.value = currentKelompok;
                 }
             }
-        }
-
-        /* -------------------------------------------------------------
-           DARI CACHE - TANPA LOADING SAMA SEKALI
-           ------------------------------------------------------------- */
-        function fetchAutoJamaahList(desa, kelompok) {
-            const listContainer = document.getElementById('autoJamaahListContainer');
-            const listEl = document.getElementById('autoJamaahList');
-
-            if (!desa || !kelompok) {
-                listContainer.classList.add('hidden');
-                if (currentMode === 'UPDATE') {
-                    document.getElementById('formJamaah').classList.add('hidden');
-                }
-                return;
-            }
-
-            const filteredData = globalCache.jamaah.filter(j => j.desa === desa && j.kelompok === kelompok);
-            filteredData.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
-
-            listContainer.classList.remove('hidden');
-
-            if (filteredData.length === 0) {
-                listEl.innerHTML = `<div class="text-xs text-slate-500 bg-slate-50/80 p-4 rounded-xl text-center border border-slate-200/60 font-medium">Belum ada jamaah/operator terdaftar di kelompok ini.</div>`;
-                return;
-            }
-
-            listEl.innerHTML = '';
-            
-            filteredData.forEach((j) => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = "w-full text-left p-3 sm:p-4 rounded-xl border border-indigo-100 hover:border-indigo-400 bg-white hover:bg-indigo-50/50 transition-all duration-300 flex justify-between items-center group cursor-pointer animate-fade-in-up hover:shadow-md";
-                
-                const noHpText = j.no_hp ? ` | WA: <span class="text-blue-600 font-extrabold">${j.no_hp}</span>` : '';
-
-                btn.innerHTML = `
-                    <div class="flex items-center gap-3 sm:gap-4">
-						<div>
-							<div class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-indigo-700 transition-colors">${j.nama}</div>
-							<div class="text-[10px] text-slate-500 mt-0.5">
-								Status: <span class="font-bold ${j.status === 'Operator' ? 'text-blue-600' : 'text-slate-600'}">${j.status || '-'}</span>${noHpText}
-							</div>
-						</div>
-					</div>
-                    <span class="text-[10px] sm:text-[11px] font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg border border-indigo-200 shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300">
-                        Edit &raquo;
-                    </span>
-                `;
-                
-                btn.onclick = () => selectJamaahToForm(j);
-                listEl.appendChild(btn);
-            });
         }
 
         document.getElementById('searchKelompok').addEventListener('change', function() {
@@ -1939,6 +1966,16 @@
             toggleNoHpInput(stVal);
             document.getElementById('no_hp').value = j.no_hp || '';
 
+            const isDis = !!j.is_disabilitas;
+            document.getElementById('is_disabilitas').checked = isDis;
+            toggleDisabilitasOptions(isDis);
+
+            if (isDis && Array.isArray(j.kategori_disabilitas)) {
+                document.querySelectorAll('input[name="kat_disabilitas"]').forEach(cb => {
+                    cb.checked = j.kategori_disabilitas.includes(cb.value);
+                });
+            }
+
             document.getElementById('formJamaah').classList.remove('hidden');
             document.getElementById('formJamaah').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -1954,7 +1991,6 @@
 			const savedDesa = desaEl.value;
 			const savedKelompok = kelompokEl.value;
 
-			// Aksi hapus data jika status dipilih Meninggal/Sambung Luar
 			if (currentMode === "UPDATE" && statusValue === "Meninggal / Sambung Luar Daerah") {
 				if (!editId) {
 					showCustomModal("Peringatan", "Silakan cari dan pilih data terlebih dahulu.", "⚠️");
@@ -1994,6 +2030,14 @@
 			const fullDate = `${thn}-${bln}-${tgl}`;
 			const calculatedAge = hitungUmurOtomatis();
 
+            const isDisabilitasChecked = document.getElementById('is_disabilitas').checked;
+            const katDisabilitasSelected = [];
+            if (isDisabilitasChecked) {
+                document.querySelectorAll('input[name="kat_disabilitas"]:checked').forEach(cb => {
+                    katDisabilitasSelected.push(cb.value);
+                });
+            }
+
 			const payload = {
 				nama: toTitleCase(document.getElementById('nama').value.trim()),
 				no_hp: statusValue === 'Operator' ? document.getElementById('no_hp').value.trim() : null,
@@ -2003,10 +2047,11 @@
 				umur: calculatedAge,
 				desa: savedDesa,
 				kelompok: savedKelompok,
-				status: statusValue
+				status: statusValue,
+                is_disabilitas: isDisabilitasChecked,
+                kategori_disabilitas: katDisabilitasSelected
 			};
 
-			// --- PENGECEKAN DUPLIKAT (HANYA SAAT DAFTAR BARU) ---
 			if (!editId) {
 				const isDuplicate = globalCache.jamaah.some(j => 
 					(j.nama || '').trim().toLowerCase() === payload.nama.toLowerCase() &&
@@ -2026,12 +2071,11 @@
 					);
 
 					if (!userChoice) {
-						return; // User klik Batal
+						return;
 					}
 				}
 			}
 
-			// --- PROSES SIMPAN / UPDATE ---
 			showDataLoading("Menyimpan data...");
 
 			try {
@@ -2059,7 +2103,6 @@
 						switchMode('UPDATE', true);
 						if (currentDesa && currentKelompok) fetchAutoJamaahList(currentDesa, currentKelompok);
 					} else {
-						// Reset input jamaah saja
 						document.getElementById('edit_jamaah_id').value = "";
 						document.getElementById('nama').value = "";
 						document.getElementById('jenis_kelamin').value = "";
@@ -2069,9 +2112,9 @@
 						document.getElementById('tgl_lahir_thn').value = "";
 						document.getElementById('status').value = "Menikah";
 						toggleNoHpInput("Menikah");
+                        toggleDisabilitasOptions(false);
 						document.getElementById('displayUmur').classList.add('hidden');
 
-						// Pertahankan Pilihan Desa & Kelompok
 						if (savedDesa) {
 							desaEl.value = savedDesa;
 							kelompokEl.innerHTML = '<option value="">-- Pilih Kelompok --</option>';
@@ -2094,9 +2137,6 @@
 			}
 		});
 
-        /* =========================================================================
-           FUNGSI EKSPOR EXCEL & CSV DATA JAMAAH (DARI CACHE)
-           ========================================================================= */
         function openExportJamaahModal() {
             const searchDesa = document.getElementById('searchDesa').value;
             const searchKelompok = document.getElementById('searchKelompok').value;
@@ -2200,6 +2240,7 @@
                     desa: "Desa",
                     kelompok: "Kelompok",
                     status: "Status Jamaah",
+                    disabilitas: "Disabilitas",
                     no_hp: "No HP / WhatsApp"
                 };
 
@@ -2212,6 +2253,15 @@
                         if (col === 'tanggal_lahir' && val) {
                             const p = val.split('-');
                             if (p.length === 3) val = `${p[2]}/${p[1]}/${p[0]}`;
+                        } else if (col === 'disabilitas') {
+                            if (item.is_disabilitas) {
+                                const kats = Array.isArray(item.kategori_disabilitas) && item.kategori_disabilitas.length > 0 
+                                    ? item.kategori_disabilitas.join(', ') 
+                                    : 'Ya';
+                                val = `Penyandang (${kats})`;
+                            } else {
+                                val = 'Tidak';
+                            }
                         }
 
                         row[headerName] = val;
@@ -2436,7 +2486,6 @@
             }
         }
 
-        /* DARI CACHE SECARA INSTAN */
         function loadListSarpras() {
             const tbody = document.getElementById('tbodyListSarpras');
             const tfoot = document.getElementById('tfootListSarpras');
@@ -2565,12 +2614,12 @@
             return null;
         }
 
-        /* DARI CACHE - TANPA LOADING */
         function loadRekapStatusKeseluruhan() {
             const dataJamaah = globalCache.jamaah;
-            let menikah = 0, duda = 0, janda = 0, manula = 0, operator = 0;
+            let menikah = 0, duda = 0, janda = 0, manula = 0, operator = 0, totalDisabilitas = 0;
             
             window.allOperatorsCache = [];
+            window.activeDisabilitasDataset = [];
             window.statusJamaahCache = {
                 'Menikah': [],
                 'Duda': [],
@@ -2586,6 +2635,18 @@
                     desa: item.desa || '-',
                     umur: item.umur !== null && item.umur !== undefined ? `${item.umur} thn` : '-'
                 };
+
+                if (item.is_disabilitas) {
+                    totalDisabilitas++;
+                    window.activeDisabilitasDataset.push({
+                        nama: item.nama,
+                        kelompok: item.kelompok || '-',
+                        desa: item.desa || '-',
+                        kategori: Array.isArray(item.kategori_disabilitas) && item.kategori_disabilitas.length > 0 
+                            ? item.kategori_disabilitas.join(', ') 
+                            : 'Penyandang Disabilitas'
+                    });
+                }
 
                 if (st === "menikah") {
                     menikah++;
@@ -2615,6 +2676,8 @@
             document.getElementById('stJanda').textContent = janda;
             document.getElementById('stManula').textContent = manula;
             document.getElementById('stOperator').textContent = operator;
+            document.getElementById('stTotalJamaahDewasa').textContent = `${dataJamaah.length} Orang`;
+            document.getElementById('stTotalDisabilitas').textContent = `${totalDisabilitas} Orang`;
 
             const dataGenerus = globalCache.generus;
             const genCounts = { paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0 };
@@ -2631,8 +2694,102 @@
             document.getElementById('genRemaja').textContent = genCounts.remaja;
             document.getElementById('genUsiaMandiri').textContent = genCounts.usiaMandiri;
 
+            document.getElementById('stTotalGenerus').textContent = `${dataGenerus.length} Orang`;
             document.getElementById('stTotalAll').textContent = `${dataJamaah.length + dataGenerus.length} Data`;
         }
+
+        /* MODAL CUSTOM DISABILITAS */
+		function showDisabilitasDetailModal() {
+			window.activeDisabilitasDataset.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
+
+			// Hitung rekap per kategori disabilitas
+			const katCounts = {};
+			window.activeDisabilitasDataset.forEach(item => {
+				let kats = [];
+				if (Array.isArray(item.kategoriRaw) && item.kategoriRaw.length > 0) {
+					kats = item.kategoriRaw;
+				} else if (item.kategori) {
+					kats = item.kategori.split(',').map(s => s.trim());
+				} else {
+					kats = ['Lainnya'];
+				}
+
+				kats.forEach(k => {
+					const cleanKat = k || 'Lainnya';
+					katCounts[cleanKat] = (katCounts[cleanKat] || 0) + 1;
+				});
+			});
+
+			// Render badge rekap per kategori
+			const summaryEl = document.getElementById('disabilitasCategorySummary');
+			if (summaryEl) {
+				summaryEl.innerHTML = '';
+				const keys = Object.keys(katCounts);
+				if (keys.length === 0) {
+					summaryEl.innerHTML = `<p class="col-span-full text-[10px] text-slate-400 font-semibold text-center py-1">Belum ada kategori terdata.</p>`;
+				} else {
+					keys.forEach(kat => {
+						const badge = document.createElement('div');
+						badge.className = "p-1.5 bg-white/80 rounded-xl border border-teal-100 flex justify-between items-center";
+						badge.innerHTML = `
+							<span class="text-[10px] font-extrabold text-slate-600 truncate mr-1" title="${kat}">${kat}</span>
+							<span class="text-[10px] font-black text-teal-700 bg-teal-100 px-1.5 py-0.5 rounded-md">${katCounts[kat]}</span>
+						`;
+						summaryEl.appendChild(badge);
+					});
+				}
+			}
+
+			const searchInput = document.getElementById('disabilitasDetailSearch');
+			if (searchInput) searchInput.value = '';
+
+			renderDisabilitasDetailList(window.activeDisabilitasDataset);
+			openModal('disabilitasDetailModal');
+		}
+
+		function renderDisabilitasDetailList(listData) {
+			const listEl = document.getElementById('disabilitasDetailList');
+			listEl.innerHTML = '';
+
+			if (!listData || listData.length === 0) {
+				listEl.innerHTML = `<p class="text-xs text-slate-400 font-semibold text-center py-5">Tidak ada penyandang disabilitas terdaftar.</p>`;
+				return;
+			}
+
+			listData.forEach(item => {
+				const card = document.createElement('div');
+				card.className = "p-2.5 sm:p-3 bg-gradient-to-r from-teal-50/80 to-emerald-50/80 border border-teal-100 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 animate-fade-in-up hover:shadow-md transition-shadow";
+				
+				card.innerHTML = `
+					<div>
+						<div class="font-extrabold text-xs sm:text-sm text-slate-800">${item.nama}</div>
+						<div class="text-[10px] font-bold text-slate-500 mt-0.5">
+							Klp. <span class="text-teal-800 font-black">${item.kelompok}</span> (${item.desa})
+						</div>
+					</div>
+					<div class="shrink-0 text-left sm:text-right">
+						<span class="text-[9px] font-extrabold text-teal-800 bg-teal-100 border border-teal-200 px-2 py-0.5 rounded-lg inline-block">
+							${item.kategori}
+						</span>
+					</div>
+				`;
+				listEl.appendChild(card);
+			});
+		}
+
+		function filterDisabilitasDetailList() {
+			const query = (document.getElementById('disabilitasDetailSearch').value || '').toLowerCase().trim();
+			if (!query) {
+				renderDisabilitasDetailList(window.activeDisabilitasDataset);
+				return;
+			}
+			const filtered = window.activeDisabilitasDataset.filter(item => {
+				return (item.nama || '').toLowerCase().includes(query) || 
+					   (item.kelompok || '').toLowerCase().includes(query) ||
+					   (item.kategori || '').toLowerCase().includes(query);
+			});
+			renderDisabilitasDetailList(filtered);
+		}
 
         function showStatusDetailModal(categoryName) {
             document.getElementById('statusDetailTitle').textContent = `Rincian Kategori: ${categoryName}`;
@@ -2690,10 +2847,8 @@
             renderStatusDetailList(filtered);
         }
 
-        /* DARI CACHE SECARA INSTAN */
         function showKelompokDetailModal(kelompokNama) {
             document.getElementById('kelompokDetailTitle').textContent = `Kelompok: ${kelompokNama}`;
-            const listEl = document.getElementById('kelompokDetailList');
 
             const data = globalCache.jamaah.filter(j => j.kelompok === kelompokNama);
             data.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
@@ -2734,9 +2889,6 @@
                 listEl.appendChild(card);
             });
         }
-		
-		// Variable penampung jamaah per kelompok terpilih
-		window.currentGroupJamaahData = [];
 
 		function fetchAutoJamaahList(desa, kelompok) {
 			const listContainer = document.getElementById('autoJamaahListContainer');
@@ -2755,13 +2907,10 @@
 			const filteredData = globalCache.jamaah.filter(j => j.desa === desa && j.kelompok === kelompok);
 			filteredData.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
 
-			// Simpan data kelompok ke variabel global
 			window.currentGroupJamaahData = filteredData;
-
 			renderJamaahListItems(window.currentGroupJamaahData);
 		}
 
-		// Fungsi render list jamaah tanpa icon
 		function renderJamaahListItems(filteredData) {
 			const listContainer = document.getElementById('autoJamaahListContainer');
 			const listEl = document.getElementById('autoJamaahList');
@@ -2781,13 +2930,14 @@
 				btn.className = "w-full text-left p-3 sm:p-4 rounded-xl border border-indigo-100 hover:border-indigo-400 bg-white hover:bg-indigo-50/50 transition-all duration-300 flex justify-between items-center group cursor-pointer animate-fade-in-up hover:shadow-md";
 				
 				const noHpText = j.no_hp ? ` | WA: <span class="text-blue-600 font-extrabold">${j.no_hp}</span>` : '';
+                const disText = j.is_disabilitas ? ` | <span class="text-teal-600 font-bold">♿ Disabilitas</span>` : '';
 
 				btn.innerHTML = `
 					<div class="flex items-center gap-3 sm:gap-4">
 						<div>
 							<div class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-indigo-700 transition-colors">${j.nama}</div>
 							<div class="text-[10px] text-slate-500 mt-0.5">
-								Status: <span class="font-bold ${j.status === 'Operator' ? 'text-blue-600' : 'text-slate-600'}">${j.status || '-'}</span>${noHpText}
+								Status: <span class="font-bold ${j.status === 'Operator' ? 'text-blue-600' : 'text-slate-600'}">${j.status || '-'}</span>${noHpText}${disText}
 							</div>
 						</div>
 					</div>
@@ -2801,7 +2951,6 @@
 			});
 		}
 
-		// Fungsi filter saat mengetik di input pencarian
 		function filterJamaahByNama() {
 			const query = (document.getElementById('searchNamaJamaah').value || '').toLowerCase().trim();
 			if (!query) {
@@ -2899,7 +3048,6 @@
             renderOperatorModalList(filtered);
         }
 
-        /* DARI CACHE SECARA INSTAN */
         function loadRekapKelompokLengkap() {
             const tbody = document.getElementById('tbodyRekapKelompok');
             const tfoot = document.getElementById('tfootRekapKelompok');
@@ -2917,8 +3065,8 @@
                         const key = `${desa}__${kelompok}`;
                         rekapMap[key] = {
                             desa, kelompok,
-                            paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0,
-                            menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJumlah: 0,
+                            paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0, totalGenerus: 0,
+                            menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJamaah: 0, totalKeseluruhan: 0,
                             subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
                         };
                     });
@@ -2932,14 +3080,15 @@
                         if (!rekapMap[key]) {
                             rekapMap[key] = {
                                 desa: g.desa, kelompok: g.kelompok,
-                                paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0,
-                                menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJumlah: 0,
+                                paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0, totalGenerus: 0,
+                                menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJamaah: 0, totalKeseluruhan: 0,
                                 subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
                             };
                         }
                         const katKey = parseKategoriGenerus(g.kategori_usia);
                         if (katKey) rekapMap[key][katKey]++;
-                        rekapMap[key].totalJumlah++;
+                        rekapMap[key].totalGenerus++;
+                        rekapMap[key].totalKeseluruhan++;
                     }
                 });
             }
@@ -2950,8 +3099,8 @@
                     if (!rekapMap[key]) {
                         rekapMap[key] = {
                             desa: j.desa, kelompok: j.kelompok,
-                            paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0,
-                            menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJumlah: 0,
+                            paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0, totalGenerus: 0,
+                            menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJamaah: 0, totalKeseluruhan: 0,
                             subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
                         };
                     }
@@ -2962,7 +3111,8 @@
                     else if (st === "manula") rekapMap[key].manula++;
                     else if (st === "operator") rekapMap[key].operator++;
                     
-                    rekapMap[key].totalJumlah++;
+                    rekapMap[key].totalJamaah++;
+                    rekapMap[key].totalKeseluruhan++;
                 }
             });
 
@@ -2972,8 +3122,8 @@
                     if (!rekapMap[key]) {
                         rekapMap[key] = {
                             desa: s.desa, kelompok: s.kelompok,
-                            paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0,
-                            menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJumlah: 0,
+                            paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0, totalGenerus: 0,
+                            menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, totalJamaah: 0, totalKeseluruhan: 0,
                             subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
                         };
                     }
@@ -2988,8 +3138,8 @@
             });
 
             tbody.innerHTML = '';
-            let totPaud = 0, totTk = 0, totCaberawit = 0, totPraRemaja = 0, totRemaja = 0, totUsiaMandiri = 0;
-            let totMenikah = 0, totDuda = 0, totJanda = 0, totManula = 0, totOperator = 0, totAllJumlah = 0;
+            let totPaud = 0, totTk = 0, totCaberawit = 0, totPraRemaja = 0, totRemaja = 0, totUsiaMandiri = 0, totAllGenerus = 0;
+            let totMenikah = 0, totDuda = 0, totJanda = 0, totManula = 0, totOperator = 0, totAllJamaah = 0, totAllKeseluruhan = 0;
             let totSub = 0, totMasjid = 0, totAula = 0, totKmL = 0, totKmP = 0, totKmMt = 0, totKmTamu = 0;
 
             const items = Object.values(rekapMap);
@@ -3001,13 +3151,15 @@
                 totPraRemaja += item.praRemaja;
                 totRemaja += item.remaja;
                 totUsiaMandiri += item.usiaMandiri;
+                totAllGenerus += item.totalGenerus;
 
                 totMenikah += item.menikah;
                 totDuda += item.duda;
                 totJanda += item.janda;
                 totManula += item.manula;
                 totOperator += item.operator;
-                totAllJumlah += item.totalJumlah;
+                totAllJamaah += item.totalJamaah;
+                totAllKeseluruhan += item.totalKeseluruhan;
 
                 totSub += item.subKlp;
                 totMasjid += item.masjid;
@@ -3028,12 +3180,14 @@
                     <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.praRemaja}</td>
                     <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.remaja}</td>
                     <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900 border-r border-indigo-100">${item.usiaMandiri}</td>
+                    <td class="px-1.5 py-3 text-center font-black bg-fuchsia-100/70 text-fuchsia-950 border-r border-indigo-200 text-[11px]">${item.totalGenerus}</td>
                     <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.menikah}</td>
                     <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.duda}</td>
                     <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.janda}</td>
                     <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.manula}</td>
                     <td class="px-1.5 py-3 text-center font-black text-blue-700 bg-blue-50/60">${item.operator}</td>
-                    <td class="px-2 py-3 text-center font-black text-indigo-700 bg-indigo-100/50 border-l border-indigo-200 text-[12px]">${item.totalJumlah}</td>
+                    <td class="px-1.5 py-3 text-center font-black text-indigo-900 bg-indigo-50 border-l border-indigo-200 text-[11px]">${item.totalJamaah}</td>
+                    <td class="px-2 py-3 text-center font-black text-indigo-900 bg-indigo-200/80 border-l border-indigo-300 text-[12px]">${item.totalKeseluruhan}</td>
                     <td class="px-1.5 py-3 text-center border-l border-indigo-200 font-bold">${item.subKlp}</td>
                     <td class="px-1.5 py-3 text-center font-bold">${item.masjid}</td>
                     <td class="px-1.5 py-3 text-center font-bold">${item.aula}</td>
@@ -3048,17 +3202,19 @@
                 <tr>
                     <td class="px-2.5 py-4 text-left font-black uppercase sticky-col bg-indigo-200/90">TOTAL</td>
                     <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80 border-l border-indigo-200">${totPaud}</td>
-                    <td class="px-1.5 py-4 text-center font-black text-fuchsia-200/80">${totTk}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totTk}</td>
                     <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totCaberawit}</td>
                     <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totPraRemaja}</td>
                     <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totRemaja}</td>
                     <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80 border-r border-indigo-200">${totUsiaMandiri}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-300/80 border-r border-indigo-300 text-[12px]">${totAllGenerus}</td>
                     <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totMenikah}</td>
                     <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totDuda}</td>
                     <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totJanda}</td>
                     <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totManula}</td>
                     <td class="px-1.5 py-4 text-center font-black text-blue-800 bg-blue-100/90">${totOperator}</td>
-                    <td class="px-2 py-4 text-center font-black text-indigo-800 bg-indigo-300/80 border-l border-indigo-300 text-[13px]">${totAllJumlah}</td>
+                    <td class="px-1.5 py-4 text-center font-black text-indigo-950 bg-indigo-200/80 border-l border-indigo-200 text-[12px]">${totAllJamaah}</td>
+                    <td class="px-2 py-4 text-center font-black text-indigo-950 bg-indigo-300 border-l border-indigo-300 text-[13px]">${totAllKeseluruhan}</td>
                     <td class="px-1.5 py-4 text-center font-black text-indigo-950 border-l border-indigo-300">${totSub}</td>
                     <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totMasjid}</td>
                     <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totAula}</td>
@@ -3089,7 +3245,6 @@
             }
         }
 
-        /* DARI CACHE SECARA INSTAN */
         function populateKegiatanFilter() {
             const selKegiatan = document.getElementById('filterKegiatanAbsensi');
             if (!selKegiatan) return;
@@ -3102,7 +3257,6 @@
             if (currentValue && uniqueKegiatan.includes(currentValue)) selKegiatan.value = currentValue;
         }
 
-        /* DARI CACHE SECARA INSTAN */
         function loadRekapAbsensi() {
             const desa = document.getElementById('filterDesaAbsensi')?.value || '';
             const tahun = document.getElementById('filterTahun').value;
@@ -3199,9 +3353,6 @@
             XLSX.writeFile(wb, fileName);
         }
 
-        /* =========================================================================
-           SISTEM CETAK
-           ========================================================================= */
         function printData(elementId, documentTitle = 'Laporan Sistem Informasi') {
             let targetContentEl;
 
@@ -3404,11 +3555,7 @@
             };
         }
 
-        /* -------------------------------------------------------------
-		 * INTERCEPTOR POPUP OPTION PICKER DI TENGAH LAYAR
-		 * ------------------------------------------------------------- */
 		let activeSelectTarget = null;
-
 		let touchStartY = 0;
 		let touchStartX = 0;
 		let isSwiping = false;
@@ -3570,11 +3717,9 @@
                 window.history.back();
             }
         }
-		
-		// Modal konfirmasi duplikat dengan janji (Promise)
+
 		function showDuplicateConfirmModal(nama, tempat, tgl, kelompok, desa) {
 			return new Promise((resolve) => {
-				// Buat elemen modal jika belum ada di DOM
 				let modal = document.getElementById('duplicateConfirmModal');
 				if (!modal) {
 					modal = document.createElement('div');
@@ -3602,11 +3747,9 @@
 					document.body.appendChild(modal);
 				}
 
-				// Tampilkan pesan detail data duplikat
 				document.getElementById('duplicateModalText').innerHTML = 
 					`Jamaah dengan nama <b>"${nama}"</b>, lahir di <b>${tempat} (${tgl})</b>, kelompok <b>${kelompok}</b> (${desa}) sudah ada di database.<br><br>Apakah Anda tetap ingin menyimpan data ini?`;
 
-				// Tampilkan modal
 				modal.classList.remove('opacity-0', 'pointer-events-none');
 				modal.classList.add('opacity-100');
 
@@ -3628,8 +3771,6 @@
 				btnContinue.addEventListener('click', onContinue);
 			});
 		}
-		
-		
     </script>
 </body>
 </html>
