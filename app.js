@@ -1489,7 +1489,16 @@ document.getElementById('formAbsensiKegiatan').addEventListener('submit', functi
                 switchTabAbsensi('REKAP');
             });
         } catch(e) {
-            showCustomModal("Gagal", e.message || "Gagal menyimpan absensi", "❌");
+            // Mengecek apakah error disebabkan oleh constraint unik di Supabase (PostgreSQL Error Code 23505)
+            if (e.code === '23505' || (e.message && e.message.includes('unique_kegiatan_kelompok_tanggal'))) {
+                showCustomModal(
+                    "Absensi Sudah Terisi", 
+                    `Kelompok ${payload.kelompok} (${payload.desa}) sudah pernah mengisi absensi untuk kegiatan "${payload.nama_kegiatan}" pada tanggal ${payload.tanggal_kegiatan}.\n\nJika ingin mengubah data, silakan gunakan tombol Edit di menu Rekapan.`, 
+                    "⚠️"
+                );
+            } else {
+                showCustomModal("Gagal Simpan", e.message || "Gagal menyimpan absensi", "❌");
+            }
         } finally {
             hideDataLoading();
         }
