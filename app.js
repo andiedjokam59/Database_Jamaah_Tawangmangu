@@ -58,9 +58,10 @@ async function fetchAllRows(client, tableName, selectColumns = '*') {
     while (hasMore) {
         let query = client.from(tableName).select(selectColumns);
 
-        if (currentUser.role === 'OPERATOR' && currentUser.desa && currentUser.kelompok) {
-            query = query.eq('desa', currentUser.desa).eq('kelompok', currentUser.kelompok);
-        }
+        // KODE DI BAWAH INI KITA HAPUS / KOMENTARI AGAR SEMUA DATA SEDAERAH BISA DIMUAT
+        // if (currentUser.role === 'OPERATOR' && currentUser.desa && currentUser.kelompok) {
+        //     query = query.eq('desa', currentUser.desa).eq('kelompok', currentUser.kelompok);
+        // }
 
         const { data: pageData, error } = await query.range(page * pageSize, (page + 1) * pageSize - 1);
 
@@ -2186,23 +2187,46 @@ function filterKelompokDetailList() {
     renderKelompokDetailList(filtered);
 }
 
-function showAllOperatorsModal() {
-    document.getElementById('opModalTitle').textContent = "Semua Operator Terdaftar";
-    window.activeOperatorDataset = window.allOperatorsCache ? [...window.allOperatorsCache] : [];
-    window.activeOperatorDataset.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
+async function showAllOperatorsModal() {
+    document.getElementById('opModalTitle').textContent = "Kontak Operator Semua Kelompok";
+    
+    showDataLoading("Memuat daftar kontak operator...");
+    
+    try {
+        // Ambil data langsung dari Supabase agar Operator bisa melihat data dari kelompok lain
+        const { data, error } = await supabaseUtama
+            .from('data_jamaah')
+            .select('nama, no_hp, desa, kelompok')
+            .eq('status', 'Operator');
+            
+        if (error) throw error;
+        
+        window.activeOperatorDataset = data || [];
+        
+        // Urutkan berdasarkan Desa -> Kelompok -> Nama
+        window.activeOperatorDataset.sort((a, b) => {
+            if (a.desa !== b.desa) return (a.desa || '').localeCompare(b.desa || '');
+            if (a.kelompok !== b.kelompok) return (a.kelompok || '').localeCompare(b.kelompok || '');
+            return (a.nama || '').localeCompare(b.nama || '');
+        });
 
-    const searchInput = document.getElementById('opSearchInput');
-    if (searchInput) searchInput.value = '';
+        const searchInput = document.getElementById('opSearchInput');
+        if (searchInput) searchInput.value = '';
 
-    const iconBox = document.getElementById('opModalIconBox');
-    const opCard = document.getElementById('operatorDetailModalCard');
-    const theme = getCurrentTheme();
+        const iconBox = document.getElementById('opModalIconBox');
+        const opCard = document.getElementById('operatorDetailModalCard');
+        const theme = getCurrentTheme();
 
-    iconBox.className = `w-14 h-14 ${theme.iconBgModal} rounded-3xl flex items-center justify-center mx-auto text-2xl font-bold shadow-inner`;
-    opCard.style.borderColor = theme.borderColorModal;
+        iconBox.className = `w-14 h-14 ${theme.iconBgModal} rounded-3xl flex items-center justify-center mx-auto text-2xl font-bold shadow-inner`;
+        opCard.style.borderColor = theme.borderColorModal;
 
-    renderOperatorModalList(window.activeOperatorDataset);
-    openModal('operatorDetailModal');
+        renderOperatorModalList(window.activeOperatorDataset);
+        openModal('operatorDetailModal');
+    } catch (err) {
+        showCustomModal("Gagal", "Gagal memuat kontak operator: " + err.message, "❌");
+    } finally {
+        hideDataLoading();
+    }
 }
 
 function renderOperatorModalList(listData) {
@@ -2424,7 +2448,7 @@ function loadRekapKelompokLengkap() {
                 <td class="px-1 py-2.5 text-center font-black uppercase bg-indigo-200/95 text-[10px] border border-indigo-300">TOT</td>
                 <td colspan="5" class="p-2.5 bg-gradient-to-r from-indigo-100/90 via-fuchsia-50/90 to-indigo-100/90 border border-indigo-300">
                     <div class="space-y-2">
-                        <div class="flex flex-wrap items-center justify-between gap-1.5 border-b border-indigo-200/60 pb-1.5">
+                        <div class="flex flex-wrap items-center justify-start gap-6 border-b border-indigo-200/60 pb-1.5">
                             <div class="flex items-center gap-1.5">
                                 <span class="text-[10px] font-black text-indigo-900 uppercase">Total:</span>
                                 <span class="text-xs font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-fuchsia-600 bg-white px-2 py-0.5 rounded-md border border-indigo-200">
@@ -2469,10 +2493,9 @@ function loadRekapKelompokLengkap() {
             <th class="px-1.5 py-3 text-center whitespace-nowrap">Manula</th>
             <th class="px-1.5 py-3 text-center text-blue-800 bg-blue-100/80 whitespace-nowrap">Opr.</th>
             
+            <th class="px-1.5 py-3 text-center bg-indigo-100/80 font-black whitespace-nowrap border-l border-indigo-200">Jml Jamaah</th>
             <th class="px-1.5 py-3 text-center bg-blue-100/80 text-blue-950 font-bold whitespace-nowrap border-l border-indigo-200">Jml L</th>
             <th class="px-1.5 py-3 text-center bg-pink-100/80 text-pink-950 font-bold whitespace-nowrap">Jml P</th>
-
-            <th class="px-1.5 py-3 text-center bg-indigo-100/80 font-black whitespace-nowrap border-l border-indigo-200">Jml Jamaah</th>
             <th class="px-2 py-3 text-center bg-indigo-200 font-black whitespace-nowrap border-l border-indigo-300 text-indigo-950">Total</th>
         </tr>
     `;
@@ -2653,9 +2676,9 @@ function setupYearFilter() {
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonthStr = String(now.getMonth() + 1).padStart(2, '0');
-    const currentDateStr = String(now.getDate()).padStart(2, '0'); // Ambil tanggal hari ini (01 - 31)
+    const currentDateStr = String(now.getDate()).padStart(2, '0');
 
-    // Populate Dropdown Angka Tanggal (01 - 31) & Set Default Tanggal Hari Ini
+    // 1. Dropdown Tanggal
     const selTanggalFilter = document.getElementById('filterTanggalAbsensi');
     if (selTanggalFilter) {
         selTanggalFilter.innerHTML = '<option value="">Semua Tgl</option>';
@@ -2663,23 +2686,27 @@ function setupYearFilter() {
             const val = i < 10 ? `0${i}` : `${i}`;
             selTanggalFilter.add(new Option(val, val));
         }
-        selTanggalFilter.value = currentDateStr; // Default: Hari Ini
+        // Set default ke Tanggal Hari Ini
+        selTanggalFilter.value = currentDateStr; 
     }
 
-    // Populate Dropdown Tahun
+    // 2. Dropdown Tahun
     const selTahunFilter = document.getElementById('filterTahun');
     if (selTahunFilter) {
-        selTahunFilter.innerHTML = '';
+        selTahunFilter.innerHTML = '<option value="">Semua Tahun</option>';
         for (let i = currentYear; i >= currentYear - 3; i--) {
             selTahunFilter.add(new Option(`Tahun ${i}`, i));
         }
-        selTahunFilter.value = currentYear; // Default: Tahun Sekarang
+        // Set default ke Tahun Sekarang
+        selTahunFilter.value = currentYear; 
     }
 
-    // Populate Dropdown Bulan & Set Default Bulan Sekarang
+    // 3. Dropdown Bulan
     const selBulanFilter = document.getElementById('filterBulanAbsensi');
     if (selBulanFilter) {
-        selBulanFilter.value = currentMonthStr; // Default: Bulan Sekarang
+        // Pilihan 'Semua Bulan' sudah ada di HTML, kita cukup set default value-nya
+        // Set default ke Bulan Sekarang
+        selBulanFilter.value = currentMonthStr; 
     }
 }
 
@@ -2709,6 +2736,16 @@ function loadRekapAbsensi() {
     if (kegiatan) data = data.filter(item => item.nama_kegiatan === kegiatan);
 
     data.sort((a, b) => {
+        // Prioritaskan kelompok operator yang sedang login di urutan paling atas
+        if (currentUser && currentUser.role === 'OPERATOR') {
+            const aIsMyGroup = (a.desa === currentUser.desa && a.kelompok === currentUser.kelompok) ? 1 : 0;
+            const bIsMyGroup = (b.desa === currentUser.desa && b.kelompok === currentUser.kelompok) ? 1 : 0;
+            if (aIsMyGroup !== bIsMyGroup) {
+                return bIsMyGroup - aIsMyGroup;
+            }
+        }
+        
+        // Jika bukan grupnya, urutkan berdasarkan tanggal terbaru
         const dateA = String(a.tanggal_kegiatan || '');
         const dateB = String(b.tanggal_kegiatan || '');
         if (dateA !== dateB) {
@@ -2716,7 +2753,7 @@ function loadRekapAbsensi() {
         }
         return String(b.id || '').localeCompare(String(a.id || ''));
     });
-
+   
     const filteredData = data.filter(item => {
         if (desa && item.desa !== desa) return false;
         if (!item.tanggal_kegiatan) return false;
@@ -2829,6 +2866,14 @@ function loadRekapAbsensi() {
             if (p.length === 3) tglFormatted = `${p[2]}/${p[1]}/${p[0]}`;
         }
 
+        // --- TAMBAHKAN KODE INI UNTUK MENGAMANKAN TOMBOL EDIT ---
+        let btnEditHtml = '';
+        // Tombol edit hanya muncul jika yang login adalah Developer ATAU Operator grup tersebut
+        if (currentUser.role === 'DEVELOPER' || (currentUser.role === 'OPERATOR' && item.desa === currentUser.desa && item.kelompok === currentUser.kelompok)) {
+            btnEditHtml = `<button onclick="editAbsensi('${item.id}')" class="px-3 py-1.5 bg-fuchsia-100 text-fuchsia-700 hover:bg-fuchsia-200 rounded-lg font-extrabold text-[10px] transition-colors shadow-sm">Edit</button>`;
+        }
+        // --------------------------------------------------------
+
         const tr = document.createElement('tr');
         tr.className = "hover:bg-fuchsia-50/50 transition-colors";
         tr.innerHTML = `
@@ -2842,7 +2887,7 @@ function loadRekapAbsensi() {
             </td>
             <td class="px-2 py-3 text-center whitespace-nowrap font-bold text-pink-600">${item.jumlah_ijin || 0} Orang</td>
             <td class="px-2 py-3 text-right font-extrabold whitespace-nowrap text-slate-800">Rp${(item.infaq || 0).toLocaleString('id-ID')}</td>
-            <td class="px-2 py-3 text-center whitespace-nowrap no-print"><button onclick="editAbsensi('${item.id}')" class="px-3 py-1.5 bg-fuchsia-100 text-fuchsia-700 hover:bg-fuchsia-200 rounded-lg font-extrabold text-[10px] transition-colors shadow-sm">Edit</button></td>
+            <td class="px-2 py-3 text-center whitespace-nowrap no-print">${btnEditHtml}</td>
         `;
         tbody.appendChild(tr);
     });
@@ -3161,7 +3206,7 @@ function openCenterPicker(selectEl) {
     const options = Array.from(selectEl.options);
 
     options.forEach((opt) => {
-        if (!opt.value && options.length > 1) return;
+        //if (!opt.value && options.length > 1) return;
 
         const isSelected = opt.value === selectEl.value;
         const item = document.createElement('div');
