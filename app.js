@@ -386,11 +386,13 @@ function applyRoleRestrictionsUI() {
     const opDesa = currentUser.desa;
     const opKelompok = currentUser.kelompok;
 
+    // 1. Tambahkan exportDesa dan exportKelompok ke dalam daftar yang dikunci
     const pairs = [
         { desaId: 'desa', kelompokId: 'kelompok' },
         { desaId: 'searchDesa', kelompokId: 'searchKelompok' },
         { desaId: 'abs_desa', kelompokId: 'abs_kelompok' },
-        { desaId: 'sarp_desa', kelompokId: 'sarp_kelompok' }
+        { desaId: 'sarp_desa', kelompokId: 'sarp_kelompok' },
+        { desaId: 'exportDesa', kelompokId: 'exportKelompok' } // <-- Tambahan untuk Ekspor
     ];
 
     pairs.forEach(({ desaId, kelompokId }) => {
@@ -407,6 +409,13 @@ function applyRoleRestrictionsUI() {
             kEl.classList.remove('bg-slate-100/50', 'text-slate-400');
         }
     });
+
+    // 2. Kunci pilihan "Mode Export" agar operator hanya bisa mengekspor Per Kelompok
+    const exportScopeEl = document.getElementById('exportScopeMode');
+    if (exportScopeEl) {
+        exportScopeEl.value = 'KELOMPOK';
+        exportScopeEl.disabled = true;
+    }
 
     if (document.getElementById('searchKelompok')) {
         fetchAutoJamaahList(opDesa, opKelompok);
@@ -1183,6 +1192,10 @@ function openExportJamaahModal() {
             const expKelompok = document.getElementById('exportKelompok');
             expKelompok.value = searchKelompok;
         }
+    }
+	
+	if (currentUser && currentUser.role === 'OPERATOR') {
+        applyRoleRestrictionsUI();
     }
 
     openModal('exportJamaahModal');
