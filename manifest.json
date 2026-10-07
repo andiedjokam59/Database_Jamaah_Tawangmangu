@@ -1,5 +1,5 @@
 {
-  "short_name": "OS TW",
+  "short_name": "Data TW",
   "name": "Pendataan & Absensi Jamaah",
   "icons": [
     {
@@ -14,8 +14,8 @@
     }
   ],
   "start_url": "./index.html",
-  "background_color": "#fff7ed",
-  "theme_color": "#ea580c",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
   "display": "standalone",
   "orientation": "portrait"
 }
