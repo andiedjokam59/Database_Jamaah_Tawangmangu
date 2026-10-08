@@ -16,22 +16,33 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
 		@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
-		
+
+		/* OPTIMASI GLOBAL: GPU Acceleration & Smooth Performance */
+		* {
+			-webkit-tap-highlight-color: transparent;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+			box-sizing: border-box;
+		}
+
 		body {
 			font-family: 'Outfit', sans-serif;
 			background-color: #0f172a; /* Warna Slate Gelap Elegan */
 			color: #f8fafc;
-			-webkit-tap-highlight-color: transparent;
 			padding-top: env(safe-area-inset-top);
+			overflow-x: hidden;
+			touch-action: manipulation; /* Menghilangkan delay tap 300ms di HP */
 		}
 
-		/* BACKGROUND GELAP SIMPLE & ELEGAN (TANPA ANIMASI) */
+		/* BACKGROUND GELAP SIMPLE & ELEGAN (PERFORMA TINGGI) */
 		.animated-bg {
 			position: fixed;
 			top: 0; left: 0; width: 100vw; height: 100vh;
 			z-index: -1;
 			background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #111827 100%);
 			overflow: hidden;
+			will-change: transform;
+			transform: translateZ(0);
 		}
 
 		.animated-bg::after {
@@ -49,20 +60,23 @@
 			background: rgba(255, 255, 255, 0.95);
 			border: 1px solid rgba(255, 255, 255, 0.15);
 			box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+			will-change: transform, opacity;
+			transform: translateZ(0);
 		}
 
 		.glass-btn-menu {
 			background: rgba(255, 255, 255, 0.92);
 			border: 1px solid rgba(255, 255, 255, 0.9);
 			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-			transition: transform 0.15s ease, background-color 0.15s ease;
+			transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+			will-change: transform;
 		}
 		.glass-btn-menu:active {
-			transform: scale(0.97);
+			transform: scale(0.96) translateZ(0);
 		}
 
 		.rounded-box-input {
-			transition: border-color 0.2s ease;
+			transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 			background-color: rgba(255, 255, 255, 0.95);
 			border: 2px solid #e2e8f0;
 			border-radius: 1rem;
@@ -70,6 +84,7 @@
 		.rounded-box-input:focus {
 			background-color: #ffffff;
 			border-color: #6366f1;
+			box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
 			outline: none;
 		}
 
@@ -78,13 +93,14 @@
 			opacity: 1;
 		}
 
-		/* TABEL SCROLL RINGAN */
+		/* TABEL SCROLL RINGAN & SMOOTH */
 		.table-vertical-scroll {
 			max-height: 60vh;
 			overflow-y: auto;
 			overflow-x: auto;
 			border-radius: 1rem;
 			-webkit-overflow-scrolling: touch;
+			scroll-behavior: smooth;
 		}
 
 		.table-vertical-scroll > table {
@@ -142,49 +158,69 @@
 		#sectionSarpras thead .sticky-col, #sectionSarpras tfoot .sticky-col { background-color: #ccfbf1 !important; }
 		#sectionRekap thead .sticky-col, #sectionRekap tfoot .sticky-col { background-color: #e0e7ff !important; }
 
-		/* MODAL RINGAN */
+		/* MODAL CONTAINER & BACKDROP DENGAN HARDWARE ACCELERATION */
 		.modal-backdrop {
-			transition: opacity 0.2s ease;
+			transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s ease;
 			opacity: 0;
+			visibility: hidden;
 			pointer-events: none;
+			will-change: opacity, visibility;
 		}
 		.modal-backdrop.active {
 			opacity: 1;
+			visibility: visible;
 			pointer-events: auto;
 		}
-		
+
 		.modal-content-card {
-			transition: transform 0.2s ease, opacity 0.2s ease;
-			transform: scale(0.95);
+			transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+			transform: scale(0.92) translateY(10px);
 			opacity: 0;
+			will-change: transform, opacity;
 		}
 		.modal-backdrop.active .modal-content-card {
-			transform: scale(1);
+			transform: scale(1) translateY(0);
 			opacity: 1;
 		}
 
+		/* CUSTOM CENTER PICKER (DROPDOWN) DENGAN SMOOTH ANIMATION */
 		#centerPickerModal, #belumAbsenModal {
-			transition: opacity 0.2s ease;
-			background: rgba(15, 23, 42, 0.75);
+			transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s ease;
+			background: rgba(15, 23, 42, 0.65);
+			backdrop-filter: blur(8px);
+			-webkit-backdrop-filter: blur(8px);
 		}
+
 		#centerPickerModal > div, #belumAbsenModalCard {
-			transition: transform 0.2s ease, opacity 0.2s ease;
+			transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 			background: rgba(255, 255, 255, 0.97);
 			border: 1px solid rgba(255, 255, 255, 0.9);
 			box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-		}
-		.picker-option-item {
-			transition: background-color 0.15s ease, color 0.15s ease;
+			will-change: transform, opacity;
 		}
 
+		.picker-option-item {
+			transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+			touch-action: manipulation;
+		}
+		.picker-option-item:active {
+			transform: scale(0.97);
+		}
+
+		/* ANIMASI DOKUMEN & SECTION LEBIH HALUS */
 		.section-content {
 			opacity: 0;
-			transition: opacity 0.2s ease;
-		}
-		.section-content.section-active {
-			opacity: 1;
+			transform: translateY(12px) scale(0.99);
+			transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+			will-change: opacity, transform;
 		}
 
+		.section-content.section-active {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+		}
+
+		/* CUSTOM SCROLLBARS */
 		#autoJamaahList::-webkit-scrollbar, .scroll-container::-webkit-scrollbar, .table-vertical-scroll::-webkit-scrollbar, #centerPickerOptions::-webkit-scrollbar, #belumAbsenList::-webkit-scrollbar {
 			height: 6px;
 			width: 6px;
@@ -206,7 +242,7 @@
 			opacity: 0;
 			visibility: hidden;
 		}
-		
+
 		.loader-ring {
 			border: 4px solid transparent;
 			border-top-color: #818cf8;

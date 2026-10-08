@@ -598,24 +598,27 @@ function switchSectionView(target) {
     const targetSection = sections[target];
     if (!targetSection) return;
 
+    // Sembunyikan section lainnya
     Object.keys(sections).forEach(secKey => {
-        if (secKey !== target) {
+        if (secKey !== target && sections[secKey]) {
             sections[secKey].classList.remove('section-active');
             sections[secKey].classList.add('hidden');
         }
     });
 
     targetSection.classList.remove('hidden');
-    setTimeout(() => {
-        targetSection.classList.add('section-active');
-    }, 30);
+    
+    // Gunakan requestAnimationFrame untuk memastikan animasi render CSS 60fps tanpa glitch
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            targetSection.classList.add('section-active');
+        });
+    });
 
     activeSectionId = target;
 
     if (target === 'database') {
-        if (currentMode !== 'UPDATE') {
-            switchMode('DAFTAR');
-        }
+        if (currentMode !== 'UPDATE') switchMode('DAFTAR');
     } else if (target === 'absensi') {
         switchTabAbsensi(activeAbsensiSubTab || 'INPUT');
         setupYearFilter();
@@ -635,52 +638,27 @@ function openModal(id, pushHistory = true) {
     const el = document.getElementById(id);
     if (!el) return;
 
-    if (id === 'belumAbsenModal') {
-        const modalContent = document.getElementById('belumAbsenModalCard');
-        el.classList.remove('hidden');
-        setTimeout(() => {
-            el.classList.remove('opacity-0');
-            if (modalContent) {
-                modalContent.classList.remove('scale-90', 'opacity-0');
-                modalContent.classList.add('scale-100', 'opacity-100');
-            }
-        }, 20);
-
-        if (pushHistory) {
-            history.pushState({ modalOpen: id, section: activeSectionId }, '', '#' + id);
-        }
-        return;
-    }
-
     if (pushHistory) {
         history.pushState({ modal: id, section: activeSectionId }, '', '#' + id);
     }
+    
     el.classList.remove('hidden');
-    setTimeout(() => {
-        el.classList.add('active');
-    }, 20);
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            el.classList.add('active');
+        });
+    });
 }
 
 function closeModal(id, backHistory = true) {
     const el = document.getElementById(id);
     if (!el) return;
 
-    if (id === 'belumAbsenModal') {
-        const modalContent = document.getElementById('belumAbsenModalCard');
-        if (modalContent) {
-            modalContent.classList.remove('scale-100', 'opacity-100');
-            modalContent.classList.add('scale-90', 'opacity-0');
-        }
-        el.classList.add('opacity-0');
-        setTimeout(() => {
-            el.classList.add('hidden');
-        }, 300);
-    } else {
-        el.classList.remove('active');
-        setTimeout(() => {
-            el.classList.add('hidden');
-        }, 350);
-    }
+    el.classList.remove('active');
+    
+    setTimeout(() => {
+        el.classList.add('hidden');
+    }, 250);
 
     if (backHistory && window.history.state && (window.history.state.modal === id || window.history.state.modalOpen === id)) {
         window.history.back();
@@ -915,12 +893,13 @@ function switchMode(mode, keepSearchFilters = false) {
         btnSubmit.textContent = "Perbarui Data Jamaah";
 
         if (!mpOption) {
-            const opt = document.createElement('option');
-            opt.value = "Meninggal / Sambung Luar Daerah";
-            opt.textContent = "Meninggal / Sambung Luar Daerah";
-            opt.className = "text-red-600 font-extrabold bg-red-50";
-            statusSelect.appendChild(opt);
-        }
+			const opt = document.createElement('option');
+			opt.value = "Meninggal / Sambung Luar Daerah";
+			opt.textContent = "Meninggal / Sambung Luar Daerah";
+			// Tambahkan class khusus teks merah
+			opt.className = "text-red-600 font-extrabold bg-red-50";
+			statusSelect.appendChild(opt);
+		}
     } else {
         document.getElementById('tabDaftar').className = "py-2.5 text-xs font-bold rounded-xl bg-indigo-600 text-white shadow-md transition-all duration-300";
         document.getElementById('tabUpdate').className = "py-2.5 text-xs font-bold rounded-xl text-indigo-800 hover:bg-indigo-200/50 transition-all duration-300";
@@ -3203,14 +3182,13 @@ function openCenterPicker(selectEl) {
     if (selectEl.options.length > 0 && !selectEl.options[0].value) {
         titleText = selectEl.options[0].text.replace(/[^a-zA-Z0-9\s]/g, '').trim();
     } else {
-        const labelEl = selectEl.closest('div').querySelector('label');
+        const labelEl = selectEl.closest('div')?.querySelector('label');
         if (labelEl) {
             titleText = labelEl.textContent.replace(/[^a-zA-Z0-9\s]/g, '').trim();
         }
     }
-    if (!titleText) titleText = "Pilih Opsi";
 
-    titleEl.textContent = titleText;
+    titleEl.textContent = titleText || "Pilih Opsi";
     titleEl.className = `text-xs font-extrabold uppercase tracking-widest ${theme.pickerTitleClass} truncate max-w-[70%] block`;
 
     optionsEl.className = "overflow-y-auto space-y-2.5 pr-1 flex-1 py-1";
@@ -3219,44 +3197,55 @@ function openCenterPicker(selectEl) {
     const options = Array.from(selectEl.options);
 
     options.forEach((opt) => {
-        //if (!opt.value && options.length > 1) return;
+		const isSelected = opt.value === selectEl.value;
+		const isMeninggal = opt.value === "Meninggal / Sambung Luar Daerah"; // Cek opsi meninggal
+		const item = document.createElement('div');
+		
+		const baseClass = "picker-option-item p-3.5 sm:p-4 rounded-xl text-xs sm:text-sm font-semibold cursor-pointer flex justify-between items-center transition-all border";
+		
+		// Tentukan warna berdasarkan kondisi (Selected / Meninggal / Normal)
+		let colorStyle = "";
+		if (isSelected) {
+			colorStyle = "bg-gradient-to-r " + theme.btnGradient + " text-white border-transparent shadow-md transform scale-[1.01]";
+		} else if (isMeninggal) {
+			// Style khusus tulisan dan background merah untuk opsi Meninggal / Sambung Luar Daerah
+			colorStyle = "bg-rose-50/90 border-rose-200 text-rose-600 hover:bg-rose-100 hover:border-rose-300 font-extrabold shadow-xs";
+		} else {
+			colorStyle = "bg-white/90 border-slate-200/80 text-slate-700 hover:bg-white hover:border-indigo-200 shadow-xs";
+		}
 
-        const isSelected = opt.value === selectEl.value;
-        const item = document.createElement('div');
-        
-        const baseClass = "picker-option-item p-3.5 sm:p-4 rounded-xl text-xs sm:text-sm font-semibold cursor-pointer flex justify-between items-center transition-all border backdrop-blur-sm";
-        const unselectedClass = "bg-white/80 border-slate-200/80 shadow-sm text-slate-700 hover:bg-white hover:border-indigo-200 hover:shadow-md";
-        const selectedClass = "active-selected border-transparent shadow-lg transform scale-[1.02]";
+		item.className = `${baseClass} ${colorStyle}`;
 
-        item.className = `${baseClass} ${isSelected ? selectedClass : unselectedClass}`;
+		item.innerHTML = `
+			<span class="truncate pr-2">${opt.text}</span>
+			${isSelected ? `
+				<svg class="w-4 h-4 sm:w-5 sm:h-5 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+				</svg>
+			` : ''}
+		`;
 
-        item.innerHTML = `
-            <span class="truncate pr-2">${opt.text}</span>
-            ${isSelected ? `
-                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white shrink-0 drop-shadow-sm" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
-                </svg>
-            ` : ''}
-        `;
+		item.onclick = (e) => {
+			e.stopPropagation();
+			selectEl.value = opt.value;
+			selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+			closeCenterPicker();
+		};
 
-        item.onclick = () => {
-            selectEl.value = opt.value;
-            selectEl.dispatchEvent(new Event('change', { bubbles: true }));
-            closeCenterPicker();
-        };
-
-        optionsEl.appendChild(item);
-    });
+		optionsEl.appendChild(item);
+	});
 
     const modalContent = modal.firstElementChild;
-    modalContent.className = `rounded-[2rem] p-5 sm:p-6 max-w-sm w-full transform scale-90 opacity-0 max-h-[75vh] flex flex-col ${theme.pickerThemeClass}`;
+    modalContent.className = `rounded-[2rem] p-5 sm:p-6 max-w-sm w-full transform transition-all duration-300 max-h-[75vh] flex flex-col ${theme.pickerThemeClass}`;
 
     modal.classList.remove('hidden');
-    setTimeout(() => {
-        modal.classList.remove('opacity-0');
-        modalContent.classList.remove('scale-90', 'opacity-0');
-        modalContent.classList.add('scale-100', 'opacity-100');
-    }, 20);
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            modal.classList.remove('opacity-0');
+            modalContent.classList.remove('scale-90', 'opacity-0');
+            modalContent.classList.add('scale-100', 'opacity-100');
+        });
+    });
 
     history.pushState({ pickerOpen: true, section: activeSectionId }, '', '#picker');
 }
@@ -3266,14 +3255,16 @@ function closeCenterPicker(backHistory = true) {
     if (!modal || modal.classList.contains('hidden')) return;
 
     const modalContent = modal.firstElementChild;
-    modalContent.classList.remove('scale-100', 'opacity-100');
-    modalContent.classList.add('scale-90', 'opacity-0');
+    if (modalContent) {
+        modalContent.classList.remove('scale-100', 'opacity-100');
+        modalContent.classList.add('scale-90', 'opacity-0');
+    }
     modal.classList.add('opacity-0');
 
     setTimeout(() => {
         modal.classList.add('hidden');
         activeSelectTarget = null;
-    }, 300);
+    }, 250);
 
     if (backHistory && window.history.state && window.history.state.pickerOpen) {
         window.history.back();
