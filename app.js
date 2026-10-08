@@ -658,7 +658,7 @@ function closeModal(id, backHistory = true) {
     
     setTimeout(() => {
         el.classList.add('hidden');
-    }, 250);
+    }, 380); // Disesuaikan dengan durasi animasi CSS
 
     if (backHistory && window.history.state && (window.history.state.modal === id || window.history.state.modalOpen === id)) {
         window.history.back();
@@ -3264,7 +3264,7 @@ function closeCenterPicker(backHistory = true) {
     setTimeout(() => {
         modal.classList.add('hidden');
         activeSelectTarget = null;
-    }, 250);
+    }, 380);
 
     if (backHistory && window.history.state && window.history.state.pickerOpen) {
         window.history.back();
