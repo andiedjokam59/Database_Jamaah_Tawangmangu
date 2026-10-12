@@ -1226,19 +1226,100 @@ function processExportJamaahData(exportType = 'excel') {
     closeModal('exportJamaahModal');
 
     try {
-        let data = [...globalCache.jamaah];
-
+        // 1. Ambil & Filter Data Jamaah
+        let jamaahList = [...globalCache.jamaah];
         if (mode === "DESA") {
-            data = data.filter(d => d.desa === selectedDesa);
+            jamaahList = jamaahList.filter(d => d.desa === selectedDesa);
         } else if (mode === "KELOMPOK") {
-            data = data.filter(d => d.desa === selectedDesa && d.kelompok === selectedKelompok);
+            jamaahList = jamaahList.filter(d => d.desa === selectedDesa && d.kelompok === selectedKelompok);
         }
 
+        // 2. Ambil & Filter Data Generus (sesuai wilayah terpilih)
+        let generusList = [...(globalCache.generus || [])];
+        if (mode === "DESA") {
+            generusList = generusList.filter(g => g.desa === selectedDesa);
+        } else if (mode === "KELOMPOK") {
+            generusList = generusList.filter(g => g.desa === selectedDesa && g.kelompok === selectedKelompok);
+        }
+
+        // Fungsi bantu hitung umur dari string YYYY-MM-DD
+        const calculateAgeFromDate = (dateString) => {
+            if (!dateString) return null;
+            const parts = dateString.split('-');
+            if (parts.length !== 3) return null;
+            const birthDate = new Date(`${parts[0]}-${parts[1]}-${parts[2]}`);
+            const today = new Date();
+            if (isNaN(birthDate.getTime())) return null;
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+            return age >= 0 ? age : null;
+        };
+
+        // 3. Normalisasi Struktur Data Jamaah
+        const normalizedJamaah = jamaahList.map(j => {
+            let calcAge = j.umur;
+            if ((calcAge === null || calcAge === undefined || calcAge === '') && j.tanggal_lahir) {
+                calcAge = calculateAgeFromDate(j.tanggal_lahir);
+            }
+            return {
+                nama: j.nama || '',
+                jenis_kelamin: (j.jenis_kelamin || '').toUpperCase(),
+                tempat_lahir: j.tempat_lahir || '',
+                tanggal_lahir: j.tanggal_lahir || '',
+                umur: calcAge !== null && calcAge !== undefined && calcAge !== '' ? calcAge : '',
+                desa: j.desa || '',
+                kelompok: j.kelompok || '',
+                status: j.status || 'Menikah',
+                is_disabilitas: !!j.is_disabilitas,
+                kategori_disabilitas: j.kategori_disabilitas,
+                no_hp: j.no_hp || ''
+            };
+        });
+
+        // 4. Normalisasi Struktur Data Generus agar Seragam saat Dieksport
+        const normalizedGenerus = generusList.map(g => {
+            let rawKat = g.kategori_usia || 'Generus';
+            let parsedKey = parseKategoriGenerus(rawKat);
+            let labelKat = rawKat;
+
+            if (parsedKey === 'paud') labelKat = 'PAUD';
+            else if (parsedKey === 'tk') labelKat = 'TK';
+            else if (parsedKey === 'caberawit') labelKat = 'Caberawit';
+            else if (parsedKey === 'praRemaja') labelKat = 'Pra Remaja';
+            else if (parsedKey === 'remaja') labelKat = 'Remaja';
+            else if (parsedKey === 'usiaMandiri') labelKat = 'Usia Mandiri';
+
+            let valUmur = g.umur ?? g.usia ?? null;
+            const tglLahirField = g.tanggal_lahir || g.tgl_lahir || null;
+            if ((valUmur === null || valUmur === undefined || valUmur === '') && tglLahirField) {
+                valUmur = calculateAgeFromDate(tglLahirField);
+            }
+
+            return {
+                nama: g.nama || '',
+                jenis_kelamin: (g.jenis_kelamin || g.jk || '').toUpperCase(),
+                tempat_lahir: g.tempat_lahir || '',
+                tanggal_lahir: tglLahirField || '',
+                umur: valUmur !== null && valUmur !== undefined && valUmur !== '' ? valUmur : '',
+                desa: g.desa || '',
+                kelompok: g.kelompok || '',
+                status: labelKat,
+                is_disabilitas: !!g.is_disabilitas,
+                kategori_disabilitas: g.kategori_disabilitas,
+                no_hp: g.no_hp || ''
+            };
+        });
+
+        // 5. Gabungkan Data Jamaah + Generus
+        let data = [...normalizedJamaah, ...normalizedGenerus];
+
         if (!data || data.length === 0) {
-            showCustomModal("Export Gagal", "Tidak ada data jamaah yang sesuai dengan pilihan wilayah.", "ℹ️");
+            showCustomModal("Export Gagal", "Tidak ada data jamaah/generus yang sesuai dengan pilihan wilayah.", "ℹ️");
             return;
         }
 
+        // Urutkan berdasarkan Desa -> Kelompok -> Nama
         data.sort((a, b) => {
             if ((a.desa || '') !== (b.desa || '')) return (a.desa || '').localeCompare(b.desa || '');
             if ((a.kelompok || '') !== (b.kelompok || '')) return (a.kelompok || '').localeCompare(b.kelompok || '');
@@ -1253,7 +1334,7 @@ function processExportJamaahData(exportType = 'excel') {
             umur: "Umur (Thn)",
             desa: "Desa",
             kelompok: "Kelompok",
-            status: "Status Jamaah",
+            status: "Status / Kategori",
             disabilitas: "Disabilitas",
             no_hp: "No HP / WhatsApp"
         };
@@ -1271,7 +1352,7 @@ function processExportJamaahData(exportType = 'excel') {
                     if (item.is_disabilitas) {
                         const kats = Array.isArray(item.kategori_disabilitas) && item.kategori_disabilitas.length > 0 
                             ? item.kategori_disabilitas.join(', ') 
-                            : 'Penyandang Disabilitas';
+                            : (typeof item.kategori_disabilitas === 'string' && item.kategori_disabilitas ? item.kategori_disabilitas : 'Penyandang Disabilitas');
                         val = `Penyandang (${kats})`;
                     } else {
                         val = 'Bukan Penyandang Disabilitas';
@@ -1283,7 +1364,7 @@ function processExportJamaahData(exportType = 'excel') {
             return row;
         });
 
-        let fileName = "Data_Jamaah";
+        let fileName = "Data_Jamaah_dan_Generus";
         if (mode === "DESA") fileName += `_${selectedDesa}`;
         if (mode === "KELOMPOK") fileName += `_${selectedDesa}_${selectedKelompok}`;
         fileName += `_${new Date().toISOString().slice(0, 10)}`;
@@ -1301,7 +1382,7 @@ function processExportJamaahData(exportType = 'excel') {
             document.body.removeChild(link);
         } else {
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Data Jamaah");
+            XLSX.utils.book_append_sheet(wb, ws, "Data Jamaah & Generus");
             XLSX.writeFile(wb, `${fileName}.xlsx`);
         }
 
