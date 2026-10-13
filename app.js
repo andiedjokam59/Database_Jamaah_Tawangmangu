@@ -694,6 +694,7 @@ function hitungUmurOtomatis() {
     const thn = document.getElementById('tgl_lahir_thn').value;
     const badgeUmur = document.getElementById('displayUmur');
     const valUmur = document.getElementById('umurVal');
+    const statusSelect = document.getElementById('status');
 
     if (tgl && bln && thn) {
         const birthDate = new Date(`${thn}-${bln}-${tgl}`);
@@ -703,9 +704,17 @@ function hitungUmurOtomatis() {
         if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
             age--;
         }
+
         if (!isNaN(age) && age >= 0) {
             valUmur.textContent = age;
             badgeUmur.classList.remove('hidden');
+
+            // --- OTOMATISASI STATUS MANULA (60 TAHUN KE ATAS) ---
+            if (age >= 60 && statusSelect) {
+                statusSelect.value = "Manula";
+                toggleNoHpInput("Manula"); // Menyesuaikan tampilan form nomor HP
+            }
+
             return age;
         }
     }
@@ -945,13 +954,16 @@ function selectJamaahToForm(j) {
     document.getElementById('jenis_kelamin').value = j.jenis_kelamin;
     document.getElementById('tempat_lahir').value = j.tempat_lahir;
 
+    // Set tanggal lahir dulu agar umur bisa dihitung
     if(j.tanggal_lahir) {
         const parts = j.tanggal_lahir.split('-');
         if(parts.length === 3) {
             document.getElementById('tgl_lahir_thn').value = parts[0];
             document.getElementById('tgl_lahir_bln').value = parts[1];
             document.getElementById('tgl_lahir_tgl').value = parts[2];
-            hitungUmurOtomatis();
+            
+            // Hitung umur & otomatiskan status Manula jika umur >= 60
+            hitungUmurOtomatis(); 
         }
     }
 
@@ -966,9 +978,17 @@ function selectJamaahToForm(j) {
     elKlp.classList.remove('bg-slate-100/50', 'text-slate-400');
     elKlp.value = j.kelompok;
 
+    // Jika status dari DB diset, atau secara otomatis berubah lewat hitungUmurOtomatis()
     const stVal = j.status || "Menikah";
-    document.getElementById('status').value = stVal;
-    toggleNoHpInput(stVal);
+    const statusSelect = document.getElementById('status');
+    
+    // Jika umur di bawah 60, pakai status asli dari DB
+    const currentAge = hitungUmurOtomatis();
+    if (!currentAge || currentAge < 60) {
+        statusSelect.value = stVal;
+    }
+    
+    toggleNoHpInput(statusSelect.value);
     document.getElementById('no_hp').value = j.no_hp || '';
 
     document.getElementById('is_disabilitas').checked = j.is_disabilitas ? true : false;
@@ -1226,93 +1246,17 @@ function processExportJamaahData(exportType = 'excel') {
     closeModal('exportJamaahModal');
 
     try {
-        // 1. Ambil & Filter Data Jamaah
-        let jamaahList = [...globalCache.jamaah];
-        if (mode === "DESA") {
-            jamaahList = jamaahList.filter(d => d.desa === selectedDesa);
-        } else if (mode === "KELOMPOK") {
-            jamaahList = jamaahList.filter(d => d.desa === selectedDesa && d.kelompok === selectedKelompok);
-        }
+        // Filter wilayah sesuai opsi yang dipilih
+        let targetDesaFilter = mode === "ALL" ? null : selectedDesa;
+        let targetKelompokFilter = mode === "KELOMPOK" ? selectedKelompok : null;
 
-        // 2. Ambil & Filter Data Generus (sesuai wilayah terpilih)
-        let generusList = [...(globalCache.generus || [])];
-        if (mode === "DESA") {
-            generusList = generusList.filter(g => g.desa === selectedDesa);
-        } else if (mode === "KELOMPOK") {
-            generusList = generusList.filter(g => g.desa === selectedDesa && g.kelompok === selectedKelompok);
-        }
-
-        // Fungsi bantu hitung umur dari string YYYY-MM-DD
-        const calculateAgeFromDate = (dateString) => {
-            if (!dateString) return null;
-            const parts = dateString.split('-');
-            if (parts.length !== 3) return null;
-            const birthDate = new Date(`${parts[0]}-${parts[1]}-${parts[2]}`);
-            const today = new Date();
-            if (isNaN(birthDate.getTime())) return null;
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const m = today.getMonth() - birthDate.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-            return age >= 0 ? age : null;
-        };
-
-        // 3. Normalisasi Struktur Data Jamaah
-        const normalizedJamaah = jamaahList.map(j => {
-            let calcAge = j.umur;
-            if ((calcAge === null || calcAge === undefined || calcAge === '') && j.tanggal_lahir) {
-                calcAge = calculateAgeFromDate(j.tanggal_lahir);
-            }
-            return {
-                nama: j.nama || '',
-                jenis_kelamin: (j.jenis_kelamin || '').toUpperCase(),
-                tempat_lahir: j.tempat_lahir || '',
-                tanggal_lahir: j.tanggal_lahir || '',
-                umur: calcAge !== null && calcAge !== undefined && calcAge !== '' ? calcAge : '',
-                desa: j.desa || '',
-                kelompok: j.kelompok || '',
-                status: j.status || 'Menikah',
-                is_disabilitas: !!j.is_disabilitas,
-                kategori_disabilitas: j.kategori_disabilitas,
-                no_hp: j.no_hp || ''
-            };
-        });
-
-        // 4. Normalisasi Struktur Data Generus agar Seragam saat Dieksport
-        const normalizedGenerus = generusList.map(g => {
-            let rawKat = g.kategori_usia || 'Generus';
-            let parsedKey = parseKategoriGenerus(rawKat);
-            let labelKat = rawKat;
-
-            if (parsedKey === 'paud') labelKat = 'PAUD';
-            else if (parsedKey === 'tk') labelKat = 'TK';
-            else if (parsedKey === 'caberawit') labelKat = 'Caberawit';
-            else if (parsedKey === 'praRemaja') labelKat = 'Pra Remaja';
-            else if (parsedKey === 'remaja') labelKat = 'Remaja';
-            else if (parsedKey === 'usiaMandiri') labelKat = 'Usia Mandiri';
-
-            let valUmur = g.umur ?? g.usia ?? null;
-            const tglLahirField = g.tanggal_lahir || g.tgl_lahir || null;
-            if ((valUmur === null || valUmur === undefined || valUmur === '') && tglLahirField) {
-                valUmur = calculateAgeFromDate(tglLahirField);
-            }
-
-            return {
-                nama: g.nama || '',
-                jenis_kelamin: (g.jenis_kelamin || g.jk || '').toUpperCase(),
-                tempat_lahir: g.tempat_lahir || '',
-                tanggal_lahir: tglLahirField || '',
-                umur: valUmur !== null && valUmur !== undefined && valUmur !== '' ? valUmur : '',
-                desa: g.desa || '',
-                kelompok: g.kelompok || '',
-                status: labelKat,
-                is_disabilitas: !!g.is_disabilitas,
-                kategori_disabilitas: g.kategori_disabilitas,
-                no_hp: g.no_hp || ''
-            };
-        });
-
-        // 5. Gabungkan Data Jamaah + Generus
-        let data = [...normalizedJamaah, ...normalizedGenerus];
+        // 1. GUNAKAN DEDUPLIKASI PINTAR (Gabungkan Jamaah + Generus Tanpa Data Dobel/Pengajar)
+        let data = getUniqueMembers(
+            globalCache.jamaah || [],
+            globalCache.generus || [],
+            targetDesaFilter,
+            targetKelompokFilter
+        );
 
         if (!data || data.length === 0) {
             showCustomModal("Export Gagal", "Tidak ada data jamaah/generus yang sesuai dengan pilihan wilayah.", "ℹ️");
@@ -2358,6 +2302,183 @@ function filterOperatorList() {
     renderOperatorModalList(filtered);
 }
 
+function getUniqueMembers(jamaahList, generusList, targetDesa = null, targetKelompok = null) {
+    const memberMap = new Map();
+    const dobMap = new Map();
+
+    const calculateAgeFromDate = (dateString) => {
+        if (!dateString) return null;
+        const cleanStr = String(dateString).replace(/[^0-9]/g, '');
+        if (cleanStr.length !== 8) return null;
+        
+        let y, m, d;
+        if (String(dateString).includes('-') && String(dateString).indexOf('-') === 4) {
+            y = parseInt(cleanStr.substring(0, 4), 10);
+            m = parseInt(cleanStr.substring(4, 6), 10);
+            d = parseInt(cleanStr.substring(6, 8), 10);
+        } else {
+            d = parseInt(cleanStr.substring(0, 2), 10);
+            m = parseInt(cleanStr.substring(2, 4), 10);
+            y = parseInt(cleanStr.substring(4, 8), 10);
+        }
+        
+        const birthDate = new Date(y, m - 1, d);
+        const today = new Date();
+        if (isNaN(birthDate.getTime())) return null;
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) age--;
+        return age >= 0 ? age : null;
+    };
+
+    // Fungsi Pembantu: Ubah tanggal lahir ke format baku YYYYMMDD
+    const normalizeDateStr = (dateStr) => {
+        if (!dateStr) return '';
+        const digits = String(dateStr).replace(/[^0-9]/g, '');
+        if (digits.length !== 8) return String(dateStr).trim();
+        
+        if (String(dateStr).includes('-') && String(dateStr).indexOf('-') === 4) {
+            return digits; // YYYYMMDD
+        }
+        // Jika format DD-MM-YYYY -> ubah ke YYYYMMDD
+        const d = digits.substring(0, 2);
+        const m = digits.substring(2, 4);
+        const y = digits.substring(4, 8);
+        return `${y}${m}${d}`;
+    };
+
+    // Fungsi Pembantu: Cek apakah dua nama mirip/singkatan (misal: "Nur Khaina N" vs "Nur Khaina Ningsih")
+    const isSimilarName = (name1, name2) => {
+        const n1 = name1.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
+        const n2 = name2.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
+        
+        if (n1 === n2) return true;
+        
+        const words1 = n1.split(/\s+/);
+        const words2 = n2.split(/\s+/);
+        
+        // Jika kata pertama dan kedua sama persis (misal: "Nur Khaina")
+        if (words1.length >= 2 && words2.length >= 2) {
+            if (words1[0] === words2[0] && words1[1] === words2[1]) {
+                // Cek jika kata ketiga adalah singkatan (misal 'n' dengan 'ningsih')
+                if (words1[2] && words2[2]) {
+                    if (words1[2].startsWith(words2[2]) || words2[2].startsWith(words1[2])) {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+
+    // 1. OLAH DATA DARI DATA_JAMAAH (Prioritas Utama)
+    jamaahList.forEach(j => {
+        if (targetDesa && j.desa !== targetDesa) return;
+        if (targetKelompok && j.kelompok !== targetKelompok) return;
+
+        const cleanName = (j.nama || '').trim();
+        const cleanDesa = (j.desa || '').trim().toLowerCase();
+        const cleanKlp = (j.kelompok || '').trim().toLowerCase();
+        const normDob = normalizeDateStr(j.tanggal_lahir || j.tgl_lahir);
+
+        const nameKey = `${cleanName.toLowerCase()}__${cleanDesa}__${cleanKlp}`;
+        const dobKey = normDob ? `${normDob}__${cleanDesa}__${cleanKlp}` : null;
+
+        let calcAge = j.umur;
+        if ((calcAge === null || calcAge === undefined || calcAge === '') && (j.tanggal_lahir || j.tgl_lahir)) {
+            calcAge = calculateAgeFromDate(j.tanggal_lahir || j.tgl_lahir);
+        }
+
+        const memberObj = {
+            id: j.id,
+            nama: j.nama,
+            desa: j.desa,
+            kelompok: j.kelompok,
+            status: j.status || 'Menikah',
+            jenis_kelamin: (j.jenis_kelamin || '-').toUpperCase(),
+            umur: (calcAge !== null && calcAge !== undefined && calcAge !== '') ? `${calcAge} thn` : '-',
+            is_disabilitas: !!j.is_disabilitas,
+            kategori_disabilitas: j.kategori_disabilitas,
+            tipe: 'DEWASA',
+            sumber: 'data_jamaah'
+        };
+
+        memberMap.set(nameKey, memberObj);
+        if (dobKey) {
+            dobMap.set(dobKey, memberObj);
+        }
+    });
+
+    // 2. OLAH DATA DARI DATA_GENERUS (Deduplikasi Ketat)
+    generusList.forEach(g => {
+        if (targetDesa && g.desa !== targetDesa) return;
+        if (targetKelompok && g.kelompok !== targetKelompok) return;
+
+        const cleanName = (g.nama || '').trim();
+        const cleanDesa = (g.desa || '').trim().toLowerCase();
+        const cleanKlp = (g.kelompok || '').trim().toLowerCase();
+        const normDob = normalizeDateStr(g.tanggal_lahir || g.tgl_lahir);
+
+        const dobKey = normDob ? `${normDob}__${cleanDesa}__${cleanKlp}` : null;
+
+        // CEK 1: Berdasarkan Tanggal Lahir + Kelompok yang sudah ternormalisasi
+        if (dobKey && dobMap.has(dobKey)) {
+            return; // Loloskan/Abaikan karena terbukti orang yang sama
+        }
+
+        // CEK 2: Berdasarkan Kemiripan Nama & Kelompok pada daftar data_jamaah
+        let isDuplicateByName = false;
+        for (let [existingKey, existingMember] of memberMap.entries()) {
+            if (existingMember.desa.toLowerCase() === cleanDesa && existingMember.kelompok.toLowerCase() === cleanKlp) {
+                if (isSimilarName(existingMember.nama, cleanName)) {
+                    isDuplicateByName = true;
+                    break;
+                }
+            }
+        }
+
+        if (isDuplicateByName) {
+            return; // Abaikan karena nama terindikasi singkatan/mirip dari orang yang sama
+        }
+
+        // Jika lolos kedua pengecekan, berarti Generus murni
+        let rawKat = g.kategori_usia || 'Generus';
+        let parsedKey = parseKategoriGenerus(rawKat);
+        let labelKat = rawKat;
+
+        if (parsedKey === 'paud') labelKat = 'PAUD';
+        else if (parsedKey === 'tk') labelKat = 'TK';
+        else if (parsedKey === 'caberawit') labelKat = 'Caberawit';
+        else if (parsedKey === 'praRemaja') labelKat = 'Pra Remaja';
+        else if (parsedKey === 'remaja') labelKat = 'Remaja';
+        else if (parsedKey === 'usiaMandiri') labelKat = 'Usia Mandiri';
+
+        let valUmur = g.umur ?? g.usia ?? null;
+        if ((valUmur === null || valUmur === undefined || valUmur === '') && (g.tanggal_lahir || g.tgl_lahir)) {
+            valUmur = calculateAgeFromDate(g.tanggal_lahir || g.tgl_lahir);
+        }
+
+        const nameKey = `${cleanName.toLowerCase()}__${cleanDesa}__${cleanKlp}`;
+        memberMap.set(nameKey, {
+            id: g.id,
+            nama: g.nama,
+            desa: g.desa,
+            kelompok: g.kelompok,
+            status: labelKat,
+            jenis_kelamin: (g.jenis_kelamin || g.jk || '-').toUpperCase(),
+            umur: (valUmur !== null && valUmur !== undefined && valUmur !== '') ? `${valUmur} thn` : '-',
+            is_disabilitas: !!g.is_disabilitas,
+            kategori_disabilitas: g.kategori_disabilitas,
+            tipe: 'GENERUS',
+            sumber: 'data_generus'
+        });
+    });
+
+    return Array.from(memberMap.values());
+}
+
 function loadRekapKelompokLengkap() {
     const tbody = document.getElementById('tbodyRekapKelompok');
     const tfoot = document.getElementById('tfootRekapKelompok');
@@ -2365,24 +2486,12 @@ function loadRekapKelompokLengkap() {
     const filterContainer = document.getElementById('filterDesaRekap')?.parentElement;
     const titleEl = document.querySelector('#sectionRekapKelompok h4');
 
-    const jamaahData = globalCache.jamaah;
-    const generusData = globalCache.generus;
+    const jamaahData = globalCache.jamaah || [];
+    const generusData = globalCache.generus || [];
 
-    const calculateAgeFromDate = (dateString) => {
-        if (!dateString) return null;
-        const parts = dateString.split('-');
-        if (parts.length !== 3) return null;
-        const birthDate = new Date(`${parts[0]}-${parts[1]}-${parts[2]}`);
-        const today = new Date();
-        if (isNaN(birthDate.getTime())) return null;
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const m = today.getMonth() - birthDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-        return age >= 0 ? age : null;
-    };
-
+    // -------------------------------------------------------------
+    // MODE 1: TAMPILAN OPERATOR (DAFTAR NAMA ANGGOTA ANGGOTA KELOMPOK)
+    // -------------------------------------------------------------
     if (currentUser.role === 'OPERATOR') {
         if (titleEl) titleEl.textContent = `DAFTAR JAMAAH & GENERUS KELOMPOK ${currentUser.kelompok.toUpperCase()}`;
         if (filterContainer) filterContainer.style.display = 'none';
@@ -2403,72 +2512,8 @@ function loadRekapKelompokLengkap() {
             </tr>
         `;
 
-        let listMembers = [];
-        let countL = 0, countP = 0;
-        let catCounts = {
-            'Menikah': 0, 'Duda': 0, 'Janda': 0, 'Manula': 0, 'Operator': 0,
-            'PAUD': 0, 'TK': 0, 'Caberawit': 0, 'Pra Remaja': 0, 'Remaja': 0, 'Usia Mandiri': 0
-        };
-
-        jamaahData.forEach(j => {
-            if (j.desa === currentUser.desa && j.kelompok === currentUser.kelompok) {
-                const jk = (j.jenis_kelamin || '-').toUpperCase();
-                if (jk === 'L') countL++;
-                else if (jk === 'P') countP++;
-
-                const st = j.status || 'Menikah';
-                if (catCounts.hasOwnProperty(st)) catCounts[st]++;
-
-                let calcAge = j.umur;
-                if ((calcAge === null || calcAge === undefined || calcAge === '') && j.tanggal_lahir) {
-                    calcAge = calculateAgeFromDate(j.tanggal_lahir);
-                }
-
-                listMembers.push({
-                    nama: j.nama,
-                    kategori: st,
-                    jk: jk,
-                    umur: (calcAge !== null && calcAge !== undefined && calcAge !== '') ? `${calcAge} thn` : '-',
-                    isDisabilitas: j.is_disabilitas,
-                    tipe: 'DEWASA'
-                });
-            }
-        });
-
-        generusData.forEach(g => {
-            if (g.desa === currentUser.desa && g.kelompok === currentUser.kelompok) {
-                const jk = (g.jenis_kelamin || g.jk || '-').toUpperCase();
-                if (jk === 'L') countL++;
-                else if (jk === 'P') countP++;
-
-                let rawKat = g.kategori_usia || 'Generus';
-                let parsedKey = parseKategoriGenerus(rawKat);
-                let labelKat = rawKat;
-                
-                if (parsedKey === 'paud') { labelKat = 'PAUD'; catCounts['PAUD']++; }
-                else if (parsedKey === 'tk') { labelKat = 'TK'; catCounts['TK']++; }
-                else if (parsedKey === 'caberawit') { labelKat = 'Caberawit'; catCounts['Caberawit']++; }
-                else if (parsedKey === 'praRemaja') { labelKat = 'Pra Remaja'; catCounts['Pra Remaja']++; }
-                else if (parsedKey === 'remaja') { labelKat = 'Remaja'; catCounts['Remaja']++; }
-                else if (parsedKey === 'usiaMandiri') { labelKat = 'Usia Mandiri'; catCounts['Usia Mandiri']++; }
-
-                let valUmur = g.umur ?? g.usia ?? null;
-                const tglLahirField = g.tanggal_lahir || g.tgl_lahir || null;
-
-                if ((valUmur === null || valUmur === undefined || valUmur === '') && tglLahirField) {
-                    valUmur = calculateAgeFromDate(tglLahirField);
-                }
-
-                listMembers.push({
-                    nama: g.nama,
-                    kategori: labelKat,
-                    jk: jk,
-                    umur: (valUmur !== null && valUmur !== undefined && valUmur !== '') ? `${valUmur} thn` : '-',
-                    isDisabilitas: g.is_disabilitas,
-                    tipe: 'GENERUS'
-                });
-            }
-        });
+        // Gunakan DEDUPLIKASI PINTAR untuk mendapatkan daftar nama bersih tanpa ganda
+        const listMembers = getUniqueMembers(jamaahData, generusData, currentUser.desa, currentUser.kelompok);
 
         if (listMembers.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400 font-semibold text-xs border border-slate-200">Belum ada data jamaah/generus di kelompok ini.</td></tr>';
@@ -2478,8 +2523,21 @@ function loadRekapKelompokLengkap() {
 
         listMembers.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
 
+        let countL = 0, countP = 0;
+        let catCounts = {
+            'Menikah': 0, 'Duda': 0, 'Janda': 0, 'Manula': 0, 'Operator': 0,
+            'PAUD': 0, 'TK': 0, 'Caberawit': 0, 'Pra Remaja': 0, 'Remaja': 0, 'Usia Mandiri': 0
+        };
+
         tbody.innerHTML = '';
         listMembers.forEach((item, index) => {
+            if (item.jenis_kelamin === 'L') countL++;
+            else if (item.jenis_kelamin === 'P') countP++;
+
+            if (catCounts.hasOwnProperty(item.status)) {
+                catCounts[item.status]++;
+            }
+
             const tr = document.createElement('tr');
             tr.className = "hover:bg-indigo-50/50 transition-colors border-b border-indigo-50/60";
             
@@ -2492,13 +2550,13 @@ function loadRekapKelompokLengkap() {
                 <td class="px-1.5 py-2 font-extrabold text-slate-800 text-left text-[11px] leading-snug break-words border border-slate-200">${item.nama}</td>
                 <td class="px-1 py-2 text-center border border-slate-200">
                     <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border inline-block ${badgeClass}">
-                        ${item.kategori}
+                        ${item.status}
                     </span>
                 </td>
-                <td class="px-1 py-2 text-center font-bold text-slate-700 text-[11px] border border-slate-200">${item.jk}</td>
+                <td class="px-1 py-2 text-center font-bold text-slate-700 text-[11px] border border-slate-200">${item.jenis_kelamin}</td>
                 <td class="px-1 py-2 text-center font-bold text-slate-600 text-[10px] border border-slate-200">${item.umur}</td>
                 <td class="px-1 py-2 text-center border border-slate-200">
-                    ${item.isDisabilitas ? '<span class="text-teal-600 font-extrabold text-[10px]">♿ Ya</span>' : '<span class="text-slate-300 text-[10px]">-</span>'}
+                    ${item.is_disabilitas ? '<span class="text-teal-600 font-extrabold text-[10px]">♿ Ya</span>' : '<span class="text-slate-300 text-[10px]">-</span>'}
                 </td>
             `;
             tbody.appendChild(tr);
@@ -2547,6 +2605,10 @@ function loadRekapKelompokLengkap() {
         return;
     }
 
+
+    // -------------------------------------------------------------
+    // MODE 2: TAMPILAN DEVELOPER / REKAP AGREGAT PER KELOMPOK
+    // -------------------------------------------------------------
     if (titleEl) titleEl.textContent = "Rekap Jamaah & Generus Per Kelompok";
     if (filterContainer) filterContainer.style.display = 'flex';
 
@@ -2574,9 +2636,10 @@ function loadRekapKelompokLengkap() {
     `;
 
     const selectedFilterDesa = document.getElementById('filterDesaRekap').value;
-    const sarprasData = globalCache.sarpras;
+    const sarprasData = globalCache.sarpras || [];
     const rekapMap = {};
 
+    // Inisialisasi peta kelompok
     Object.keys(dataWilayah).forEach(desa => {
         if (!selectedFilterDesa || selectedFilterDesa === desa) {
             dataWilayah[desa].forEach(kelompok => {
@@ -2593,74 +2656,52 @@ function loadRekapKelompokLengkap() {
         }
     });
 
-    if (generusData && generusData.length > 0) {
-        generusData.forEach(g => {
-            if (!selectedFilterDesa || selectedFilterDesa === g.desa) {
-                const key = `${g.desa}__${g.kelompok}`;
-                if (!rekapMap[key]) {
-                    rekapMap[key] = {
-                        desa: g.desa, kelompok: g.kelompok,
-                        paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0, totalGenerus: 0,
-                        menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, jamaahL: 0, jamaahP: 0, totalJamaah: 0, totalKeseluruhan: 0,
-                        subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
-                    };
-                }
-                const katKey = parseKategoriGenerus(g.kategori_usia);
-                
-                if (katKey && rekapMap[key].hasOwnProperty(katKey)) {
-                    rekapMap[key][katKey]++;
-                    rekapMap[key].totalGenerus++;
-                    rekapMap[key].totalKeseluruhan++;
-                }
+    // Jalankan deduplikasi per wilayah/kelompok untuk rekapitulasi angka agregat
+    Object.keys(rekapMap).forEach(key => {
+        const itemMap = rekapMap[key];
+        const uniqueList = getUniqueMembers(jamaahData, generusData, itemMap.desa, itemMap.kelompok);
+
+        uniqueList.forEach(m => {
+            const st = (m.status || "").toLowerCase();
+            const jk = (m.jenis_kelamin || "").toUpperCase();
+
+            if (jk === "L") itemMap.jamaahL++;
+            else if (jk === "P") itemMap.jamaahP++;
+
+            if (m.tipe === 'DEWASA') {
+                if (st === "menikah") itemMap.menikah++;
+                else if (st === "duda") itemMap.duda++;
+                else if (st === "janda") itemMap.janda++;
+                else if (st === "manula") itemMap.manula++;
+                else if (st === "operator") itemMap.operator++;
+                itemMap.totalJamaah++;
+            } else if (m.tipe === 'GENERUS') {
+                if (st === "paud") itemMap.paud++;
+                else if (st === "tk") itemMap.tk++;
+                else if (st === "caberawit") itemMap.caberawit++;
+                else if (st === "pra remaja") itemMap.praRemaja++;
+                else if (st === "remaja") itemMap.remaja++;
+                else if (st === "usia mandiri") itemMap.usiaMandiri++;
+                itemMap.totalGenerus++;
             }
+
+            itemMap.totalKeseluruhan++;
         });
-    }
-
-    jamaahData.forEach(j => {
-        if (!selectedFilterDesa || selectedFilterDesa === j.desa) {
-            const key = `${j.desa}__${j.kelompok}`;
-            if (!rekapMap[key]) {
-                rekapMap[key] = {
-                    desa: j.desa, kelompok: j.kelompok,
-                    paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0, totalGenerus: 0,
-                    menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, jamaahL: 0, jamaahP: 0, totalJamaah: 0, totalKeseluruhan: 0,
-                    subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
-                };
-            }
-            const st = (j.status || "").toLowerCase();
-            if (st === "menikah") rekapMap[key].menikah++;
-            else if (st === "duda") rekapMap[key].duda++;
-            else if (st === "janda") rekapMap[key].janda++;
-            else if (st === "manula") rekapMap[key].manula++;
-            else if (st === "operator") rekapMap[key].operator++;
-            
-            const jk = (j.jenis_kelamin || "").toUpperCase();
-            if (jk === "L") rekapMap[key].jamaahL++;
-            else if (jk === "P") rekapMap[key].jamaahP++;
-
-            rekapMap[key].totalJamaah++;
-            rekapMap[key].totalKeseluruhan++;
-        }
     });
 
+    // Mengisi data Sarpras
     sarprasData.forEach(s => {
         if (!selectedFilterDesa || selectedFilterDesa === s.desa) {
             const key = `${s.desa}__${s.kelompok}`;
-            if (!rekapMap[key]) {
-                rekapMap[key] = {
-                    desa: s.desa, kelompok: s.kelompok,
-                    paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0, totalGenerus: 0,
-                    menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, jamaahL: 0, jamaahP: 0, totalJamaah: 0, totalKeseluruhan: 0,
-                    subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
-                };
+            if (rekapMap[key]) {
+                rekapMap[key].subKlp = parseInt(s.jumlah_sub_kelompok, 10) || 0;
+                rekapMap[key].masjid = parseInt(s.jumlah_masjid, 10) || 0;
+                rekapMap[key].aula = parseInt(s.jumlah_aula, 10) || 0;
+                rekapMap[key].kmPria = parseInt(s.km_pria, 10) || 0;
+                rekapMap[key].kmWanita = parseInt(s.km_wanita, 10) || 0;
+                rekapMap[key].kmMt = parseInt(s.km_mt, 10) || 0;
+                rekapMap[key].kmTamu = parseInt(s.km_tamu, 10) || 0;
             }
-            rekapMap[key].subKlp = parseInt(s.jumlah_sub_kelompok, 10) || 0;
-            rekapMap[key].masjid = parseInt(s.jumlah_masjid, 10) || 0;
-            rekapMap[key].aula = parseInt(s.jumlah_aula, 10) || 0;
-            rekapMap[key].kmPria = parseInt(s.km_pria, 10) || 0;
-            rekapMap[key].kmWanita = parseInt(s.km_wanita, 10) || 0;
-            rekapMap[key].kmMt = parseInt(s.km_mt, 10) || 0;
-            rekapMap[key].kmTamu = parseInt(s.km_tamu, 10) || 0;
         }
     });
 
@@ -2711,10 +2752,9 @@ function loadRekapKelompokLengkap() {
             <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.manula}</td>
             <td class="px-1.5 py-3 text-center font-black text-blue-700 bg-blue-50/60">${item.operator}</td>
             
+            <td class="px-1.5 py-3 text-center font-black text-indigo-900 bg-indigo-50 border-l border-indigo-200 text-[11px]">${item.totalJamaah}</td>
             <td class="px-1.5 py-3 text-center font-bold text-blue-900 bg-blue-50/40 border-l border-indigo-100">${item.jamaahL}</td>
             <td class="px-1.5 py-3 text-center font-bold text-pink-900 bg-pink-50/40">${item.jamaahP}</td>
-
-            <td class="px-1.5 py-3 text-center font-black text-indigo-900 bg-indigo-50 border-l border-indigo-200 text-[11px]">${item.totalJamaah}</td>
             <td class="px-2 py-3 text-center font-black text-indigo-900 bg-indigo-200/80 border-l border-indigo-300 text-[12px]">${item.totalKeseluruhan}</td>
         `;
         tbody.appendChild(tr);
@@ -2736,10 +2776,9 @@ function loadRekapKelompokLengkap() {
             <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totManula}</td>
             <td class="px-1.5 py-4 text-center font-black text-blue-800 bg-blue-100/90">${totOperator}</td>
             
+            <td class="px-1.5 py-4 text-center font-black text-indigo-950 bg-indigo-200/80 border-l border-indigo-200 text-[12px]">${totAllJamaah}</td>
             <td class="px-1.5 py-4 text-center font-black text-blue-950 bg-blue-100/90 border-l border-indigo-200">${totJamaahL}</td>
             <td class="px-1.5 py-4 text-center font-black text-pink-950 bg-pink-100/90">${totJamaahP}</td>
-
-            <td class="px-1.5 py-4 text-center font-black text-indigo-950 bg-indigo-200/80 border-l border-indigo-200 text-[12px]">${totAllJamaah}</td>
             <td class="px-2 py-4 text-center font-black text-indigo-950 bg-indigo-300 border-l border-indigo-300 text-[13px]">${totAllKeseluruhan}</td>
         </tr>
     `;
@@ -3060,7 +3099,7 @@ function printData(elementId, documentTitle = 'Laporan Sistem Informasi') {
                     background: #ffffff;
                     margin: 0;
                     padding: 0;
-                    font-size: 9pt;
+                    font-size: 12pt !important;
                 }
                 svg, img {
                     display: none !important;
@@ -3078,47 +3117,17 @@ function printData(elementId, documentTitle = 'Laporan Sistem Informasi') {
                     text-transform: uppercase;
                 }
                 .word-header p {
-                    font-size: 9pt;
+                    font-size: 10pt;
                     margin: 2px 0;
                     color: #333333;
                 }
                 h4 {
-                    font-size: 10pt;
+                    font-size: 11pt;
                     font-weight: bold;
                     margin: 10px 0 4px 0;
                     text-transform: uppercase;
                     color: #000000;
                     page-break-after: avoid;
-                }
-                
-                .grid {
-                    display: flex !important;
-                    flex-wrap: wrap !important;
-                    gap: 6px !important;
-                    margin-bottom: 10px !important;
-                }
-                .grid > div {
-                    flex: 1 1 0 !important;
-                    border: 1px solid #000000 !important;
-                    padding: 6px 4px !important;
-                    text-align: center !important;
-                    background: #fdfdfd !important;
-                    page-break-inside: avoid !important;
-                }
-                .grid span {
-                    display: block;
-                }
-                .grid span:first-child {
-                    font-size: 7.5pt;
-                    font-weight: bold;
-                    color: #444444;
-                    text-transform: uppercase;
-                }
-                .grid span:last-child {
-                    font-size: 12pt;
-                    font-weight: bold;
-                    color: #000000;
-                    margin-top: 2px;
                 }
 
                 table {
@@ -3126,37 +3135,97 @@ function printData(elementId, documentTitle = 'Laporan Sistem Informasi') {
                     border-collapse: collapse !important;
                     margin-top: 6px !important;
                     margin-bottom: 12px !important;
-                    font-size: 8pt !important;
+                    font-size: 10pt !important;
                     page-break-inside: auto !important;
                 }
-                thead {
-                    display: table-header-group !important;
-                }
+                
                 tfoot {
-                    display: table-footer-group !important;
+                    display: table-row-group !important;
+                    page-break-inside: avoid !important;
                 }
+                
                 tr {
                     page-break-inside: avoid !important;
                     break-inside: avoid !important;
                 }
+                
                 th, td {
                     border: 1px solid #000000 !important;
-                    padding: 4px 3px !important;
+                    padding: 5px 6px !important;
                     text-align: center !important;
                     vertical-align: middle !important;
                     word-wrap: break-word !important;
                 }
+                
+                /* KOLOM NAMA LENGKAP RATA KIRI */
+                td:nth-child(2), th:nth-child(2),
+                td.text-left, th.text-left {
+                    text-align: left !important;
+                }
+
                 th {
                     background-color: #f0f0f0 !important;
                     font-weight: bold !important;
                     text-transform: uppercase !important;
                 }
+                
+                /* RAPKAN BARIS TOTAL (TFOOT) */
                 tfoot td {
-                    background-color: #e6e6e6 !important;
-                    font-weight: bold !important;
-                }
-                td.sticky-col, th.sticky-col {
+                    background-color: #fcfcfc !important;
+                    font-weight: normal !important;
                     text-align: left !important;
+                    padding: 8px 10px !important;
+                }
+
+                /* RAPIKAN TAMPILAN ELEMEN DI DALAM TOTAL */
+                tfoot div, tfoot span, tfoot p {
+                    box-sizing: border-box !important;
+                }
+
+                tfoot .space-y-2 {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 6px !important;
+                }
+
+                tfoot .flex {
+                    display: flex !important;
+                    align-items: center !important;
+                }
+
+                tfoot .flex-wrap {
+                    flex-wrap: wrap !important;
+                }
+
+                tfoot .gap-6 {
+                    gap: 16px !important;
+                }
+
+                tfoot .gap-1 {
+                    gap: 6px !important;
+                }
+
+                tfoot .border-b {
+                    border-bottom: 1px solid #cccccc !important;
+                    padding-bottom: 6px !important;
+                }
+
+                /* STYLING RINGKASAN CHIPS KATEGORI DI BARIS TOTAL */
+                tfoot .bg-white\/90, tfoot .bg-white {
+                    background-color: #f0f4f8 !important;
+                    border: 1px solid #b0c4de !important;
+                    border-radius: 4px !important;
+                    padding: 3px 8px !important;
+                    margin-right: 4px !important;
+                    margin-bottom: 4px !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    font-size: 9pt !important;
+                }
+
+                tfoot .text-indigo-700, tfoot .font-black {
+                    font-weight: bold !important;
+                    color: #000000 !important;
                 }
             </style>
         </head>
@@ -3164,7 +3233,7 @@ function printData(elementId, documentTitle = 'Laporan Sistem Informasi') {
             <div class="word-header">
                 <h1>INSAN QUR'ANY TAWANGMANGU</h1>
                 <p><strong>${documentTitle}</strong></p>
-                <p style="font-size: 8pt; color: #555555;">Dicetak pada: ${dateStr} WIB</p>
+                <p style="font-size: 9pt; color: #555555;">Dicetak pada: ${dateStr} WIB</p>
             </div>
 
             ${clonedContent.innerHTML}
