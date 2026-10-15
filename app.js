@@ -1551,7 +1551,7 @@ function editAbsensi(id) {
     const boxTargetCustom = document.getElementById('boxTargetCustom');
 
     const standardOptions = [
-        "Penyampaian Materi PPG Pusat", 
+        "Materi PPG Pusat dan 30 Point", 
         "Pengajian Ibu-Ibu Daerah", 
         "Pengajian Umum Daerah", 
         "Pengajian Remaja Daerah", 
