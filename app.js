@@ -642,10 +642,19 @@ function openModal(id, pushHistory = true) {
         history.pushState({ modal: id, section: activeSectionId }, '', '#' + id);
     }
     
+    // Pastikan class 'hidden' dari Tailwind dihapus terlebih dahulu
     el.classList.remove('hidden');
+
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
             el.classList.add('active');
+            // Menangani efek fade-in untuk modal khusus seperti centerPicker/belumAbsenModal
+            el.classList.remove('opacity-0');
+            const card = el.querySelector('#belumAbsenModalCard') || el.firstElementChild;
+            if (card) {
+                card.classList.remove('scale-90', 'opacity-0');
+                card.classList.add('scale-100', 'opacity-100');
+            }
         });
     });
 }
@@ -655,10 +664,17 @@ function closeModal(id, backHistory = true) {
     if (!el) return;
 
     el.classList.remove('active');
+    el.classList.add('opacity-0');
+
+    const card = el.querySelector('#belumAbsenModalCard') || el.firstElementChild;
+    if (card) {
+        card.classList.remove('scale-100', 'opacity-100');
+        card.classList.add('scale-90', 'opacity-0');
+    }
     
     setTimeout(() => {
         el.classList.add('hidden');
-    }, 380); // Disesuaikan dengan durasi animasi CSS
+    }, 350); // Disesuaikan dengan durasi transisi CSS
 
     if (backHistory && window.history.state && (window.history.state.modal === id || window.history.state.modalOpen === id)) {
         window.history.back();
@@ -1681,6 +1697,7 @@ function copyKelompokBelumAbsen() {
     let data = [...globalCache.absensi];
     data = data.filter(item => item.nama_kegiatan === kegiatan);
     
+    // Perbaikan logika filter agar menangani opsi kosong ("Semua Tgl", "Semua Bulan", dll) dengan benar
     const filteredData = data.filter(item => {
         if (desa && item.desa !== desa) return false;
         if (!item.tanggal_kegiatan) return false;
@@ -1716,36 +1733,36 @@ function copyKelompokBelumAbsen() {
     });
 
     if (belumAbsen.length === 0) {
-        showCustomModal("Lengkap", "Mantap! Semua kelompok sudah mengisi absensi untuk kegiatan ini.", "✅");
+        showCustomModal("Lengkap", "Mantap! Semua kelompok sudah mengisi absensi untuk kegiatan ini pada filter waktu yang dipilih.", "✅");
         return;
     }
 
-    // Membuat Teks Label Waktu
+    // Membuat Label Waktu yang Dinamis
     const elmBulan = document.getElementById('filterBulanAbsensi');
-    const namaBulan = bulan ? elmBulan.options[elmBulan.selectedIndex].text : '';
+    const namaBulan = bulan ? elmBulan.options[elmBulan.selectedIndex].text : 'Semua Bulan';
     
     let labelWaktu = "";
     if (tglAngka && bulan && tahun) {
         labelWaktu = `${tglAngka} ${namaBulan} ${tahun}`;
-    } else if (tglAngka && bulan) {
-        labelWaktu = `Tanggal ${tglAngka} ${namaBulan}`;
     } else if (bulan && tahun) {
         labelWaktu = `${namaBulan} ${tahun}`;
     } else {
-        labelWaktu = `Periode ${tahun || 'Semua'}`;
+        labelWaktu = `Periode ${tahun || 'Keseluruhan'}`;
     }
 
+    // Susun Teks WhatsApp
     let pesan = `*PEMBERITAHUAN ABSENSI*\n\n`;
     pesan += `Kegiatan: *${kegiatan}*\n`;
     pesan += `Waktu: *${labelWaktu}*\n\n`;
     pesan += `Berikut adalah daftar kelompok yang *BELUM* mengisi absensi:\n\n`;
 
     belumAbsen.forEach((item, index) => {
-        pesan += `${index + 1}. Kelompok ${item.kelompok}\n`;
+        pesan += `${index + 1}. Kelompok ${item.kelompok} (${item.desa})\n`;
     });
 
     pesan += `\nMohon kepada operator kelompok terkait untuk segera mengisi absensi di aplikasi OS SDC Tawangmangu. Alkhamdulillah Jaza Kumullahu Khoiro 🙏`;
 
+    // Render Pratinjau ke dalam Modal Belum Absen
     document.getElementById('belumAbsenSubtitle').textContent = `${kegiatan} • ${labelWaktu}`;
     
     const listEl = document.getElementById('belumAbsenList');
@@ -1777,12 +1794,12 @@ function copyKelompokBelumAbsen() {
             setTimeout(() => {
                 showCustomModal(
                     "Berhasil Disalin", 
-                    `Daftar ${belumAbsen.length} kelompok yang belum absen telah disalin ke clipboard. Silakan paste di Grup WA Operator.`, 
+                    `Daftar ${belumAbsen.length} kelompok yang belum absen telah disalin ke clipboard. Silakan tempel (paste) di Grup WA Operator.`, 
                     "📋"
                 );
             }, 300);
         }).catch(() => {
-            showCustomModal("Gagal", "Browser tidak mendukung penyalinan otomatis.", "❌");
+            showCustomModal("Gagal", "Browser tidak mendukung penyalinan otomatis ke clipboard.", "❌");
         });
     };
 
