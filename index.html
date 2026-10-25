@@ -162,16 +162,18 @@
 			overflow: hidden !important;
 			text-overflow: ellipsis !important;
 			
-			min-width: 140px !important; 
-			max-width: 200px !important;
-			width: 160px !important;
+			/* Ukuran sempit untuk HP (layar kecil) */
+			min-width: 95px !important; 
+			max-width: 130px !important;
+			width: 105px !important;
 		}
 
+		/* Ukuran sedikit lebih lega saat dibuka di Tablet/Laptop/PC */
 		@media (min-width: 640px) {
 			.sticky-col { 
-				min-width: 150px !important; 
-				max-width: 220px !important; 
-				width: 170px !important; 
+				min-width: 140px !important; 
+				max-width: 200px !important; 
+				width: 160px !important; 
 			}
 		}
 
