@@ -240,6 +240,7 @@ async function handleAuthSubmit(e) {
                 modal.classList.add('hidden');
                 await preloadAllApplicationData();
                 applyRoleRestrictionsUI();
+				checkOperatorMonthlyAttendance();
             }, 400);
         }, 600);
 
@@ -617,7 +618,10 @@ function switchSectionView(target) {
 
     activeSectionId = target;
 
-    if (target === 'database') {
+    if (target === 'home') {
+		checkOperatorMonthlyAttendance();
+	}
+	if (target === 'database') {
         if (currentMode !== 'UPDATE') switchMode('DAFTAR');
     } else if (target === 'absensi') {
         switchTabAbsensi(activeAbsensiSubTab || 'INPUT');
@@ -753,6 +757,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         authModal.classList.add('hidden');
         await preloadAllApplicationData();
         applyRoleRestrictionsUI();
+		checkOperatorMonthlyAttendance();
     }
 
     setTimeout(() => {
@@ -1520,6 +1525,7 @@ document.getElementById('formAbsensiKegiatan').addEventListener('submit', functi
                 if (currentUser.role === 'OPERATOR') {
                     applyRoleRestrictionsUI();
                 }
+				checkOperatorMonthlyAttendance();
                 switchTabAbsensi('REKAP');
             });
         } catch(e) {
@@ -3537,4 +3543,176 @@ function loadRekapSarprasDeveloper() {
             <td class="px-2 py-3.5 text-center font-black text-teal-950">${totKmTamu}</td>
         </tr>
     `;
+}
+
+// Fungsi untuk mengecek absensi berdasarkan Nama Kegiatan dan Bulan saja
+function checkOperatorMonthlyAttendance() {
+    const alertContainer = document.getElementById('dashboardAlertContainer');
+    if (!alertContainer) return;
+
+    // Reset kontainer alert
+    alertContainer.innerHTML = '';
+
+    // Fitur ini khusus untuk role OPERATOR
+    if (!currentUser || currentUser.role !== 'OPERATOR') {
+        return;
+    }
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const currentYearMonth = `${year}-${month}`; // Format YYYY-MM (bulan berjalan)
+
+    const namaBulanArr = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+    const namaBulanIni = namaBulanArr[now.getMonth()];
+
+    const absensiList = globalCache.absensi || [];
+
+    // 1. Kumpulkan semua nama kegiatan unik yang sudah di-input oleh kelompok MANAPUN pada bulan ini
+    const monthActivitiesSet = new Set();
+    absensiList.forEach(item => {
+        if (item.tanggal_kegiatan && item.tanggal_kegiatan.startsWith(currentYearMonth) && item.nama_kegiatan) {
+            monthActivitiesSet.add(item.nama_kegiatan.trim());
+        }
+    });
+
+    // Jika di bulan ini belum ada satupun kelompok yang mengisi data, alert tidak ditampilkan
+    if (monthActivitiesSet.size === 0) {
+        return;
+    }
+
+    // 2. Kumpulkan nama kegiatan apa saja yang SUDAH di-input oleh operator yang sedang login pada bulan ini
+    const mySubmittedActivitiesSet = new Set();
+    absensiList.forEach(item => {
+        if (item.desa === currentUser.desa &&
+            item.kelompok === currentUser.kelompok &&
+            item.tanggal_kegiatan &&
+            item.tanggal_kegiatan.startsWith(currentYearMonth) &&
+            item.nama_kegiatan) {
+            mySubmittedActivitiesSet.add(item.nama_kegiatan.trim());
+        }
+    });
+
+    // 3. Cari nama kegiatan yang sudah ada di sistem bulan ini tapi BELUM diisi sama sekali oleh kelompok ini
+    const missingActivities = [];
+    monthActivitiesSet.forEach(namaKegiatan => {
+        if (!mySubmittedActivitiesSet.has(namaKegiatan)) {
+            missingActivities.push(namaKegiatan);
+        }
+    });
+
+    // Urutkan abjad nama kegiatan
+    missingActivities.sort();
+
+    // 4. Tampilkan alert jika ada nama kegiatan bulan ini yang terlewat oleh kelompok tersebut
+    if (missingActivities.length > 0) {
+        let listHtml = missingActivities.map(nama => `
+            <div class="bg-white/90 border border-rose-100 p-2.5 rounded-xl flex items-center justify-between gap-2 shadow-2xs mb-1.5">
+                <span class="text-xs font-extrabold text-slate-800 truncate">• ${nama}</span>
+                <span class="text-[10px] font-black bg-rose-100 text-rose-800 px-2.5 py-1 rounded-lg border border-rose-200 shrink-0">
+                    Belum Diisi
+                </span>
+            </div>
+        `).join('');
+
+        alertContainer.innerHTML = `
+            <div class="bg-gradient-to-r from-rose-500/10 via-red-500/10 to-amber-500/10 border-2 border-rose-300/80 p-4 rounded-2xl shadow-lg backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in-up">
+                <div class="flex items-start gap-3 w-full sm:w-auto">
+                    <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-xl shrink-0 shadow-inner">
+                        ⚠️
+                    </div>
+                    <div class="w-full">
+                        <h4 class="text-xs sm:text-sm font-extrabold text-rose-900 tracking-tight">
+                            Absensi Bulan ${namaBulanIni} ${year} Belum Lengkap!
+                        </h4>
+                        <p class="text-[11px] text-rose-700 font-medium mt-0.5 leading-relaxed">
+                            Kelompok <strong>${currentUser.kelompok}</strong> belum melaporkan absensi untuk kegiatan berikut pada bulan ini:
+                        </p>
+                        <div class="mt-2.5 max-h-40 overflow-y-auto pr-1">
+                            ${listHtml}
+                        </div>
+                    </div>
+                </div>
+                <button type="button" onclick="showSection('absensi')" class="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-extrabold text-xs rounded-xl shadow-md transition-all active:scale-95 shrink-0 text-center">
+                    Lengkapi Absensi &raquo;
+                </button>
+            </div>
+        `;
+    }
+}
+
+function applyRoleRestrictionsUI() {
+    const badgeKelompok = document.getElementById('badgeKelompokLogin');
+    const teksKelompokAktif = document.getElementById('namaKelompokAktif');
+
+    // Jika yang login adalah OPERATOR
+    if (currentUser.role === 'OPERATOR') {
+        const opDesa = currentUser.desa;
+        const opKelompok = currentUser.kelompok;
+
+        // Tampilkan badge nama kelompok di dashboard khusus operator
+        if (badgeKelompok && teksKelompokAktif) {
+            teksKelompokAktif.textContent = `${opKelompok} (${opDesa})`;
+            badgeKelompok.classList.remove('hidden');
+        }
+
+        const pairs = [
+            { desaId: 'desa', kelompokId: 'kelompok' },
+            { desaId: 'searchDesa', kelompokId: 'searchKelompok' },
+            { desaId: 'abs_desa', kelompokId: 'abs_kelompok' },
+            { desaId: 'sarp_desa', kelompokId: 'sarp_kelompok' },
+            { desaId: 'exportDesa', kelompokId: 'exportKelompok' }
+        ];
+
+        pairs.forEach(({ desaId, kelompokId }) => {
+            const dEl = document.getElementById(desaId);
+            const kEl = document.getElementById(kelompokId);
+
+            if (dEl && kEl) {
+                dEl.value = opDesa;
+                dEl.disabled = true;
+
+                kEl.innerHTML = `<option value="${opKelompok}">${opKelompok}</option>`;
+                kEl.value = opKelompok;
+                kEl.disabled = true;
+                kEl.classList.remove('bg-slate-100/50', 'text-slate-400');
+            }
+        });
+
+        const exportScopeEl = document.getElementById('exportScopeMode');
+        if (exportScopeEl) {
+            exportScopeEl.value = 'KELOMPOK';
+            exportScopeEl.disabled = true;
+        }
+
+        if (document.getElementById('searchKelompok')) {
+            fetchAutoJamaahList(opDesa, opKelompok);
+        }
+
+        const btnSarprasDashboard = document.querySelector("button[onclick=\"showSection('sarpras')\"]");
+        if (btnSarprasDashboard) {
+            btnSarprasDashboard.classList.add('hidden');
+        }
+
+        const btnRekapDashboard = document.querySelector("button[onclick=\"showSection('rekap')\"]");
+        if (btnRekapDashboard) {
+            btnRekapDashboard.style.gridColumn = "1 / -1";
+            btnRekapDashboard.style.justifySelf = "center";
+            btnRekapDashboard.style.width = "100%";
+            btnRekapDashboard.style.maxWidth = "320px";
+        }
+
+        const tabRekapSarpras = document.getElementById('tabRekapSarpras');
+        if (tabRekapSarpras) {
+            tabRekapSarpras.classList.add('hidden');
+        }
+    } else if (currentUser.role === 'DEVELOPER') {
+        // Jika yang login adalah DEVELOPER, sembunyikan badge kelompok
+        if (badgeKelompok) {
+            badgeKelompok.classList.add('hidden');
+        }
+    }
 }

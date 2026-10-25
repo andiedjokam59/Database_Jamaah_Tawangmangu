@@ -381,9 +381,14 @@
 
         <div class="text-center mb-6 sm:mb-8">
             <h2 id="mainTitle" class="text-2xl sm:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-fuchsia-600 leading-tight tracking-tight">INSAN QUR'ANY<br>TAWANGMANGU</h2>
-            <p id="mainSubtitle" class="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium">Sistem Informasi Jamaah & Sarana Prasarana</p>
+            <div id="badgeKelompokLogin" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-extrabold shadow-sm hidden">
+				<span>Kelompok: <span id="namaKelompokAktif">-</span></span>
+			</div>
+			<p id="mainSubtitle" class="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium">Sistem Informasi Jamaah & Sarana Prasarana</p>
             <div class="w-12 sm:w-16 h-1.5 bg-gradient-to-r from-indigo-500 to-fuchsia-500 mx-auto mt-4 rounded-full shadow-lg"></div>
         </div>
+		
+		<div id="dashboardAlertContainer" class="mb-4"></div>
 
         <!-- MENU UTAMA -->
         <div id="mainDashboard" class="section-content grid grid-cols-2 gap-3 sm:gap-5 py-2 sm:py-4">
