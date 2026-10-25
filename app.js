@@ -58,11 +58,6 @@ async function fetchAllRows(client, tableName, selectColumns = '*') {
     while (hasMore) {
         let query = client.from(tableName).select(selectColumns);
 
-        // KODE DI BAWAH INI KITA HAPUS / KOMENTARI AGAR SEMUA DATA SEDAERAH BISA DIMUAT
-        // if (currentUser.role === 'OPERATOR' && currentUser.desa && currentUser.kelompok) {
-        //     query = query.eq('desa', currentUser.desa).eq('kelompok', currentUser.kelompok);
-        // }
-
         const { data: pageData, error } = await query.range(page * pageSize, (page + 1) * pageSize - 1);
 
         if (error) throw error;
@@ -77,28 +72,108 @@ async function fetchAllRows(client, tableName, selectColumns = '*') {
             page++;
         }
     }
+
+    // KHUSUS OPERATOR:
+    // Tabel data_jamaah dan data_generus dibiarkan memuat seluruh data 
+    // agar menu 'Status Jamaah' dapat menghitung total keseluruhan secara akurat.
+    // Menu lain (seperti daftar anggota di 'Rekap Per Klp' dan 'Database') 
+    // sudah otomatis memfilter data berdasarkan kelompok operator masing-masing.
+
     return allData;
+}
+
+// Fungsi untuk menghapus cache lokal saat ada data yang diubah/disimpan
+function invalidateAppCache() {
+    localStorage.removeItem('sdc_cache_version');
+    globalCache.isLoaded = false;
 }
 
 async function preloadAllApplicationData() {
     if (globalCache.isLoaded) return;
-    showDataLoading("Mengunduh seluruh database...");
+
+    // 1. Muat dari cache lokal terlebih dahulu agar aplikasi terbuka secara instan
     try {
-        const [dataJamaah, dataGenerus, dataSarpras, dataAbsensi] = await Promise.all([
+        const cachedJamaah = localStorage.getItem('sdc_cache_jamaah');
+        if (cachedJamaah) {
+            globalCache.jamaah = JSON.parse(cachedJamaah);
+            globalCache.generus = JSON.parse(localStorage.getItem('sdc_cache_generus') || '[]');
+            globalCache.sarpras = JSON.parse(localStorage.getItem('sdc_cache_sarpras') || '[]');
+            globalCache.absensi = JSON.parse(localStorage.getItem('sdc_cache_absensi') || '[]');
+            globalCache.jadwal = JSON.parse(localStorage.getItem('sdc_cache_jadwal') || '[]');
+            globalCache.isLoaded = true;
+
+            // 2. Jalankan sinkronisasi otomatis di background secara diam-diam
+            backgroundSyncData();
+            return;
+        }
+    } catch (e) {
+        console.warn("Gagal membaca cache lokal:", e);
+    }
+
+    // Jika belum ada cache sama sekali, ambil langsung dari server
+    await fetchAndStoreAllData();
+}
+
+// Fungsi sinkronisasi otomatis di latar belakang (Background Sync)
+async function backgroundSyncData() {
+    try {
+        const [dataJamaah, dataGenerus, dataSarpras, dataAbsensi, dataJadwal] = await Promise.all([
             fetchAllRows(supabaseUtama, 'data_jamaah', '*'),
             fetchAllRows(supabaseUtama, 'data_generus', '*').catch(() => []),
             fetchAllRows(supabaseUtama, 'fasilitas_kelompok', '*').catch(() => []),
-            fetchAllRows(supabaseAbsensi, 'absensi_sdc', '*').catch(() => [])
+            fetchAllRows(supabaseAbsensi, 'absensi_sdc', '*').catch(() => []),
+            fetchAllRows(supabaseUtama, 'jadwal_kegiatan', '*').catch(() => [])
         ]);
 
         globalCache.jamaah = dataJamaah || [];
         globalCache.generus = dataGenerus || [];
         globalCache.sarpras = dataSarpras || [];
         globalCache.absensi = dataAbsensi || [];
-        globalCache.isLoaded = true;
+        globalCache.jadwal = dataJadwal || [];
+
+        // Perbarui Local Storage dengan data paling fresh dari server
+        localStorage.setItem('sdc_cache_jamaah', JSON.stringify(globalCache.jamaah));
+        localStorage.setItem('sdc_cache_generus', JSON.stringify(globalCache.generus));
+        localStorage.setItem('sdc_cache_sarpras', JSON.stringify(globalCache.sarpras));
+        localStorage.setItem('sdc_cache_absensi', JSON.stringify(globalCache.absensi));
+        localStorage.setItem('sdc_cache_jadwal', JSON.stringify(globalCache.jadwal));
+
+        // Jika pengguna sedang membuka menu Rekap atau Absensi, refresh tampilannya secara otomatis
+        if (activeSectionId === 'rekap') {
+            switchTabRekap(activeRekapSubTab);
+        } else if (activeSectionId === 'absensi' && activeAbsensiSubTab === 'REKAP') {
+            loadRekapAbsensi();
+        }
     } catch (err) {
-        console.error("Gagal memuat awal data:", err);
-        showCustomModal("Peringatan", "Gagal memuat beberapa data dari server. Aplikasi akan mencoba menggunakan data terbaru saat ini.", "⚠️");
+        console.warn("Background sync gagal (menggunakan data cache):", err);
+    }
+}
+
+async function fetchAndStoreAllData() {
+    showDataLoading("Memuat database ...");
+    try {
+        const [dataJamaah, dataGenerus, dataSarpras, dataAbsensi, dataJadwal] = await Promise.all([
+            fetchAllRows(supabaseUtama, 'data_jamaah', '*'),
+            fetchAllRows(supabaseUtama, 'data_generus', '*').catch(() => []),
+            fetchAllRows(supabaseUtama, 'fasilitas_kelompok', '*').catch(() => []),
+            fetchAllRows(supabaseAbsensi, 'absensi_sdc', '*').catch(() => []),
+            fetchAllRows(supabaseUtama, 'jadwal_kegiatan', '*').catch(() => [])
+        ]);
+
+        globalCache.jamaah = dataJamaah || [];
+        globalCache.generus = dataGenerus || [];
+        globalCache.sarpras = dataSarpras || [];
+        globalCache.absensi = dataAbsensi || [];
+        globalCache.jadwal = dataJadwal || [];
+        globalCache.isLoaded = true;
+
+        localStorage.setItem('sdc_cache_jamaah', JSON.stringify(globalCache.jamaah));
+        localStorage.setItem('sdc_cache_generus', JSON.stringify(globalCache.generus));
+        localStorage.setItem('sdc_cache_sarpras', JSON.stringify(globalCache.sarpras));
+        localStorage.setItem('sdc_cache_absensi', JSON.stringify(globalCache.absensi));
+        localStorage.setItem('sdc_cache_jadwal', JSON.stringify(globalCache.jadwal));
+    } catch (err) {
+        showCustomModal("Peringatan", "Gagal memuat beberapa data dari server.", "⚠️");
     } finally {
         hideDataLoading();
     }
@@ -593,13 +668,23 @@ function switchSectionView(target) {
         'database': document.getElementById('sectionDatabase'),
         'absensi': document.getElementById('sectionAbsensi'),
         'sarpras': document.getElementById('sectionSarpras'),
-        'rekap': document.getElementById('sectionRekap')
+        'rekap': document.getElementById('sectionRekap'),
+        'jadwal': document.getElementById('sectionJadwal')
     };
+
+    // ATUR VISIBILITAS LOGO & JUDUL (Hanya tampil di Home)
+    const headerBranding = document.getElementById('mainHeaderBranding');
+    if (headerBranding) {
+        if (target === 'home') {
+            headerBranding.classList.remove('hidden');
+        } else {
+            headerBranding.classList.add('hidden');
+        }
+    }
 
     const targetSection = sections[target];
     if (!targetSection) return;
 
-    // Sembunyikan section lainnya
     Object.keys(sections).forEach(secKey => {
         if (secKey !== target && sections[secKey]) {
             sections[secKey].classList.remove('section-active');
@@ -609,7 +694,6 @@ function switchSectionView(target) {
 
     targetSection.classList.remove('hidden');
     
-    // Gunakan requestAnimationFrame untuk memastikan animasi render CSS 60fps tanpa glitch
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
             targetSection.classList.add('section-active');
@@ -619,9 +703,8 @@ function switchSectionView(target) {
     activeSectionId = target;
 
     if (target === 'home') {
-		checkOperatorMonthlyAttendance();
-	}
-	if (target === 'database') {
+        checkOperatorMonthlyAttendance();
+    } else if (target === 'database') {
         if (currentMode !== 'UPDATE') switchMode('DAFTAR');
     } else if (target === 'absensi') {
         switchTabAbsensi(activeAbsensiSubTab || 'INPUT');
@@ -635,6 +718,8 @@ function switchSectionView(target) {
         const secSarp = document.getElementById('sectionSarpras');
         if (secSarp) secSarp.classList.add('hidden');
         switchTabRekap(activeRekapSubTab || 'STATUS_KESELURUHAN');
+    } else if (target === 'jadwal') { // <-- TAMBAHKAN KONDISI INI
+        loadJadwalKegiatan();
     }
 }
 
@@ -1062,6 +1147,9 @@ document.getElementById('formJamaah').addEventListener('submit', async function(
                     if (error) {
                         showCustomModal("Gagal Hapus", error.message, "❌");
                     } else {
+						
+						invalidateAppCache();
+						
                         globalCache.jamaah = globalCache.jamaah.filter(j => String(j.id) !== String(editId));
                         switchMode('UPDATE', true);
                         if (currentDesa && currentKelompok) fetchAutoJamaahList(currentDesa, currentKelompok);
@@ -1143,7 +1231,10 @@ document.getElementById('formJamaah').addEventListener('submit', async function(
         }
 
         showCustomModal("Sukses", editId ? "Data Berhasil Di-update!" : "Data Berhasil Disimpan!", "🎉", () => {
-            if (currentMode === "UPDATE") {
+            
+			invalidateAppCache();
+			
+			if (currentMode === "UPDATE") {
                 const currentDesa = document.getElementById('searchDesa').value;
                 const currentKelompok = document.getElementById('searchKelompok').value;
                 switchMode('UPDATE', true);
@@ -1405,7 +1496,10 @@ document.getElementById('formSarpras').addEventListener('submit', function(e) {
             }
 
             showCustomModal("Sukses", "Data Sarpras Berhasil Diperbarui!", "🏛️", () => {
-                document.getElementById('edit_sarpras_id').value = "";
+                
+				invalidateAppCache();
+				
+				document.getElementById('edit_sarpras_id').value = "";
                 setTimeout(() => {
                     switchSectionView('rekap');
                     switchTabRekap('REKAP_SARPRAS');
@@ -1517,7 +1611,10 @@ document.getElementById('formAbsensiKegiatan').addEventListener('submit', functi
             }
 
             showCustomModal("Sukses", "Data Absensi Berhasil Diperbarui!", "📋", () => {
-                e.target.reset();
+                
+				invalidateAppCache();
+				
+				e.target.reset();
                 document.getElementById('abs_nama_custom').classList.add('hidden');
                 document.getElementById('boxTargetCustom').classList.add('hidden');
                 document.getElementById('edit_absensi_id').value = "";
@@ -2329,6 +2426,9 @@ function getUniqueMembers(jamaahList, generusList, targetDesa = null, targetKelo
     const memberMap = new Map();
     const dobMap = new Map();
 
+    const filterDesa = targetDesa ? targetDesa.trim().toLowerCase() : null;
+    const filterKlp = targetKelompok ? targetKelompok.trim().toLowerCase() : null;
+
     const calculateAgeFromDate = (dateString) => {
         if (!dateString) return null;
         const cleanStr = String(dateString).replace(/[^0-9]/g, '');
@@ -2354,7 +2454,6 @@ function getUniqueMembers(jamaahList, generusList, targetDesa = null, targetKelo
         return age >= 0 ? age : null;
     };
 
-    // Fungsi Pembantu: Ubah tanggal lahir ke format baku YYYYMMDD
     const normalizeDateStr = (dateStr) => {
         if (!dateStr) return '';
         const digits = String(dateStr).replace(/[^0-9]/g, '');
@@ -2363,14 +2462,12 @@ function getUniqueMembers(jamaahList, generusList, targetDesa = null, targetKelo
         if (String(dateStr).includes('-') && String(dateStr).indexOf('-') === 4) {
             return digits; // YYYYMMDD
         }
-        // Jika format DD-MM-YYYY -> ubah ke YYYYMMDD
         const d = digits.substring(0, 2);
         const m = digits.substring(2, 4);
         const y = digits.substring(4, 8);
         return `${y}${m}${d}`;
     };
 
-    // Fungsi Pembantu: Cek apakah dua nama mirip/singkatan (misal: "Nur Khaina N" vs "Nur Khaina Ningsih")
     const isSimilarName = (name1, name2) => {
         const n1 = name1.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
         const n2 = name2.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
@@ -2380,10 +2477,8 @@ function getUniqueMembers(jamaahList, generusList, targetDesa = null, targetKelo
         const words1 = n1.split(/\s+/);
         const words2 = n2.split(/\s+/);
         
-        // Jika kata pertama dan kedua sama persis (misal: "Nur Khaina")
         if (words1.length >= 2 && words2.length >= 2) {
             if (words1[0] === words2[0] && words1[1] === words2[1]) {
-                // Cek jika kata ketiga adalah singkatan (misal 'n' dengan 'ningsih')
                 if (words1[2] && words2[2]) {
                     if (words1[2].startsWith(words2[2]) || words2[2].startsWith(words1[2])) {
                         return true;
@@ -2396,10 +2491,9 @@ function getUniqueMembers(jamaahList, generusList, targetDesa = null, targetKelo
         return false;
     };
 
-    // 1. OLAH DATA DARI DATA_JAMAAH (Prioritas Utama)
     jamaahList.forEach(j => {
-        if (targetDesa && j.desa !== targetDesa) return;
-        if (targetKelompok && j.kelompok !== targetKelompok) return;
+        if (filterDesa && (j.desa || '').trim().toLowerCase() !== filterDesa) return;
+        if (filterKlp && (j.kelompok || '').trim().toLowerCase() !== filterKlp) return;
 
         const cleanName = (j.nama || '').trim();
         const cleanDesa = (j.desa || '').trim().toLowerCase();
@@ -2434,10 +2528,9 @@ function getUniqueMembers(jamaahList, generusList, targetDesa = null, targetKelo
         }
     });
 
-    // 2. OLAH DATA DARI DATA_GENERUS (Deduplikasi Ketat)
     generusList.forEach(g => {
-        if (targetDesa && g.desa !== targetDesa) return;
-        if (targetKelompok && g.kelompok !== targetKelompok) return;
+        if (filterDesa && (g.desa || '').trim().toLowerCase() !== filterDesa) return;
+        if (filterKlp && (g.kelompok || '').trim().toLowerCase() !== filterKlp) return;
 
         const cleanName = (g.nama || '').trim();
         const cleanDesa = (g.desa || '').trim().toLowerCase();
@@ -2446,12 +2539,10 @@ function getUniqueMembers(jamaahList, generusList, targetDesa = null, targetKelo
 
         const dobKey = normDob ? `${normDob}__${cleanDesa}__${cleanKlp}` : null;
 
-        // CEK 1: Berdasarkan Tanggal Lahir + Kelompok yang sudah ternormalisasi
         if (dobKey && dobMap.has(dobKey)) {
-            return; // Loloskan/Abaikan karena terbukti orang yang sama
+            return; 
         }
 
-        // CEK 2: Berdasarkan Kemiripan Nama & Kelompok pada daftar data_jamaah
         let isDuplicateByName = false;
         for (let [existingKey, existingMember] of memberMap.entries()) {
             if (existingMember.desa.toLowerCase() === cleanDesa && existingMember.kelompok.toLowerCase() === cleanKlp) {
@@ -2463,10 +2554,9 @@ function getUniqueMembers(jamaahList, generusList, targetDesa = null, targetKelo
         }
 
         if (isDuplicateByName) {
-            return; // Abaikan karena nama terindikasi singkatan/mirip dari orang yang sama
+            return; 
         }
 
-        // Jika lolos kedua pengecekan, berarti Generus murni
         let rawKat = g.kategori_usia || 'Generus';
         let parsedKey = parseKategoriGenerus(rawKat);
         let labelKat = rawKat;
@@ -2521,7 +2611,7 @@ function loadRekapKelompokLengkap() {
 
         const tableEl = document.getElementById('tableRekapKelompok');
         if (tableEl) {
-            tableEl.className = "w-full text-[10px] sm:text-[11px] text-left table-fixed border-collapse border border-slate-300";
+            tableEl.className = "w-full text-[10px] sm:text-[11px] text-left border-collapse border border-slate-300";
         }
 
         thead.innerHTML = `
@@ -2714,16 +2804,22 @@ function loadRekapKelompokLengkap() {
 
     // Mengisi data Sarpras
     sarprasData.forEach(s => {
-        if (!selectedFilterDesa || selectedFilterDesa === s.desa) {
-            const key = `${s.desa}__${s.kelompok}`;
-            if (rekapMap[key]) {
-                rekapMap[key].subKlp = parseInt(s.jumlah_sub_kelompok, 10) || 0;
-                rekapMap[key].masjid = parseInt(s.jumlah_masjid, 10) || 0;
-                rekapMap[key].aula = parseInt(s.jumlah_aula, 10) || 0;
-                rekapMap[key].kmPria = parseInt(s.km_pria, 10) || 0;
-                rekapMap[key].kmWanita = parseInt(s.km_wanita, 10) || 0;
-                rekapMap[key].kmMt = parseInt(s.km_mt, 10) || 0;
-                rekapMap[key].kmTamu = parseInt(s.km_tamu, 10) || 0;
+        const sDesaClean = (s.desa || '').trim();
+        const sKlpClean = (s.kelompok || '').trim();
+        
+        if (!selectedFilterDesa || selectedFilterDesa === sDesaClean) {
+            // Cari kecocokan key dengan mengabaikan huruf besar/kecil
+            const targetKey = `${sDesaClean}__${sKlpClean}`.toLowerCase();
+            const matchedKey = Object.keys(rekapMap).find(k => k.toLowerCase() === targetKey);
+            
+            if (matchedKey && rekapMap[matchedKey]) {
+                rekapMap[matchedKey].subKlp = parseInt(s.jumlah_sub_kelompok, 10) || 0;
+                rekapMap[matchedKey].masjid = parseInt(s.jumlah_masjid, 10) || 0;
+                rekapMap[matchedKey].aula = parseInt(s.jumlah_aula, 10) || 0;
+                rekapMap[matchedKey].kmPria = parseInt(s.km_pria, 10) || 0;
+                rekapMap[matchedKey].kmWanita = parseInt(s.km_wanita, 10) || 0;
+                rekapMap[matchedKey].kmMt = parseInt(s.km_mt, 10) || 0;
+                rekapMap[matchedKey].kmTamu = parseInt(s.km_tamu, 10) || 0;
             }
         }
     });
@@ -3647,18 +3743,22 @@ function checkOperatorMonthlyAttendance() {
 function applyRoleRestrictionsUI() {
     const badgeKelompok = document.getElementById('badgeKelompokLogin');
     const teksKelompokAktif = document.getElementById('namaKelompokAktif');
+    const btnUploadJadwal = document.getElementById('btnUploadJadwal');
 
-    // Jika yang login adalah OPERATOR
     if (currentUser.role === 'OPERATOR') {
         const opDesa = currentUser.desa;
         const opKelompok = currentUser.kelompok;
 
-        // Tampilkan badge nama kelompok di dashboard khusus operator
         if (badgeKelompok && teksKelompokAktif) {
             teksKelompokAktif.textContent = `${opKelompok} (${opDesa})`;
             badgeKelompok.classList.remove('hidden');
         }
 
+        if (btnUploadJadwal) {
+            btnUploadJadwal.classList.add('hidden');
+        }
+
+        // KUNCI KETAT SEMUA PILIHAN DESA DAN KELOMPOK DI SEMUA MENU
         const pairs = [
             { desaId: 'desa', kelompokId: 'kelompok' },
             { desaId: 'searchDesa', kelompokId: 'searchKelompok' },
@@ -3671,48 +3771,428 @@ function applyRoleRestrictionsUI() {
             const dEl = document.getElementById(desaId);
             const kEl = document.getElementById(kelompokId);
 
-            if (dEl && kEl) {
+            if (dEl) {
                 dEl.value = opDesa;
                 dEl.disabled = true;
+                dEl.classList.add('bg-slate-100', 'text-slate-500', 'cursor-not-allowed');
+            }
 
+            if (kEl) {
                 kEl.innerHTML = `<option value="${opKelompok}">${opKelompok}</option>`;
                 kEl.value = opKelompok;
                 kEl.disabled = true;
+                kEl.classList.add('bg-slate-100', 'text-slate-500', 'cursor-not-allowed');
                 kEl.classList.remove('bg-slate-100/50', 'text-slate-400');
             }
         });
 
+        // Kunci Mode Export khusus untuk operator (hanya bisa kelompok sendiri)
         const exportScopeEl = document.getElementById('exportScopeMode');
         if (exportScopeEl) {
             exportScopeEl.value = 'KELOMPOK';
             exportScopeEl.disabled = true;
+            exportScopeEl.classList.add('bg-slate-100', 'text-slate-500', 'cursor-not-allowed');
         }
 
+        // Otomatis muat daftar jamaah kelompok untuk mode update
         if (document.getElementById('searchKelompok')) {
             fetchAutoJamaahList(opDesa, opKelompok);
         }
-
-        const btnSarprasDashboard = document.querySelector("button[onclick=\"showSection('sarpras')\"]");
-        if (btnSarprasDashboard) {
-            btnSarprasDashboard.classList.add('hidden');
-        }
-
-        const btnRekapDashboard = document.querySelector("button[onclick=\"showSection('rekap')\"]");
-        if (btnRekapDashboard) {
-            btnRekapDashboard.style.gridColumn = "1 / -1";
-            btnRekapDashboard.style.justifySelf = "center";
-            btnRekapDashboard.style.width = "100%";
-            btnRekapDashboard.style.maxWidth = "320px";
-        }
-
-        const tabRekapSarpras = document.getElementById('tabRekapSarpras');
-        if (tabRekapSarpras) {
-            tabRekapSarpras.classList.add('hidden');
-        }
+        
     } else if (currentUser.role === 'DEVELOPER') {
-        // Jika yang login adalah DEVELOPER, sembunyikan badge kelompok
         if (badgeKelompok) {
             badgeKelompok.classList.add('hidden');
         }
+
+        if (btnUploadJadwal) {
+            btnUploadJadwal.classList.remove('hidden');
+        }
     }
+
+    checkDeveloperAccess();
+}
+
+function openUploadJadwalModal() {
+    // Pastikan hanya Developer yang bisa meng-upload/mengganti jadwal
+    if (currentUser.role !== 'DEVELOPER') {
+        showCustomModal("Akses Dibatasi", "Fitur upload/ganti jadwal hanya dapat diakses oleh Developer.", "⚠️");
+        return;
+    }
+    const fileInput = document.getElementById('fileJadwalInput');
+    if (fileInput) fileInput.value = '';
+    openModal('uploadJadwalModal');
+}
+
+function processUploadAndOverwriteJadwal() {
+    const fileInput = document.getElementById('fileJadwalInput');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        showCustomModal("Peringatan", "Silakan pilih file Excel atau CSV terlebih dahulu!", "⚠️");
+        return;
+    }
+
+    closeModal('uploadJadwalModal');
+    showDataLoading("Membaca file & memperbarui database...");
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            
+            // Ambil sheet pertama dari file excel
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            
+            // Konversi isi sheet menjadi format JSON
+            const rawJson = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            
+            if (rawJson.length < 2) {
+                throw new Error("File Excel kosong atau format baris tidak valid.");
+            }
+
+            // Deteksi baris header (mencari kolom yang sesuai dengan format Anda)
+            let headerRowIndex = 0;
+            for (let i = 0; i < Math.min(5, rawJson.length); i++) {
+                const rowStr = rawJson[i].join(' ').toLowerCase();
+                if (rowStr.includes('acara') || rowStr.includes('kegiatan') || rowStr.includes('tanggal')) {
+                    headerRowIndex = i;
+                    break;
+                }
+            }
+
+            const headers = rawJson[headerRowIndex].map(h => String(h || '').trim().toLowerCase());
+            const rows = rawJson.slice(headerRowIndex + 1);
+
+            // Mapping posisi kolom berdasarkan nama header di file Anda
+            const getColIdx = (keywords) => {
+                return headers.findIndex(h => keywords.some(k => h.includes(k)));
+            };
+
+            const idxHariTgl = getColIdx(['hari', 'tanggal']);
+            const idxAcara = getColIdx(['acara', 'kegiatan']);
+            const idxPukul = getColIdx(['pukul', 'jam']);
+            const idxTempat = getColIdx(['tempat']);
+            const idxPeserta = getColIdx(['peserta']);
+            const idxPenyampai = getColIdx(['penyampai', 'pemateri']);
+            const idxMateri = getColIdx(['materi']);
+
+            const newJadwalRecords = [];
+
+            rows.forEach(r => {
+                // Lewati baris yang kosong melompong
+                if (!r || r.length === 0 || r.every(cell => !cell)) return;
+
+                const hariTgl = idxHariTgl !== -1 ? String(r[idxHariTgl] || '').trim() : '';
+                const namaKeg = idxAcara !== -1 ? String(r[idxAcara] || '').trim() : '';
+                
+                if (!namaKeg && !hariTgl) return; // Lewati baris kosong
+
+                newJadwalRecords.push({
+                    hari_tanggal: hariTgl,
+                    nama_kegiatan: namaKeg,
+                    pukul: idxPukul !== -1 ? String(r[idxPukul] || '').trim() : '-',
+                    tempat: idxTempat !== -1 ? String(r[idxTempat] || '').trim() : '-',
+                    peserta: idxPeserta !== -1 ? String(r[idxPeserta] || '').trim() : '-',
+                    penyampai_materi: idxPenyampai !== -1 ? String(r[idxPenyampai] || '').trim() : '-',
+                    materi: idxMateri !== -1 ? String(r[idxMateri] || '').trim() : '-'
+                });
+            });
+
+            if (newJadwalRecords.length === 0) {
+                throw new Error("Tidak ada data jadwal valid yang ditemukan di dalam file.");
+            }
+
+            // --- PROSES OVERWRITE (TIMPA DATA) DI SUPABASE ---
+            // 1. Hapus semua data jadwal lama di database
+            const { error: deleteErr } = await supabaseUtama
+                .from('jadwal_kegiatan')
+                .delete()
+                .neq('id', 0); // Menghapus seluruh baris
+
+            if (deleteErr) throw deleteErr;
+
+            // 2. Masukkan (Insert) data jadwal baru dari file yang di-upload
+            const { data: insertedData, error: insertErr } = await supabaseUtama
+                .from('jadwal_kegiatan')
+                .insert(newJadwalRecords)
+                .select();
+
+            if (insertErr) throw insertErr;
+
+            // Update cache lokal
+            globalCache.jadwal = insertedData || [];
+
+            hideDataLoading();
+            showCustomModal(
+                "Berhasil Overwrite!", 
+                `Jadwal bulan lalu telah dihapus dan digantikan dengan ${newJadwalRecords.length} agenda kegiatan terbaru dari file Anda.`, 
+                "🎉",
+                () => {
+                    loadJadwalKegiatan(); // Refresh tampilan tabel jadwal
+                }
+            );
+
+        } catch (err) {
+            hideDataLoading();
+            showCustomModal("Gagal Memproses File", err.message || "Terjadi kesalahan saat membaca file.", "❌");
+        }
+    };
+
+    reader.readAsArrayBuffer(file);
+}
+
+function loadJadwalKegiatan() {
+    const tbody = document.getElementById('tbodyJadwal');
+    if (!tbody) return;
+
+    const jadwalList = globalCache.jadwal || [];
+
+    if (jadwalList.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400 font-medium">Belum ada agenda jadwal kegiatan yang diunggah.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = '';
+    jadwalList.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-violet-50/50 transition-colors";
+        tr.innerHTML = `
+            <td class="px-2 py-3 font-bold text-violet-900 text-center text-[11px] sm:text-xs leading-snug">${item.hari_tanggal || '-'}</td>
+            <td class="px-3 py-3 font-extrabold text-slate-800 text-[11px] sm:text-xs leading-relaxed">${item.nama_kegiatan || '-'}</td>
+            <td class="px-2 py-3 text-center whitespace-nowrap font-bold text-slate-600 text-[11px] sm:text-xs">${item.pukul || '-'}</td>
+            <td class="px-2.5 py-3 font-semibold text-slate-700 text-[11px] sm:text-xs">${item.tempat || '-'}</td>
+            <td class="px-2.5 py-3 font-semibold text-slate-700 text-[11px] sm:text-xs">${item.peserta || '-'}</td>
+            <td class="px-2.5 py-3 font-semibold text-slate-700 text-[11px] sm:text-xs">${item.penyampai_materi || '-'}</td>
+            <td class="px-2.5 py-3 font-semibold text-slate-700 text-[11px] sm:text-xs">${item.materi || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function checkDeveloperAccess() {
+    const uploadContainer = document.getElementById('developerUploadContainer');
+    if (!uploadContainer) return;
+
+    // Cek apakah yang login adalah DEVELOPER
+    if (currentUser && currentUser.role === 'DEVELOPER') {
+        uploadContainer.classList.remove('hidden'); // Tampilkan kotak upload
+    } else {
+        uploadContainer.classList.add('hidden'); // Sembunyikan jika bukan developer
+    }
+}
+
+document.getElementById('uploadFileWord')?.addEventListener('change', function(e) {
+    // Pengaman ketat: Tolak jika bukan developer
+    if (!currentUser || currentUser.role !== 'DEVELOPER') {
+        showCustomModal("Akses Ditolak", "Maaf, hanya developer yang memiliki hak akses untuk mengunggah jadwal.", "⛔");
+        e.target.value = ''; // Reset pilihan file
+        return;
+    }
+
+    const file = e.target.files[0];
+    if (!file) return;
+
+    showDataLoading("Membaca file Word...");
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+        const arrayBuffer = event.target.result;
+
+        // Menggunakan library Mammoth.js untuk membaca file .docx
+        mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
+            .then(function(result) {
+                const htmlString = result.value;
+                parseWordTableToJadwal(htmlString);
+            })
+            .catch(function(err) {
+                console.error("Gagal membaca file Word:", err);
+                showCustomModal("Error", "Gagal membaca file Word. Pastikan file berformat .docx yang valid.", "❌");
+            })
+            .finally(() => {
+                hideDataLoading();
+            });
+    };
+
+    reader.readAsArrayBuffer(file);
+});
+
+function parseWordTableToJadwal(htmlString) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+    const table = doc.querySelector('table');
+
+    if (!table) {
+        showCustomModal("Peringatan", "Tidak ditemukan tabel di dalam dokumen Word tersebut. Pastikan data jadwal disusun dalam bentuk tabel.", "⚠️");
+        return;
+    }
+
+    const rows = table.querySelectorAll('tr');
+    const parsedJadwal = [];
+
+    // Mulai dari i = 1 dengan asumsi baris pertama adalah judul kolom (header)
+    for (let i = 1; i < rows.length; i++) {
+        const cols = rows[i].querySelectorAll('td, th');
+        if (cols.length >= 7) {
+            parsedJadwal.push({
+                hari_tanggal: cols[0].textContent.trim(),
+                nama_kegiatan: cols[1].textContent.trim(),
+                pukul: cols[2].textContent.trim(),
+                tempat: cols[3].textContent.trim(),
+                peserta: cols[4].textContent.trim(),
+                penyampai_materi: cols[5].textContent.trim(),
+                materi: cols[6].textContent.trim()
+            });
+        }
+    }
+
+    if (parsedJadwal.length === 0) {
+        showCustomModal("Peringatan", "Format tabel dalam file Word kosong atau tidak sesuai.", "⚠️");
+        return;
+    }
+
+    uploadJadwalToSupabase(parsedJadwal);
+}
+
+async function uploadJadwalToSupabase(dataList) {
+    showDataLoading("Menyimpan jadwal ke database...");
+    try {
+        const { error } = await supabaseUtama.from('jadwal_kegiatan').insert(dataList);
+
+        if (error) throw error;
+
+        showCustomModal("Sukses", "Jadwal kegiatan dari file Word berhasil diunggah!", "✅");
+        
+        // Bersihkan input file dan perbarui data di layar
+        document.getElementById('uploadFileWord').value = '';
+        globalCache.isLoaded = false;
+        await preloadAllApplicationData();
+        loadJadwalKegiatan();
+
+    } catch (err) {
+        console.error("Gagal menyimpan ke Supabase:", err);
+        showCustomModal("Error", "Gagal menyimpan data ke database.", "❌");
+    } finally {
+        hideDataLoading();
+    }
+}
+
+async function processUploadAndOverwriteJadwal() {
+    const fileInput = document.getElementById('fileJadwalInput');
+    if (!fileInput || fileInput.files.length === 0) {
+        showCustomModal("Peringatan", "Silakan pilih file jadwal (.docx, .xlsx, atau .csv) terlebih dahulu.", "⚠️");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const fileName = file.name.toLowerCase();
+    
+    showDataLoading("Memproses dan menyimpan jadwal...");
+
+    try {
+        let rawRows = [];
+
+        if (fileName.endsWith('.docx')) {
+            const arrayBuffer = await file.arrayBuffer();
+            const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+            rawRows = parseTableHtmlToRawArray(result.value);
+        } else {
+            const data = await file.arrayBuffer();
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            rawRows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        }
+
+        // Panggil fungsi pintar untuk mencocokkan kolom secara otomatis
+        const mappedData = mapTableRowsToSupabaseData(rawRows);
+
+        if (!mappedData || mappedData.length === 0) {
+            hideDataLoading();
+            showCustomModal("Gagal", "Tidak ada data valid yang ditemukan pada file.", "❌");
+            return;
+        }
+
+        // 1. Hapus seluruh data jadwal lama di Supabase (Overwrite)
+        const { error: deleteErr } = await supabaseUtama
+            .from('jadwal_kegiatan')
+            .delete()
+            .neq('id', 0);
+
+        if (deleteErr) throw deleteErr;
+
+        // 2. Masukkan data baru yang sudah dipetakan ke Supabase
+        const { data: insertedData, error: insertErr } = await supabaseUtama
+            .from('jadwal_kegiatan')
+            .insert(mappedData)
+            .select();
+
+        if (insertErr) throw insertErr;
+		
+		invalidateAppCache();
+
+        // Perbarui cache lokal
+        globalCache.jadwal = insertedData || [];
+
+        hideDataLoading();
+        closeModal('uploadJadwalModal');
+        showCustomModal("Berhasil", `Jadwal kegiatan berhasil diperbarui (${mappedData.length} agenda)!`, "✅");
+        loadJadwalKegiatan(); // Refresh tabel jadwal di layar
+
+    } catch (error) {
+        hideDataLoading();
+        console.error("Gagal memproses file:", error);
+        showCustomModal("Error", "Gagal menyimpan data ke database: " + (error.message || ''), "❌");
+    }
+}
+
+// Helper untuk membaca tabel HTML dari Word (.docx)
+function parseTableHtmlToRawArray(htmlString) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+    const tables = doc.querySelectorAll('table');
+    if (tables.length === 0) return [];
+
+    let rowsData = [];
+    const rows = tables[0].querySelectorAll('tr');
+    rows.forEach(row => {
+        const cols = row.querySelectorAll('td, th');
+        let rowData = [];
+        cols.forEach(col => rowData.push(col.textContent.trim()));
+        if (rowData.length > 0) rowsData.push(rowData);
+    });
+    return rowsData;
+}
+
+// Fungsi pintar untuk mendeteksi dan memetakan kolom secara otomatis
+function mapTableRowsToSupabaseData(rawRows) {
+    if (!rawRows || rawRows.length < 2) return [];
+
+    const headers = rawRows[0].map(h => (h ? h.toString().toLowerCase().trim() : ''));
+    const dataRows = rawRows.slice(1);
+
+    const getIndex = (keywords) => {
+        return headers.findIndex(h => keywords.some(kw => h.includes(kw)));
+    };
+
+    const idxHari = getIndex(['hari', 'tanggal', 'tgl']);
+    const idxAcara = getIndex(['acara', 'kegiatan', 'nama kegiatan', 'agenda']);
+    const idxPukul = getIndex(['pukul', 'jam', 'waktu']);
+    const idxTempat = getIndex(['tempat', 'lokasi', 'gedung']);
+    const idxPeserta = getIndex(['peserta', 'sasaran', 'golongan']);
+    const idxPenyampai = getIndex(['penyampai', 'pemateri', 'muballigh', 'penceramah', 'nara sumber']);
+    const idxMateri = getIndex(['materi', 'judul', 'pembahasan']);
+
+    return dataRows.map(row => {
+        return {
+            hari_tanggal: idxHari !== -1 ? (row[idxHari] || '') : (row[0] || ''),
+            nama_kegiatan: idxAcara !== -1 ? (row[idxAcara] || '') : (row[1] || ''),
+            pukul: idxPukul !== -1 ? (row[idxPukul] || '') : (row[2] || ''),
+            tempat: idxTempat !== -1 ? (row[idxTempat] || '') : (row[3] || ''),
+            peserta: idxPeserta !== -1 ? (row[idxPeserta] || '') : (row[4] || ''),
+            penyampai_materi: idxPenyampai !== -1 ? (row[idxPenyampai] || '') : (row[5] || ''),
+            materi: idxMateri !== -1 ? (row[idxMateri] || '') : (row[6] || '')
+        };
+    }).filter(item => item.nama_kegiatan && item.nama_kegiatan.trim() !== '');
 }

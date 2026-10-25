@@ -14,6 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <style>
 		@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
@@ -50,7 +51,7 @@
 			position: absolute;
 			top: 0; left: 0;
 			width: 100%; height: 100%;
-			background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 800 800"><path fill="%23ffffff" fill-opacity="0.03" d="M11.6 797.7c19 1.4 38.8-11.8 51.1-27.1 13.8-17.1 16.3-39.6 28.5-56.7 11.2-15.6 29.8-23.7 43.1-37.4 13-13.4 19.3-32.3 32-45.9 11.7-12.5 29.7-18.4 41-31.2 11.4-12.9 17-31.8 28.6-44.5 12-13.2 31.4-19.3 43.1-33 11.4-13.4 16-33.1 27.7-46.7 12.1-14 32.7-20.7 44.5-35 11.4-13.8 15.3-34.5 27.1-48.4 12.5-14.7 34.2-22.1 46.1-37 11.4-14.3 14.2-36 26.1-50.2 12.9-15.4 35.8-23.5 47.7-39 11.3-14.7 12.8-37.7 24.8-52.1 13.4-16.1 37.6-24.9 49.6-41 11.1-15 11-39.5 23-54 14.1-16.9 39.7-26.2 51.6-42.9 10.9-15.3 8.9-41.5 20.9-56 15-17.9 42-27.7 53.8-44.8 10.6-15.4 6.5-43.7 18.5-58.1C806.3 11.6 835 1.5 848.4-12.4c12-12.5 10.5-38.3 23-50.4 16.1-15.5 45.4-21.7 58.7-34 9.1-8.5 7.1-30.8 16.6-38.9L1000-200v1000H0V11.6C0 8 1 4.3 2.8 1c11.5 13.5 35 22.8 47.8 36.4 11.2 11.9 14 31.9 25.5 43.6 12.7 12.9 33.7 19.1 46.2 32.2 11.1 11.6 13.1 31.8 24.4 43.1 13 13 34.3 19 46.6 32 10.9 11.5 11.7 32 23 43.2 13.3 13.2 35.1 19.1 47.2 32.2 10.6 11.5 10 32.4 21.3 43.8 13.7 13.7 36 19.4 48 33 10.3 11.7 8.2 33 19.5 44.5 14.2 14.4 37 20 48.9 34.3 9.9 11.9 6.2 33.7 17.5 45.4 14.7 15.3 38.1 20.8 49.8 35.8 9.4 12.1 4 34.6 15.3 46.6 15.4 16.3 39.4 21.8 51 37.3 8.8 12 1.6 35.6 12.8 47.6 16.1 17.3 40.8 23.1 52.1 39 8 11.8-1 36.8 10.1 48.8 17.1 18.5 42.6 24.6 53.7 41 7 10.4-3.8 38.2 7.1 50.1 18.2 20 44.8 26.5 55.7 43.5 5.8 9-6.8 39.8 4.1 51.6 19.5 21.1 47.2 28.3 57.9 46.1 4.5 7.6-10 41.6 0 53 21 22.4 50 29.9 60.5 48.9 2.9 5.3-13.6 43.7-3.8 54.4 23 24.9 53.4 31 63.8 51.1 1 2 1 3.9 0 5.6-1.1 1.7-2.9 2.1-5.1 1.4-1.1-.3-2.1-.9-3-1.6zm0 0"/></svg>');
+			background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 800 800"><path fill="%23ffffff" fill-opacity="0.03" d="M11.6 797.7c19 1.4 38.8-11.8 51.1-27.1 13.8-17.1 16.3-39.6 28.5-56.7 11.2-15.6 29.8-23.7 43.1-37.4 13-13.4 19.3-32.3 32-45.9 11.7-12.5 29.7-18.4 41-31.2 11.4-12.9 17-31.8 28.6-44.5 12-13.2 31.4-19.3 43.1-33 11.4-13.4 16-33.1 27.7-46.7 12.1-14 32.7-20.7 44.5-35 11.4-13.8 15.3-34.5 27.1-48.4 12.5-14.7 34.2-22.1 46.1-37 11.4-14.3 14.2-36 26.1-50.2 12.9-15.4 35.8-23.5 47.7-39 11.3-14.7 12.8-37.7 24.8-52.1 13.4-16.1 37.6-24.9 49.6-41 11.1-15 11-39.5 23-54 14.1-16.9 39.7-26.2 51.6-42.9 10.9-15.3 8.9-41.5 20.9-56 15-17.9 42-27.7 53.8-44.8 10.6-15.4 6.5-43.7 18.5-58.1C806.3 11.6 835 1.5 848.4-12.4c12-12.5 10.5-38.3 23-50.4 16.1-15.5 45.4-21.7 58.7-34 9.1-8.5 7.1-30.8 16.6-38.9L1000-200v1000H0V11.6C0 8 1 4.3 2.8 1c11.5 13.5 35 22.8 47.8 36.4 11.2 11.9 14 31.9 25.5 43.6 12.7 12.9 33.7 19.1 46.2 32.2 11.1 11.6 13.1 31.8 24.4 43.1 13 13 34.3 19 46.6 32 10.9 11.5 11.7 32 23 43.2 13.3 13.2 35.1 19.1 47.2 32.2 10.6 11.5 10 32.4 21.3 43.8 13.7 13.7 36 19.4 48 33 10.3 11.7 8.2 33 19.5 44.5 14.2 14.4 37 20 48.9 34.3 9.9 11.9 6.2 33.7 17.5 45.4 14.7 15.3 38.1 20.8 49.8 35.8 9.4 12.1 4 34.6 15.3 46.6 15.4 16.3 39.4 21.8 51 37.3 8.8 12 1.6 35.6 12.8 47.6 16.1 17.3 40.8 23.1 52.1 39 8 11.8-1 36.8 10.1 48.8 17.1 18.5 42.6 24.6 53.7 41 7 10.4-3.8 38.2 7.1 50.1 18.2 20 44.8 26.5 55.7 43.5 5.8 9-6.8 39.8 4.1 51.6 19.5 21.1 47.2 28.3 57.9 46.1 4.5 7.6-10 41.6 0 53 21 22.4 50 29.9 60.5 48.9 2.9 5.3-13.6 43.7-3.8 54.4 23 24.9 53.4 31 63.8 51.1 1 2 1 3.9 0 5.6-1.1 1.7-2.9 2.1-5.1 1.4-1.1-.3-2.1-.9-3-1.6zm0 0ゲージ');
 			background-size: 500px 500px;
 			opacity: 0.5;
 		}
@@ -93,21 +94,36 @@
 			opacity: 1;
 		}
 
-		/* TABEL SCROLL RINGAN & SMOOTH */
+		/* TABEL DENGAN GRID / PEMISAH HITAM PEKAT ANTAR BARIS & KOLOM & OPTIMASI FPS */
 		.table-vertical-scroll {
-			max-height: 60vh;
+			max-height: 72vh;
 			overflow-y: auto;
 			overflow-x: auto;
 			border-radius: 1rem;
 			-webkit-overflow-scrolling: touch;
 			scroll-behavior: smooth;
+			
+			contain: layout paint;
+			will-change: transform, scroll-position;
+			transform: translateZ(0);
 		}
 
-		.table-vertical-scroll > table {
-			min-width: 650px;
-			width: 100%;
-			border-collapse: separate;
-			border-spacing: 0;
+		/* Pastikan tabel Rekap, Absensi, dan Sarpras tetap luas dan longgar */
+		#sectionRekap .table-vertical-scroll > table,
+		#sectionAbsensi .table-vertical-scroll > table,
+		#sectionSarpras .table-vertical-scroll > table {
+			width: max-content !important;
+		}
+
+		.table-vertical-scroll th, 
+		.table-vertical-scroll td {
+			border: 1px solid #000000 !important;
+			padding: 10px 12px;
+		}
+
+		/* Sembunyikan tombol print khusus di mode operator */
+		body.operator-mode .operator-hidden {
+			display: none !important;
 		}
 
 		thead tr th {
@@ -135,28 +151,47 @@
 		#sectionRekap thead tr th { background-color: #eef2ff !important; }
 		#sectionRekap tfoot tr td { background-color: #e0e7ff !important; }
 
+		/* KUNCI KOLOM PERTAMA (KELOMPOK) - UKURAN PAS & TIDAK TERLALU SEMPIT */
 		.sticky-col {
 			position: sticky !important;
 			left: 0 !important;
 			background-color: #ffffff !important;
 			color: #0f172a !important;
-			z-index: 10 !important;
+			z-index: 35 !important;
 			white-space: nowrap !important;
 			overflow: hidden !important;
 			text-overflow: ellipsis !important;
-			max-width: 180px;
-			min-width: 90px;
+			
+			min-width: 140px !important; 
+			max-width: 200px !important;
+			width: 160px !important;
 		}
 
 		@media (min-width: 640px) {
-			.sticky-col { max-width: 240px; min-width: 130px; }
+			.sticky-col { 
+				min-width: 150px !important; 
+				max-width: 220px !important; 
+				width: 170px !important; 
+			}
 		}
 
-		thead .sticky-col, tfoot .sticky-col { z-index: 30 !important; }
+		thead .sticky-col, tfoot .sticky-col { z-index: 40 !important; }
 
 		#sectionAbsensi thead .sticky-col, #sectionAbsensi tfoot .sticky-col { background-color: #fbcfe8 !important; }
 		#sectionSarpras thead .sticky-col, #sectionSarpras tfoot .sticky-col { background-color: #ccfbf1 !important; }
 		#sectionRekap thead .sticky-col, #sectionRekap tfoot .sticky-col { background-color: #e0e7ff !important; }
+		#sectionJadwal thead .sticky-col { background-color: #ede9fe !important; }
+
+		/* KHUSUS MENU JADWAL DILETAKKAN NORMAL AGAR TIDAK IKUT MELEBAR */
+		#sectionJadwal .table-vertical-scroll > table {
+			width: 100% !important;
+			table-layout: auto !important;
+		}
+
+		#sectionJadwal .table-vertical-scroll table th, 
+		#sectionJadwal .table-vertical-scroll table td {
+			white-space: normal !important;
+		}
 
 		/* MODAL CONTAINER & BACKDROP DENGAN TRANSISI HALUS */
 		.modal-backdrop {
@@ -287,8 +322,8 @@
             </div>
         </div>
     </div>
-
-    <!-- MODAL AUTENTIKASI DENGAN DUA MODE (LOGIN / BUAT PASSWORD KELOMPOK) -->
+	
+	<!-- MODAL AUTENTIKASI DENGAN DUA MODE (LOGIN / BUAT PASSWORD KELOMPOK) -->
     <div id="authModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[90] flex items-center justify-center p-4 transition-all duration-300">
         <div class="glass-card rounded-[2rem] p-6 sm:p-8 max-w-sm w-full text-center space-y-5 animate-fade-in-up">
             
@@ -353,41 +388,45 @@
         </div>
     </div>
 
-    <div class="glass-card p-4 sm:p-8 rounded-[2rem] w-full max-w-2xl my-2 sm:my-4 relative transition-all duration-500 hover:shadow-[0_15px_50px_rgba(99,102,241,0.15)]">
-        
-        <!-- Tombol Reload di Kiri Atas -->
-		<div class="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
-			<button type="button" onclick="window.location.reload()" title="Refresh Halaman" aria-label="Refresh Halaman" class="p-2.5 bg-white/60 hover:bg-white active:scale-90 text-indigo-600 border border-indigo-100 rounded-xl transition duration-300 shadow-sm hover:shadow-md flex items-center justify-center backdrop-blur-md">
-				<svg class="w-4 h-4 sm:w-5 sm:h-5 transition-transform hover:rotate-180 duration-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-				</svg>
-			</button>
-		</div>
-
-		<!-- Tombol Logout di Kanan Atas -->
-		<div class="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
-			<button type="button" onclick="handleLogout()" title="Keluar / Logout" aria-label="Keluar Aplikasi" class="p-2.5 bg-white/60 hover:bg-rose-50 active:scale-90 text-rose-500 hover:text-rose-600 border border-rose-100 rounded-xl transition duration-300 shadow-sm hover:shadow-md flex items-center justify-center backdrop-blur-md">
-				<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-				</svg>
-			</button>
-		</div>
-
-        <div class="flex justify-center mb-4 sm:mb-5">
-            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-[3px] border-indigo-200 p-1.5 bg-white shadow-xl flex items-center justify-center overflow-hidden transform hover:scale-110 transition-transform duration-500">
-                <img src="logo sdc tw.png" alt="Logo Insan Qur'any Tawangmangu" class="w-full h-full object-contain drop-shadow-sm">
-            </div>
-        </div>
-
-        <div class="text-center mb-6 sm:mb-8">
-            <h2 id="mainTitle" class="text-2xl sm:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-fuchsia-600 leading-tight tracking-tight">INSAN QUR'ANY<br>TAWANGMANGU</h2>
-            <div id="badgeKelompokLogin" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-extrabold shadow-sm hidden">
-				<span>Kelompok: <span id="namaKelompokAktif">-</span></span>
-			</div>
-			<p id="mainSubtitle" class="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium">Sistem Informasi Jamaah & Sarana Prasarana</p>
-            <div class="w-12 sm:w-16 h-1.5 bg-gradient-to-r from-indigo-500 to-fuchsia-500 mx-auto mt-4 rounded-full shadow-lg"></div>
-        </div>
+    <!-- KARTU UTAMA -->
+	<div class="glass-card p-4 sm:p-8 rounded-[2rem] w-full max-w-2xl my-4 sm:my-8 relative flex flex-col h-auto transition-all duration-500 shadow-2xl">
 		
+		<!-- WADAH BRANDING & TOMBOL UTAMA (Hanya tampil di Dashboard Utama) -->
+		<div id="mainHeaderBranding" class="relative">
+			<!-- Tombol Reload di Kiri Atas -->
+			<div class="absolute top-0 left-0 z-20">
+				<button type="button" onclick="window.location.reload()" title="Refresh Halaman" aria-label="Refresh Halaman" class="p-2.5 bg-white/80 hover:bg-white active:scale-90 text-indigo-600 border border-indigo-100 rounded-xl transition duration-300 shadow-sm hover:shadow-md flex items-center justify-center backdrop-blur-md">
+					<svg class="w-4 h-4 sm:w-5 sm:h-5 transition-transform hover:rotate-180 duration-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+					</svg>
+				</button>
+			</div>
+
+			<!-- Tombol Logout di Kanan Atas -->
+			<div class="absolute top-0 right-0 z-20">
+				<button type="button" onclick="handleLogout()" title="Keluar / Logout" aria-label="Keluar Aplikasi" class="p-2.5 bg-white/80 hover:bg-rose-50 active:scale-90 text-rose-500 hover:text-rose-600 border border-rose-100 rounded-xl transition duration-300 shadow-sm hover:shadow-md flex items-center justify-center backdrop-blur-md">
+					<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+					</svg>
+				</button>
+			</div>
+
+			<div class="flex justify-center mb-4 sm:mb-5 pt-2">
+				<div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-[3px] border-indigo-200 p-1.5 bg-white shadow-xl flex items-center justify-center overflow-hidden transform hover:scale-110 transition-transform duration-500">
+					<img src="logo sdc tw.png" alt="Logo Insan Qur'any Tawangmangu" class="w-full h-full object-contain drop-shadow-sm">
+				</div>
+			</div>
+
+			<div class="text-center mb-6 sm:mb-8">
+				<h2 id="mainTitle" class="text-2xl sm:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-fuchsia-600 leading-tight tracking-tight">INSAN QUR'ANY<br>TAWANGMANGU</h2>
+				<div id="badgeKelompokLogin" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-extrabold shadow-sm hidden">
+					<span>Kelompok: <span id="namaKelompokAktif">-</span></span>
+				</div>
+				<p id="mainSubtitle" class="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium">Sistem Informasi Jamaah & Sarana Prasarana</p>
+				<div class="w-12 sm:w-16 h-1.5 bg-gradient-to-r from-indigo-500 to-fuchsia-500 mx-auto mt-4 rounded-full shadow-lg"></div>
+			</div>
+		</div>
+
 		<div id="dashboardAlertContainer" class="mb-4"></div>
 
         <!-- MENU UTAMA -->
@@ -434,6 +473,17 @@
                 </div>
                 <span class="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-amber-700 tracking-wide">REKAP</span>
                 <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-1 font-medium">Rekapitulasi Jamaah & Sarpras</span>
+            </button>
+
+            <!-- MENU JADWAL KEGIATAN -->
+            <button type="button" onclick="showSection('jadwal')" class="glass-btn-menu flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl group col-span-2">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-violet-500 to-purple-600 text-white rounded-[1.2rem] flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
+                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <span class="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-violet-700 tracking-wide">JADWAL</span>
+                <span class="text-[9px] sm:text-[10px] text-slate-500 text-center mt-1 font-medium">Agenda Kegiatan Daerah</span>
             </button>
         </div>
 
@@ -679,7 +729,7 @@
                     <button type="button" id="btnCopyBelumAbsen" onclick="copyKelompokBelumAbsen()" class="hidden px-3.5 py-2 bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 active:scale-95 text-white font-bold text-[11px] rounded-xl transition-all shadow-md flex items-center gap-1.5">
                         Belum Absen
                     </button>
-                    <button type="button" id="btnPrintAbsensi" onclick="printData('printableAbsensi', 'Laporan Absensi Kegiatan Jamaah')" class="hidden px-3.5 py-2 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-bold text-[11px] rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-1.5">
+                    <button type="button" id="btnPrintAbsensi" onclick="printData('printableAbsensi', 'Laporan Absensi Kegiatan Jamaah')" class="hidden px-3.5 py-2 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-bold text-[11px] rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-1.5 operator-hidden">
                         🖨️ Print
                     </button>
                 </div>
@@ -838,7 +888,7 @@
                                     <th class="px-2 py-3 text-center whitespace-nowrap no-print">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="tbodyRekapAbsensi" class="divide-y divide-fuchsia-50 text-slate-700 bg-white/50"></tbody>
+                            <tbody id="tbodyRekapAbsensi" class="divide-y divide-fuchsia-100 text-slate-700 bg-white/50"></tbody>
                             <tfoot id="tfootRekapAbsensi" class="bg-fuchsia-100/95 font-extrabold text-fuchsia-950 border-t border-fuchsia-200"></tfoot>
                         </table>
                     </div>
@@ -960,7 +1010,7 @@
                         </svg>
                         <span>Excel</span>
                     </button>
-                    <button type="button" id="btnPrintRekap" onclick="triggerPrintRekapCurrentTab()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-bold text-[11px] rounded-xl transition-all shadow-md flex items-center gap-1.5">
+                    <button type="button" id="btnPrintRekap" onclick="triggerPrintRekapCurrentTab()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-bold text-[11px] rounded-xl transition-all shadow-md flex items-center gap-1.5 operator-hidden">
                         🖨️ Print
                     </button>
                 </div>
@@ -1108,7 +1158,7 @@
                                         <th class="px-1.5 py-3 text-center whitespace-nowrap">Kmr Tmu</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tbodyRekapKelompok" class="divide-y divide-indigo-50/80 text-slate-700 bg-white/60"></tbody>
+                                <tbody id="tbodyRekapKelompok" class="divide-y divide-indigo-100 text-slate-700 bg-white/60"></tbody>
                                 <tfoot id="tfootRekapKelompok" class="bg-indigo-100/90 font-black text-indigo-950 border-t border-indigo-200"></tfoot>
                             </table>
                         </div>
@@ -1117,6 +1167,94 @@
             </div>
         </div>
 
+        <!-- ================= SECTION JADWAL KEGIATAN (DI DALAM KARTU UTAMA) ================= -->
+		<div id="sectionJadwal" class="section-content hidden space-y-6">
+			
+			<!-- Tombol Kembali -->
+			<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+				<button type="button" onclick="showSection('home')" class="inline-flex items-center gap-2 text-xs font-bold text-violet-600 hover:text-violet-700 bg-violet-50/80 px-4 py-2 rounded-xl border border-violet-200 transition-all hover:-translate-x-1 shadow-sm">
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+					Kembali ke Menu Utama
+				</button>
+			</div>
+
+			<!-- GRID PEMISAH ANTARA HEADER/AKSI DAN TABEL AGENDA -->
+			<div class="grid grid-cols-1 gap-6">
+				<!-- Header & Tombol Aksi -->
+				<div class="flex justify-between items-center border-b border-slate-200/60 pb-3">
+					<h3 class="font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-purple-500 text-base sm:text-lg">Agenda Jadwal Kegiatan Daerah</h3>
+					<div class="flex items-center gap-2">
+						<button type="button" id="btnUploadJadwal" onclick="openUploadJadwalModal()" class="px-3 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 active:scale-95 text-white font-extrabold text-[11px] rounded-xl transition-all shadow-md flex items-center gap-1.5 hidden">
+							📂 Upload File
+						</button>
+						<button type="button" onclick="printData('printableJadwal', 'Agenda Jadwal Kegiatan')" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-bold text-[11px] rounded-xl transition-all shadow-md flex items-center gap-1.5 operator-hidden">
+							🖨️ Print
+						</button>
+					</div>
+				</div>
+
+				<!-- Kotak Tabel Agenda yang Terpisah Jelas -->
+				<div id="printableJadwal" class="space-y-4">
+					<div class="border border-violet-100 rounded-2xl shadow-inner overflow-hidden bg-white">
+						<div class="table-vertical-scroll">
+							<table class="w-full text-[11px] sm:text-xs text-left">
+								<thead class="bg-gradient-to-r from-violet-100 to-purple-100 text-violet-950 font-extrabold border-b border-violet-200">
+									<tr>
+										<th class="px-2 py-3 text-center w-[15%] text-[11px] sm:text-xs">Hari, Tanggal</th>
+										<th class="px-3 py-3 w-[45%] text-[11px] sm:text-xs">Acara / Kegiatan</th>
+										<th class="px-2 py-3 text-center whitespace-nowrap text-[11px] sm:text-xs">Pukul</th>
+										<th class="px-2 py-3 whitespace-nowrap text-[11px] sm:text-xs">Tempat</th>
+										<th class="px-2 py-3 whitespace-nowrap text-[11px] sm:text-xs">Peserta</th>
+										<th class="px-2 py-3 whitespace-nowrap text-[11px] sm:text-xs">Penyampai Materi</th>
+										<th class="px-2 py-3 whitespace-nowrap text-[11px] sm:text-xs">Materi</th>
+									</tr>
+								</thead>
+								<tbody id="tbodyJadwal" class="divide-y divide-violet-100 text-slate-700 bg-white/50"></tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+    </div>
+
+    <!-- MODAL UPLOAD & OVERWRITE JADWAL -->
+    <div id="uploadJadwalModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+        <div class="modal-content-card glass-card rounded-[2rem] p-6 max-w-md w-full space-y-5 border border-violet-200">
+            <div class="flex justify-between items-center border-b border-slate-200/60 pb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center font-bold text-lg">📄</div>
+                    <div>
+                        <h4 class="text-base font-extrabold text-slate-800">Upload File Jadwal</h4>
+                        <p class="text-[10px] text-slate-500 font-medium">Format: Word (.docx) atau Excel (.xlsx / .csv)</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeModal('uploadJadwalModal')" class="p-1.5 text-slate-400 hover:text-slate-800 bg-slate-100 rounded-full transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <div class="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900 font-medium leading-relaxed">
+                    ⚠️ <strong>Perhatian:</strong> Mengunggah file baru akan **menghapus otomatis (overwrite)** seluruh jadwal bulan sebelumnya dan menggantinya dengan data baru dari file ini.
+                </div>
+
+                <div>
+                    <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">Pilih File (.docx / .xlsx / .csv)</label>
+                    <input type="file" id="fileJadwalInput" accept=".docx, .xlsx, .xls, .csv" class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-extrabold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 cursor-pointer border border-violet-200 rounded-xl p-2 bg-white">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button type="button" onclick="closeModal('uploadJadwalModal')" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-extrabold transition-all border border-slate-200 active:scale-95">
+                    Batal
+                </button>
+                <button type="button" onclick="processUploadAndOverwriteJadwal()" class="w-full py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 active:scale-95 text-white rounded-xl text-xs font-extrabold transition-all shadow-md">
+                    Upload & Timpa Data
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- MODAL RINCIAN STATUS JAMAAH -->
@@ -1383,6 +1521,18 @@
             </div>
         </div>
     </div>
+
+    <!-- SCRIPT DETEKSI MODE OPERATOR & HIDE PRINT BUTTON -->
+    <script>
+        setInterval(() => {
+            const badgeKelompok = document.getElementById('badgeKelompokLogin');
+            if (badgeKelompok && !badgeKelompok.classList.contains('hidden')) {
+                document.body.classList.add('operator-mode');
+            } else {
+                document.body.classList.remove('operator-mode');
+            }
+        }, 300);
+    </script>
 
     <!-- MENGHUBUNGKAN FILE LOGIKA JAVASCRIPT APP.JS -->
     <script src="app.js"></script>
