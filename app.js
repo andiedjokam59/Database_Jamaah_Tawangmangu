@@ -297,9 +297,7 @@ async function handleAuthSubmit(e) {
                 desa: opData.desa,
                 kelompok: opData.kelompok
             };
-            sessionStorage.setItem('userSession', JSON.stringify(currentUser));
-			
-			recordOperatorActivity(currentUser.desa, currentUser.kelompok);
+            sessionStorage.setItem('userSession', JSON.stringify(currentUser));			
         }
 
         spinner.classList.add('hidden');
@@ -331,86 +329,6 @@ async function handleAuthSubmit(e) {
         inputEl.value = "";
         inputEl.focus();
     }
-}
-
-async function recordOperatorActivity(desa, kelompok) {
-    try {
-        // Menggunakan upsert: jika desa & kelompok sudah ada, baris ditimpa (di-update) waktunya
-        await supabaseUtama.from('operator_logs').upsert([
-            { 
-                desa: desa, 
-                kelompok: kelompok, 
-                created_at: new Date().toISOString() // Waktu diperbarui ke saat ini
-            }
-        ], { onConflict: 'desa,kelompok' });
-    } catch (err) {
-        console.warn("Gagal mencatat log operator:", err);
-    }
-}
-
-async function loadDeveloperRecentOperators() {
-    const recentBox = document.getElementById('developerRecentBox');
-    const recentList = document.getElementById('recentOperatorList');
-
-    if (!recentBox || !recentList) return;
-
-    // Jika yang login bukan Developer ATAU sedang tidak di menu utama ('home'), sembunyikan kotak ini
-    if (!currentUser || currentUser.role !== 'DEVELOPER' || activeSectionId !== 'home') {
-        recentBox.classList.add('hidden');
-        return;
-    }
-
-    recentBox.classList.remove('hidden');
-    recentList.innerHTML = `<p class="text-xs text-slate-400 text-center py-2">Memuat aktivitas operator...</p>`;
-
-    try {
-        const { data, error } = await supabaseUtama
-            .from('operator_logs')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(5);
-
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-            recentList.innerHTML = `<p class="text-xs text-slate-400 text-center py-2">Belum ada aktivitas operator tercatat.</p>`;
-            return;
-        }
-
-        recentList.innerHTML = '';
-        data.forEach(log => {
-            const timeAgo = formatTimeAgo(log.created_at);
-            const item = document.createElement('div');
-            item.className = "p-2.5 sm:p-3 bg-white border border-indigo-100 rounded-xl flex items-center justify-between text-xs shadow-2xs hover:shadow-sm transition-all";
-            item.innerHTML = `
-                <div class="flex items-center gap-2.5">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block shrink-0"></span>
-                    <span class="font-extrabold text-slate-800 text-xs sm:text-sm">Kelompok ${log.kelompok}</span>
-                    <span class="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md font-bold">${log.desa}</span>
-                </div>
-                <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">${timeAgo}</span>
-            `;
-            recentList.appendChild(item);
-        });
-
-    } catch (err) {
-        recentList.innerHTML = `<p class="text-xs text-rose-500 text-center py-2">Gagal memuat log aktivitas.</p>`;
-    }
-}
-
-// Helper untuk menampilkan format waktu relatif (misal: "Baru saja", "5 menit yang lalu")
-function formatTimeAgo(dateString) {
-    const date = new Date(dateString);
-    const now = new Date();
-    const seconds = Math.floor((now - date) / 1000);
-
-    if (seconds < 60) return "Baru saja";
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes} menit lalu`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours} jam lalu`;
-    const days = Math.floor(hours / 24);
-    return `${days} hari lalu`;
 }
 
 function handleLogout() {
@@ -786,12 +704,7 @@ function switchSectionView(target) {
 
     if (target === 'home') {
         checkOperatorMonthlyAttendance();
-		loadDeveloperRecentOperators();
-	} else {
-        // Sembunyikan papan recent saat membuka menu lain
-        const recentBox = document.getElementById('developerRecentBox');
-        if (recentBox) recentBox.classList.add('hidden');
-    }
+    } // <-- PERBAIKAN: Tutup kurung kurawal ditambahkan di sini
 
     if (target === 'database') {
         if (currentMode !== 'UPDATE') switchMode('DAFTAR');
@@ -3896,8 +3809,6 @@ function applyRoleRestrictionsUI() {
         if (btnUploadJadwal) {
             btnUploadJadwal.classList.remove('hidden');
         }
-		
-		loadDeveloperRecentOperators();
     }
 
     checkDeveloperAccess();
