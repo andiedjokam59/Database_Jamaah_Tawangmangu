@@ -395,13 +395,23 @@
 	
 		<!-- WADAH BRANDING & TOMBOL UTAMA (Hanya tampil di Dashboard Utama) -->
 		<div id="mainHeaderBranding" class="relative">
-			<!-- Tombol Reload di Kiri Atas -->
-			<div class="absolute top-0 left-0 z-20">
+			<!-- Tombol Reload & Log Operator (Disusun berdampingan rapi) -->
+			<div class="absolute top-0 left-0 z-20 flex items-center gap-2">
+				<!-- Tombol Refresh -->
 				<button type="button" onclick="window.location.reload()" title="Refresh Halaman" aria-label="Refresh Halaman" class="p-2.5 bg-white/80 hover:bg-white active:scale-90 text-indigo-600 border border-indigo-100 rounded-xl transition duration-300 shadow-sm hover:shadow-md flex items-center justify-center backdrop-blur-md">
 					<svg class="w-4 h-4 sm:w-5 sm:h-5 transition-transform hover:rotate-180 duration-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
 					</svg>
 				</button>
+
+				<!-- Tombol Log Operator (Hanya muncul jika login sebagai Developer) -->
+				<div id="developerLogBtnContainer" class="hidden">
+					<button type="button" onclick="openDeveloperLogModal()" title="Log Akses Operator" aria-label="Log Akses Operator" class="p-2.5 bg-white/80 hover:bg-white active:scale-90 text-indigo-600 border border-indigo-100 rounded-xl transition duration-300 shadow-sm hover:shadow-md flex items-center justify-center backdrop-blur-md">
+						<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+						</svg>
+					</button>
+				</div>
 			</div>
 
 			<!-- Tombol Logout di Kanan Atas -->
@@ -1466,7 +1476,7 @@
             </div>
             
             <div class="relative text-left pt-2">
-                <input type="text" id="opSearchInput" oninput="filterOperatorList()" placeholder="🔍 Cari nama / kelompok / no. HP..." class="w-full text-xs p-3 pl-4 rounded-xl border-2 border-blue-200 bg-white text-blue-900 font-bold focus:outline-none focus:border-blue-500 transition-all shadow-inner">
+                <input type="text" id="opSearchInput" oninput="filterOperatorList()" placeholder="🔍 Cari nama / kelompok / no. HP..." class="w-full text-xs p-3 pl-4 rounded-xl border-2 border-blue-200 bg-white text-blue-900 font-bold focus:outline-none focus:border-indigo-500 transition-all shadow-inner">
             </div>
 
             <div id="opModalList" class="max-h-64 overflow-y-auto space-y-2.5 text-left pr-1 scroll-container py-1"></div>
@@ -1476,6 +1486,52 @@
             </button>
         </div>
     </div>
+
+    <!-- MODAL LOG AKSES OPERATOR -->
+	<div id="developerLogModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+		<div id="developerLogModalCard" class="bg-white rounded-[2rem] shadow-2xl max-w-2xl w-full p-5 sm:p-6 transform scale-90 opacity-0 transition-all duration-300 flex flex-col max-h-[85vh] border border-indigo-100">
+			<!-- Header Modal -->
+			<div class="flex items-center justify-between pb-4 border-b border-slate-100">
+				<div class="flex items-center gap-3">
+					<div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-lg shadow-inner">
+						📋
+					</div>
+					<div>
+						<h3 class="text-sm sm:text-base font-extrabold text-slate-800">Log Aktivitas & Akses Operator</h3>
+						<p class="text-[11px] text-slate-500">Riwayat aktivitas operator yang masuk ke sistem</p>
+					</div>
+				</div>
+				<button type="button" onclick="closeModal('developerLogModal')" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100 transition-colors">
+					✕
+				</button>
+			</div>
+
+			<!-- BAR PENCARIAN (SEARCH BAR) -->
+			<div class="pt-4 pb-2">
+				<div class="relative">
+					<span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+						🔍
+					</span>
+					<input type="text" id="developerLogSearchInput" oninput="filterDeveloperLogs()" placeholder="Cari berdasarkan kelompok, desa, atau aktivitas..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all shadow-2xs">
+				</div>
+			</div>
+
+			<!-- Konten / Daftar Log -->
+			<div class="py-2 flex-1 overflow-y-auto space-y-2.5 pr-1" id="developerLogListContainer">
+				<div class="text-xs text-slate-400 text-center py-6">Memuat data log...</div>
+			</div>
+
+			<!-- Footer Modal -->
+			<div class="pt-4 border-t border-slate-100 flex justify-between items-center gap-2">
+				<button type="button" onclick="fetchAndRenderDeveloperLogs()" class="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-extrabold text-xs rounded-xl transition-colors">
+					🔄 Muat Ulang Log
+				</button>
+				<button type="button" onclick="closeModal('developerLogModal')" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-xs rounded-xl transition-all shadow-md">
+					Tutup
+				</button>
+			</div>
+		</div>
+	</div>
 
     <!-- MODAL CUSTOM PICKER (GLASSMORPHISM) -->
     <div id="centerPickerModal" class="fixed inset-0 z-[150] flex items-center justify-center p-4 hidden opacity-0" onclick="closeCenterPicker()">

@@ -300,6 +300,14 @@ async function handleAuthSubmit(e) {
             sessionStorage.setItem('userSession', JSON.stringify(currentUser));			
         }
 
+        // --- KIRIM LOG KE SUPABASE SAAT BERHASIL LOGIN ---
+        await recordOperatorLog(
+            "LOGIN", 
+            currentUser.role === 'DEVELOPER' 
+                ? "Developer masuk ke sistem (Full Access)" 
+                : `Operator Kelompok ${currentUser.kelompok} (${currentUser.desa}) login`
+        );
+
         spinner.classList.add('hidden');
         btnText.textContent = currentUser.role === 'DEVELOPER' ? "Akses Dev Diterima" : `Operator ${currentUser.kelompok}`;
         btn.className = "w-full py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg flex items-center justify-center gap-2 transition duration-300 transform scale-105";
@@ -328,6 +336,20 @@ async function handleAuthSubmit(e) {
         errEl.classList.remove('hidden');
         inputEl.value = "";
         inputEl.focus();
+    }
+}
+
+// Pastikan fungsi pencatatan log ini ada di app.js
+async function recordOperatorLog(aksi, keterangan) {
+    try {
+        await supabaseUtama.from('operator_logs').insert([{
+            desa: currentUser.desa || 'Pusat',
+            kelompok: currentUser.kelompok || 'Developer',
+            aksi: aksi,
+            keterangan: keterangan
+        }]);
+    } catch (err) {
+        console.warn("Gagal mencatat log:", err);
     }
 }
 
@@ -3746,6 +3768,9 @@ function applyRoleRestrictionsUI() {
     const badgeKelompok = document.getElementById('badgeKelompokLogin');
     const teksKelompokAktif = document.getElementById('namaKelompokAktif');
     const btnUploadJadwal = document.getElementById('btnUploadJadwal');
+    
+    // Ambil elemen container tombol log operator dengan aman
+    const devLogBtnContainer = document.getElementById('developerLogBtnContainer');
 
     if (currentUser.role === 'OPERATOR') {
         const opDesa = currentUser.desa;
@@ -3758,6 +3783,11 @@ function applyRoleRestrictionsUI() {
 
         if (btnUploadJadwal) {
             btnUploadJadwal.classList.add('hidden');
+        }
+
+        // Sembunyikan tombol log operator untuk operator biasa
+        if (devLogBtnContainer) {
+            devLogBtnContainer.classList.add('hidden');
         }
 
         // KUNCI KETAT SEMUA PILIHAN DESA DAN KELOMPOK DI SEMUA MENU
@@ -3808,6 +3838,11 @@ function applyRoleRestrictionsUI() {
 
         if (btnUploadJadwal) {
             btnUploadJadwal.classList.remove('hidden');
+        }
+
+        // Tampilkan tombol log operator khusus untuk Developer secara aman
+        if (devLogBtnContainer) {
+            devLogBtnContainer.classList.remove('hidden');
         }
     }
 
@@ -4197,4 +4232,100 @@ function mapTableRowsToSupabaseData(rawRows) {
             materi: idxMateri !== -1 ? (row[idxMateri] || '') : (row[6] || '')
         };
     }).filter(item => item.nama_kegiatan && item.nama_kegiatan.trim() !== '');
+}
+
+window.allDeveloperLogsDataset = [];
+
+// Fungsi untuk membuka modal Log Operator
+async function openDeveloperLogModal() {
+    if (currentUser.role !== 'DEVELOPER') {
+        showCustomModal("Akses Dibatasi", "Fitur ini hanya dapat diakses oleh Developer.", "⚠️");
+        return;
+    }
+    
+    // Kosongkan kolom pencarian setiap kali modal dibuka
+    const searchInput = document.getElementById('developerLogSearchInput');
+    if (searchInput) searchInput.value = '';
+
+    openModal('developerLogModal');
+    await fetchAndRenderDeveloperLogs();
+}
+
+// Fungsi mengambil data log dari tabel operator_logs di Supabase
+async function fetchAndRenderDeveloperLogs() {
+    const container = document.getElementById('developerLogListContainer');
+    container.innerHTML = `<div class="text-xs text-slate-400 text-center py-6">Mengambil data log...</div>`;
+
+    try {
+        const { data, error } = await supabaseUtama
+            .from('operator_logs')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(50); // Maksimal ambil 50 data terbaru dari database
+
+        if (error) throw error;
+
+        window.allDeveloperLogsDataset = data || [];
+        renderDeveloperLogList(window.allDeveloperLogsDataset);
+
+    } catch (err) {
+        container.innerHTML = `<div class="text-xs text-rose-500 text-center py-6 font-semibold">Gagal memuat log: ${err.message}</div>`;
+    }
+}
+
+// Fungsi untuk merender daftar kartu log ke layar
+function renderDeveloperLogList(listData) {
+    const container = document.getElementById('developerLogListContainer');
+    container.innerHTML = '';
+
+    if (!listData || listData.length === 0) {
+        container.innerHTML = `<div class="text-xs text-slate-400 text-center py-6 font-medium">Tidak ada catatan log aktivitas yang ditemukan.</div>`;
+        return;
+    }
+
+    listData.forEach(log => {
+        const dateObj = new Date(log.created_at);
+        const timeFormatted = dateObj.toLocaleDateString('id-ID', {
+            day: 'numeric', month: 'short', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+
+        const card = document.createElement('div');
+        card.className = "p-3.5 bg-slate-50/80 border border-slate-200/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-white hover:border-indigo-200 transition-all shadow-2xs animate-fade-in-up";
+        
+        card.innerHTML = `
+            <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-extrabold text-indigo-900">${log.kelompok || 'Developer'}</span>
+                    <span class="text-[10px] font-bold text-slate-500 bg-slate-200/70 px-2 py-0.5 rounded-md">${log.desa || 'Pusat'}</span>
+                </div>
+                <p class="text-xs text-slate-700 font-medium">${log.keterangan || log.aksi || '-'}</p>
+            </div>
+            <div class="text-[10px] font-bold text-slate-400 shrink-0 text-left sm:text-right">
+                ${timeFormatted} WIB
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+// Fungsi pencarian log secara real-time saat diketik
+function filterDeveloperLogs() {
+    const query = (document.getElementById('developerLogSearchInput').value || '').toLowerCase().trim();
+    
+    if (!query) {
+        renderDeveloperLogList(window.allDeveloperLogsDataset);
+        return;
+    }
+
+    const filtered = window.allDeveloperLogsDataset.filter(log => {
+        const kelompokMatch = (log.kelompok || '').toLowerCase().includes(query);
+        const desaMatch = (log.desa || '').toLowerCase().includes(query);
+        const ketMatch = (log.keterangan || '').toLowerCase().includes(query);
+        const aksiMatch = (log.aksi || '').toLowerCase().includes(query);
+
+        return kelompokMatch || desaMatch || ketMatch || aksiMatch;
+    });
+
+    renderDeveloperLogList(filtered);
 }
