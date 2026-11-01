@@ -4273,17 +4273,29 @@ async function fetchAndRenderDeveloperLogs() {
     }
 }
 
-// Fungsi untuk merender daftar kartu log ke layar
+// Fungsi untuk merender daftar kartu log ke layar (Hanya menampilkan Operator)
 function renderDeveloperLogList(listData) {
     const container = document.getElementById('developerLogListContainer');
     container.innerHTML = '';
 
-    if (!listData || listData.length === 0) {
-        container.innerHTML = `<div class="text-xs text-slate-400 text-center py-6 font-medium">Tidak ada catatan log aktivitas yang ditemukan.</div>`;
+    // Filter ketat: Hanya ambil data yang kelompoknya BUKAN 'Developer' atau 'Pusat'
+    const operatorOnlyData = (listData || []).filter(log => {
+        const kelompok = (log.kelompok || '').toLowerCase();
+        const desa = (log.desa || '').toLowerCase();
+        
+        // Sembunyikan jika log berasal dari Developer / Pusat
+        if (kelompok === 'developer' || kelompok === 'pusat' || desa === 'pusat') {
+            return false;
+        }
+        return true;
+    });
+
+    if (operatorOnlyData.length === 0) {
+        container.innerHTML = `<div class="text-xs text-slate-400 text-center py-6 font-medium">Tidak ada catatan log aktivitas operator yang ditemukan.</div>`;
         return;
     }
 
-    listData.forEach(log => {
+    operatorOnlyData.forEach(log => {
         const dateObj = new Date(log.created_at);
         const timeFormatted = dateObj.toLocaleDateString('id-ID', {
             day: 'numeric', month: 'short', year: 'numeric',
@@ -4296,8 +4308,8 @@ function renderDeveloperLogList(listData) {
         card.innerHTML = `
             <div class="space-y-1">
                 <div class="flex items-center gap-2">
-                    <span class="text-xs font-extrabold text-indigo-900">${log.kelompok || 'Developer'}</span>
-                    <span class="text-[10px] font-bold text-slate-500 bg-slate-200/70 px-2 py-0.5 rounded-md">${log.desa || 'Pusat'}</span>
+                    <span class="text-xs font-extrabold text-indigo-950">Kelompok ${log.kelompok || '-'}</span>
+                    <span class="text-[10px] font-bold text-slate-500 bg-slate-200/70 px-2 py-0.5 rounded-md">${log.desa || '-'}</span>
                 </div>
                 <p class="text-xs text-slate-700 font-medium">${log.keterangan || log.aksi || '-'}</p>
             </div>
