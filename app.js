@@ -343,7 +343,7 @@ async function handleAuthSubmit(e) {
 async function recordOperatorLog(aksi, keterangan) {
     try {
         await supabaseUtama.from('operator_logs').insert([{
-            desa: currentUser.desa || 'Pusat',
+            desa: currentUser.desa || 'Admin',
             kelompok: currentUser.kelompok || 'Developer',
             aksi: aksi,
             keterangan: keterangan
@@ -4278,13 +4278,13 @@ function renderDeveloperLogList(listData) {
     const container = document.getElementById('developerLogListContainer');
     container.innerHTML = '';
 
-    // Filter ketat: Hanya ambil data yang kelompoknya BUKAN 'Developer' atau 'Pusat'
+    // Filter ketat: Hanya ambil data yang kelompoknya BUKAN 'Developer' atau 'Admin'
     const operatorOnlyData = (listData || []).filter(log => {
         const kelompok = (log.kelompok || '').toLowerCase();
         const desa = (log.desa || '').toLowerCase();
         
-        // Sembunyikan jika log berasal dari Developer / Pusat
-        if (kelompok === 'developer' || kelompok === 'pusat' || desa === 'pusat') {
+        // Sembunyikan jika log berasal dari Developer / Admin
+        if (kelompok === 'developer' || kelompok === 'Admin' || desa === 'Admin') {
             return false;
         }
         return true;
