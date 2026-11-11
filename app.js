@@ -1935,6 +1935,7 @@ function copyKelompokBelumAbsen() {
 
 function parseKategoriGenerus(rawStr) {
     const val = (rawStr || "").toLowerCase().trim();
+	if (val.includes('balita')) return 'balita';
     if (val.includes('paud')) return 'paud';
     if (val.includes('tk')) return 'tk';
     if (val.includes('caberawit') || val.includes('cabe rawit')) return 'caberawit';
@@ -2005,7 +2006,7 @@ function loadRekapStatusKeseluruhan() {
         }
     });
 
-    const genCounts = { paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0 };
+    const genCounts = { balita: 0,paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0 };
     let totalGenerusMurni = 0;
 
     dataGenerus.forEach(g => {
@@ -2045,7 +2046,8 @@ function loadRekapStatusKeseluruhan() {
     document.getElementById('stTotalJamaahDewasa').textContent = `${dataJamaah.length} Orang`;
     document.getElementById('stTotalDisabilitas').textContent = `${totalDisabilitas} Orang`;
 
-    document.getElementById('genPaud').textContent = genCounts.paud;
+    document.getElementById('genBalita').textContent = genCounts.balita;
+	document.getElementById('genPaud').textContent = genCounts.paud;
     document.getElementById('genTk').textContent = genCounts.tk;
     document.getElementById('genCaberawit').textContent = genCounts.caberawit;
     document.getElementById('genPraRemaja').textContent = genCounts.praRemaja;
@@ -2225,10 +2227,22 @@ function filterStatusDetailList() {
 function showKelompokDetailModal(kelompokNama) {
     document.getElementById('kelompokDetailTitle').textContent = `Kelompok: ${kelompokNama}`;
 
-    const data = globalCache.jamaah.filter(j => j.kelompok === kelompokNama);
-    data.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
+    // Panggil fungsi getUniqueMembers untuk menyaring data ganda/mirip secara otomatis
+    // (Fungsi ini otomatis menggabungkan jamaah & generus serta membuang data duplikat)
+    const uniqueMembers = getUniqueMembers(
+        globalCache.jamaah || [],
+        globalCache.generus || [],
+        null, // Tidak batasi desa, cukup kelompoknya saja
+        kelompokNama
+    );
 
-    let combined = data.map(j => ({ nama: j.nama, status: j.status || 'Jamaah' }));
+    let combined = uniqueMembers.map(m => ({
+        nama: m.nama,
+        status: m.status || 'Jamaah'
+    }));
+
+    // Urutkan berdasarkan abjad nama
+    combined.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
     window.activeKelompokDataset = combined;
 
     const searchInput = document.getElementById('kelompokDetailSearch');
@@ -2585,7 +2599,8 @@ function getUniqueMembers(jamaahList, generusList, targetDesa = null, targetKelo
         let parsedKey = parseKategoriGenerus(rawKat);
         let labelKat = rawKat;
 
-        if (parsedKey === 'paud') labelKat = 'PAUD';
+        if (parsedKey === 'balita') labelKat = 'BALITA';
+		else if (parsedKey === 'paud') labelKat = 'PAUD';
         else if (parsedKey === 'tk') labelKat = 'TK';
         else if (parsedKey === 'caberawit') labelKat = 'Caberawit';
         else if (parsedKey === 'praRemaja') labelKat = 'Pra Remaja';
@@ -2663,7 +2678,7 @@ function loadRekapKelompokLengkap() {
         let countL = 0, countP = 0;
         let catCounts = {
             'Menikah': 0, 'Duda': 0, 'Janda': 0, 'Manula': 0, 'Operator': 0,
-            'PAUD': 0, 'TK': 0, 'Caberawit': 0, 'Pra Remaja': 0, 'Remaja': 0, 'Usia Mandiri': 0
+            'BALITA': 0,'PAUD': 0, 'TK': 0, 'Caberawit': 0, 'Pra Remaja': 0, 'Remaja': 0, 'Usia Mandiri': 0
         };
 
         tbody.innerHTML = '';
@@ -2752,6 +2767,7 @@ function loadRekapKelompokLengkap() {
     thead.innerHTML = `
         <tr>
             <th class="px-2.5 py-3 sticky-col">Kelompok</th>
+			<th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950 border-l border-indigo-200">BALITA</th>
             <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950 border-l border-indigo-200">PAUD</th>
             <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">TK</th>
             <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">Cbr</th>
@@ -2765,7 +2781,7 @@ function loadRekapKelompokLengkap() {
             <th class="px-1.5 py-3 text-center whitespace-nowrap">Manula</th>
             <th class="px-1.5 py-3 text-center text-blue-800 bg-blue-100/80 whitespace-nowrap">Opr.</th>
             
-            <th class="px-1.5 py-3 text-center bg-indigo-100/80 font-black whitespace-nowrap border-l border-indigo-200">Jml Jamaah</th>
+            <th class="px-1.5 py-3 text-center bg-indigo-100/80 font-black whitespace-nowrap border-l border-indigo-200">Jml Dewasa</th>
             <th class="px-1.5 py-3 text-center bg-blue-100/80 text-blue-950 font-bold whitespace-nowrap border-l border-indigo-200">Jml L</th>
             <th class="px-1.5 py-3 text-center bg-pink-100/80 text-pink-950 font-bold whitespace-nowrap">Jml P</th>
             <th class="px-2 py-3 text-center bg-indigo-200 font-black whitespace-nowrap border-l border-indigo-300 text-indigo-950">Total</th>
@@ -2783,7 +2799,7 @@ function loadRekapKelompokLengkap() {
                 const key = `${desa}__${kelompok}`;
                 rekapMap[key] = {
                     desa, kelompok,
-                    paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0, totalGenerus: 0,
+                    balita: 0,paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0, totalGenerus: 0,
                     menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, 
                     jamaahL: 0, jamaahP: 0,
                     totalJamaah: 0, totalKeseluruhan: 0,
@@ -2813,7 +2829,8 @@ function loadRekapKelompokLengkap() {
                 else if (st === "operator") itemMap.operator++;
                 itemMap.totalJamaah++;
             } else if (m.tipe === 'GENERUS') {
-                if (st === "paud") itemMap.paud++;
+                if (st === "balita") itemMap.balita++;
+				else if (st === "paud") itemMap.paud++;
                 else if (st === "tk") itemMap.tk++;
                 else if (st === "caberawit") itemMap.caberawit++;
                 else if (st === "pra remaja") itemMap.praRemaja++;
@@ -2849,7 +2866,7 @@ function loadRekapKelompokLengkap() {
     });
 
     tbody.innerHTML = '';
-    let totPaud = 0, totTk = 0, totCaberawit = 0, totPraRemaja = 0, totRemaja = 0, totUsiaMandiri = 0, totAllGenerus = 0;
+    let totBalita = 0,totPaud = 0, totTk = 0, totCaberawit = 0, totPraRemaja = 0, totRemaja = 0, totUsiaMandiri = 0, totAllGenerus = 0;
     let totMenikah = 0, totDuda = 0, totJanda = 0, totManula = 0, totOperator = 0;
     let totJamaahL = 0, totJamaahP = 0;
     let totAllJamaah = 0, totAllKeseluruhan = 0;
@@ -2857,6 +2874,7 @@ function loadRekapKelompokLengkap() {
     const items = Object.values(rekapMap);
 
     items.forEach((item) => {
+		totBalita += item.balita;
         totPaud += item.paud;
         totTk += item.tk;
         totCaberawit += item.caberawit;
@@ -2882,6 +2900,7 @@ function loadRekapKelompokLengkap() {
         
         tr.innerHTML = `
             <td class="px-2.5 py-3 font-extrabold text-indigo-900 hover:text-indigo-600 hover:underline cursor-pointer sticky-col" onclick="showKelompokDetailModal('${item.kelompok}')" title="Klik untuk lihat anggota ${item.kelompok}">${item.kelompok}</td>
+			<td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900 border-l border-indigo-100">${item.balita}</td>
             <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900 border-l border-indigo-100">${item.paud}</td>
             <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.tk}</td>
             <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.caberawit}</td>
@@ -2906,6 +2925,7 @@ function loadRekapKelompokLengkap() {
     tfoot.innerHTML = `
         <tr>
             <td class="px-2.5 py-4 text-left font-black uppercase sticky-col bg-indigo-200/90">TOTAL</td>
+			<td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80 border-l border-indigo-200">${totBalita}</td>
             <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80 border-l border-indigo-200">${totPaud}</td>
             <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totTk}</td>
             <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totCaberawit}</td>
@@ -3090,7 +3110,7 @@ function loadRekapAbsensi() {
                     const kat = parseKategoriGenerus(g.kategori_usia);
 
                     if (listTarget.includes('muda_mudi') && ['praRemaja', 'remaja', 'usiaMandiri'].includes(kat)) return true;
-                    if (listTarget.includes('caberawit') && ['paud', 'tk', 'caberawit'].includes(kat)) return true;
+                    if (listTarget.includes('caberawit') && ['balita', 'paud', 'tk', 'caberawit'].includes(kat)) return true;
                     return false;
                 }).length;
 
