@@ -911,16 +911,55 @@ function initDesaDropdowns() {
 function initDateDropdowns() {
     const tglSel = document.getElementById('tgl_lahir_tgl');
     const thnSel = document.getElementById('tgl_lahir_thn');
+    const absTglSel = document.getElementById('abs_tgl');
+    const absThnSel = document.getElementById('abs_thn');
+
+    if (tglSel) tglSel.innerHTML = '';
+    if (thnSel) thnSel.innerHTML = '';
+    if (absTglSel) absTglSel.innerHTML = '';
+    if (absThnSel) absThnSel.innerHTML = '';
 
     for (let i = 1; i <= 31; i++) {
         const val = i < 10 ? `0${i}` : `${i}`;
         if (tglSel) tglSel.add(new Option(val, val));
+        if (absTglSel) absTglSel.add(new Option(val, val));
     }
 
     const currentYear = new Date().getFullYear();
     for (let y = currentYear; y >= currentYear - 100; y--) {
         if (thnSel) thnSel.add(new Option(y, y));
     }
+
+    for (let y = currentYear + 1; y >= currentYear - 5; y--) {
+        if (absThnSel) absThnSel.add(new Option(y, String(y)));
+    }
+
+    setAbsensiDateDefault();
+}
+
+function getTodayDateString() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function setAbsensiDateDefault(dateStr = null) {
+    const targetDate = dateStr || getTodayDateString();
+    const parts = targetDate.split('-');
+    if (parts.length !== 3) return;
+
+    const thnEl = document.getElementById('abs_thn');
+    const blnEl = document.getElementById('abs_bln');
+    const tglEl = document.getElementById('abs_tgl');
+
+    if (thnEl && !Array.from(thnEl.options).some(o => o.value === parts[0])) {
+        thnEl.add(new Option(parts[0], parts[0]));
+    }
+    if (thnEl) thnEl.value = parts[0];
+    if (blnEl) blnEl.value = parts[1];
+    if (tglEl) tglEl.value = parts[2];
 }
 
 function bindDropdown(desaId, kelompokId) {
@@ -1594,17 +1633,18 @@ document.getElementById('formAbsensiKegiatan').addEventListener('submit', functi
     const selectNama = document.getElementById('abs_nama').value;
     const customNama = toTitleCase(document.getElementById('abs_nama_custom').value.trim());
     const finalNamaKegiatan = selectNama === 'LAINNYA' ? customNama : selectNama;
-    
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    const todayStr = `${year}-${month}-${day}`;
-    
-    let tanggalKegiatan = editId ? document.getElementById('edit_tanggal_kegiatan').value : todayStr;
+
+    const absTgl = document.getElementById('abs_tgl')?.value;
+    const absBln = document.getElementById('abs_bln')?.value;
+    const absThn = document.getElementById('abs_thn')?.value;
+
+    let tanggalKegiatan = (absThn && absBln && absTgl)
+        ? `${absThn}-${absBln}-${absTgl}`
+        : (editId ? document.getElementById('edit_tanggal_kegiatan').value : getTodayDateString());
+
     const infaqRaw = document.getElementById('abs_infaq').value.replace(/[^0-9]/g, '');
 
-    const targetCustomSelected = selectNama === 'LAINNYA' 
+    const targetCustomSelected = selectNama === 'LAINNYA'
         ? Array.from(document.querySelectorAll('input[name="target_custom"]:checked')).map(cb => cb.value)
         : null;
 
@@ -1623,7 +1663,7 @@ document.getElementById('formAbsensiKegiatan').addEventListener('submit', functi
     (async () => {
         showDataLoading("Menyimpan data absensi...");
         try {
-            if(editId) {
+            if (editId) {
                 const { data, error } = await supabaseAbsensi.from('absensi_sdc').update(payload).eq('id', editId).select();
                 if (error) throw error;
                 const idx = globalCache.absensi.findIndex(a => String(a.id) === String(editId));
@@ -1635,26 +1675,27 @@ document.getElementById('formAbsensiKegiatan').addEventListener('submit', functi
             }
 
             showCustomModal("Sukses", "Data Absensi Berhasil Diperbarui!", "📋", () => {
-                
-				invalidateAppCache();
-				
-				e.target.reset();
+                invalidateAppCache();
+
+                e.target.reset();
                 document.getElementById('abs_nama_custom').classList.add('hidden');
                 document.getElementById('boxTargetCustom').classList.add('hidden');
                 document.getElementById('edit_absensi_id').value = "";
-                
+                document.getElementById('edit_tanggal_kegiatan').value = "";
+                document.getElementById('absBtn').textContent = "Simpan Absensi";
+                setAbsensiDateDefault();
+
                 if (currentUser.role === 'OPERATOR') {
                     applyRoleRestrictionsUI();
                 }
-				checkOperatorMonthlyAttendance();
+                checkOperatorMonthlyAttendance();
                 switchTabAbsensi('REKAP');
             });
-        } catch(e) {
-            // Mengecek apakah error disebabkan oleh constraint unik di Supabase (PostgreSQL Error Code 23505)
+        } catch (e) {
             if (e.code === '23505' || (e.message && e.message.includes('unique_kegiatan_kelompok_tanggal'))) {
                 showCustomModal(
-                    "Absensi Sudah Terisi", 
-                    `Kelompok ${payload.kelompok} (${payload.desa}) sudah pernah mengisi absensi untuk kegiatan "${payload.nama_kegiatan}" pada tanggal ${payload.tanggal_kegiatan}.\n\nJika ingin mengubah data, silakan gunakan tombol Edit di menu Rekapan.`, 
+                    "Absensi Sudah Terisi",
+                    `Kelompok ${payload.kelompok} (${payload.desa}) sudah pernah mengisi absensi untuk kegiatan "${payload.nama_kegiatan}" pada tanggal ${payload.tanggal_kegiatan}.\n\nJika ingin mengubah data, silakan gunakan tombol Edit di menu Rekapan.`,
                     "⚠️"
                 );
             } else {
@@ -1668,20 +1709,21 @@ document.getElementById('formAbsensiKegiatan').addEventListener('submit', functi
 
 function editAbsensi(id) {
     const data = globalCache.absensi.find(a => String(a.id) === String(id));
-    if(!data) return;
+    if (!data) return;
 
     document.getElementById('edit_absensi_id').value = data.id;
     document.getElementById('edit_tanggal_kegiatan').value = data.tanggal_kegiatan;
+    setAbsensiDateDefault(data.tanggal_kegiatan);
 
     const selectNama = document.getElementById('abs_nama');
     const customInput = document.getElementById('abs_nama_custom');
     const boxTargetCustom = document.getElementById('boxTargetCustom');
 
     const standardOptions = [
-        "Materi PPG Pusat dan 30 Point", 
-        "Pengajian Ibu-Ibu Daerah", 
-        "Pengajian Umum Daerah", 
-        "Pengajian Remaja Daerah", 
+        "Materi PPG Pusat dan 30 Point",
+        "Pengajian Ibu-Ibu Daerah",
+        "Pengajian Umum Daerah",
+        "Pengajian Remaja Daerah",
         "Asrama K. Khotbah"
     ];
 
@@ -1776,32 +1818,42 @@ function triggerPrintRekapCurrentTab() {
 }
 
 function switchTabAbsensi(tab) {
-	activeAbsensiSubTab = tab;
-	
+    activeAbsensiSubTab = tab;
+
     const btnPrint = document.getElementById('btnPrintAbsensi');
     const btnCopy = document.getElementById('btnCopyBelumAbsen');
     const tabInput = document.getElementById('tabInputAbsensi');
     const tabRekap = document.getElementById('tabRekapAbsensi');
 
-    if(tab === 'INPUT') {
+    if (tab === 'INPUT') {
         document.getElementById('formAbsensiKegiatan').classList.remove('hidden');
         document.getElementById('printableAbsensi').classList.add('hidden');
-        
+
+        const editIdVal = document.getElementById('edit_absensi_id')?.value;
+        const savedTglVal = document.getElementById('edit_tanggal_kegiatan')?.value;
+        if (window._pendingAlertPrefill && window._pendingAlertPrefill.tanggalIso) {
+            setAbsensiDateDefault(window._pendingAlertPrefill.tanggalIso);
+        } else if (!editIdVal) {
+            setAbsensiDateDefault();
+        } else if (savedTglVal) {
+            setAbsensiDateDefault(savedTglVal);
+        }
+
         tabInput.className = "py-2 px-3.5 text-xs font-extrabold rounded-xl bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white shadow-md flex items-center gap-1.5 transition-all duration-300";
         tabRekap.className = "py-2 px-3.5 text-xs font-extrabold rounded-xl text-fuchsia-900 hover:bg-fuchsia-200/60 flex items-center gap-1.5 transition-all duration-300";
 
-        if(btnPrint) btnPrint.classList.add('hidden');
-        if(btnCopy) btnCopy.classList.add('hidden');
+        if (btnPrint) btnPrint.classList.add('hidden');
+        if (btnCopy) btnCopy.classList.add('hidden');
     } else {
         document.getElementById('formAbsensiKegiatan').classList.add('hidden');
         document.getElementById('printableAbsensi').classList.remove('hidden');
-        
+
         tabRekap.className = "py-2 px-3.5 text-xs font-extrabold rounded-xl bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white shadow-md flex items-center gap-1.5 transition-all duration-300";
         tabInput.className = "py-2 px-3.5 text-xs font-extrabold rounded-xl text-fuchsia-900 hover:bg-fuchsia-200/60 flex items-center gap-1.5 transition-all duration-300";
 
-        if(btnPrint) btnPrint.classList.remove('hidden');
-        if(btnCopy && currentUser.role === 'DEVELOPER') btnCopy.classList.remove('hidden');
-        
+        if (btnPrint) btnPrint.classList.remove('hidden');
+        if (btnCopy && currentUser.role === 'DEVELOPER') btnCopy.classList.remove('hidden');
+
         populateKegiatanFilter();
         loadRekapAbsensi();
     }
@@ -2631,24 +2683,36 @@ function getUniqueMembers(jamaahList, generusList, targetDesa = null, targetKelo
     return Array.from(memberMap.values());
 }
 
+window.lastDeveloperRekapExport = null;
+
 function loadRekapKelompokLengkap() {
     const tbody = document.getElementById('tbodyRekapKelompok');
     const tfoot = document.getElementById('tfootRekapKelompok');
     const thead = document.querySelector('#tableRekapKelompok thead');
+    const tableEl = document.getElementById('tableRekapKelompok');
     const filterContainer = document.getElementById('filterDesaRekap')?.parentElement;
-    const titleEl = document.querySelector('#sectionRekapKelompok h4');
+    const titleEl = document.getElementById('judulRekapKelompok');
+    const infoHeaderDev = document.getElementById('infoHeaderLaporanDev');
+    const rekapBawahDev = document.getElementById('rekapBawahDeveloper');
+    const theadBawah = document.getElementById('theadRekapBawahDev');
+    const tbodyBawah = document.getElementById('tbodyRekapBawahDev');
 
     const jamaahData = globalCache.jamaah || [];
     const generusData = globalCache.generus || [];
+    const sarprasData = globalCache.sarpras || [];
+    const absensiData = globalCache.absensi || [];
 
     // -------------------------------------------------------------
-    // MODE 1: TAMPILAN OPERATOR (DAFTAR NAMA ANGGOTA ANGGOTA KELOMPOK)
+    // MODE 1: TAMPILAN OPERATOR (DAFTAR NAMA ANGGOTA KELOMPOK)
     // -------------------------------------------------------------
     if (currentUser.role === 'OPERATOR') {
+        window.lastDeveloperRekapExport = null;
+        if (tableEl) tableEl.classList.remove('dev-rekap-table');
+        if (infoHeaderDev) infoHeaderDev.classList.add('hidden');
+        if (rekapBawahDev) rekapBawahDev.classList.add('hidden');
         if (titleEl) titleEl.textContent = `DAFTAR JAMAAH & GENERUS KELOMPOK ${currentUser.kelompok.toUpperCase()}`;
         if (filterContainer) filterContainer.style.display = 'none';
 
-        const tableEl = document.getElementById('tableRekapKelompok');
         if (tableEl) {
             tableEl.className = "w-full text-[10px] sm:text-[11px] text-left border-collapse border border-slate-300";
         }
@@ -2656,15 +2720,14 @@ function loadRekapKelompokLengkap() {
         thead.innerHTML = `
             <tr>
                 <th class="px-1 py-2 text-center w-[6%] text-[10px] sm:text-[11px] border border-indigo-200 bg-indigo-100/80 text-indigo-950 font-extrabold">No</th>
-                <th class="px-1 py-2 text-left text-[10px] sm:text-[11px] w-[30%] border border-indigo-200 bg-indigo-100/80 text-indigo-950 font-extrabold">Nama Lengkap</th>
-                <th class="px-1 py-2 text-center text-[10px] sm:text-[11px] w-[24%] border border-indigo-200 bg-indigo-100/80 text-indigo-950 font-extrabold">Status</th>
-                <th class="px-1 py-2 text-center text-[10px] sm:text-[11px] w-[8%] border border-indigo-200 bg-indigo-100/80 text-indigo-950 font-extrabold">JK</th>
-                <th class="px-1 py-2 text-center text-[10px] sm:text-[11px] w-[16%] border border-indigo-200 bg-indigo-100/80 text-indigo-950 font-extrabold">Umur</th>
-                <th class="px-1 py-2 text-center text-[10px] sm:text-[11px] w-[16%] border border-indigo-200 bg-indigo-100/80 text-indigo-950 font-extrabold">Dis.</th>
+                <th class="px-1.5 py-2 text-left text-[10px] sm:text-[11px] w-[30%] border border-indigo-200 bg-indigo-100/80 text-indigo-950 font-extrabold">Nama Lengkap</th>
+                <th class="px-1.5 py-2 text-center text-[10px] sm:text-[11px] w-[24%] border border-indigo-200 bg-indigo-100/80 text-indigo-950 font-extrabold">Status</th>
+                <th class="px-1.5 py-2 text-center text-[10px] sm:text-[11px] w-[8%] border border-indigo-200 bg-indigo-100/80 text-indigo-950 font-extrabold">JK</th>
+                <th class="px-1.5 py-2 text-center text-[10px] sm:text-[11px] w-[16%] border border-indigo-200 bg-indigo-100/80 text-indigo-950 font-extrabold">Umur</th>
+                <th class="px-1.5 py-2 text-center text-[10px] sm:text-[11px] w-[16%] border border-indigo-200 bg-indigo-100/80 text-indigo-950 font-extrabold">Dis.</th>
             </tr>
         `;
 
-        // Gunakan DEDUPLIKASI PINTAR untuk mendapatkan daftar nama bersih tanpa ganda
         const listMembers = getUniqueMembers(jamaahData, generusData, currentUser.desa, currentUser.kelompok);
 
         if (listMembers.length === 0) {
@@ -2678,7 +2741,7 @@ function loadRekapKelompokLengkap() {
         let countL = 0, countP = 0;
         let catCounts = {
             'Menikah': 0, 'Duda': 0, 'Janda': 0, 'Manula': 0, 'Operator': 0,
-            'BALITA': 0,'PAUD': 0, 'TK': 0, 'Caberawit': 0, 'Pra Remaja': 0, 'Remaja': 0, 'Usia Mandiri': 0
+            'BALITA': 0, 'PAUD': 0, 'TK': 0, 'Caberawit': 0, 'Pra Remaja': 0, 'Remaja': 0, 'Usia Mandiri': 0
         };
 
         tbody.innerHTML = '';
@@ -2692,22 +2755,22 @@ function loadRekapKelompokLengkap() {
 
             const tr = document.createElement('tr');
             tr.className = "hover:bg-indigo-50/50 transition-colors border-b border-indigo-50/60";
-            
-            const badgeClass = item.tipe === 'GENERUS' 
-                ? 'bg-fuchsia-50 text-fuchsia-800 border-fuchsia-200' 
+
+            const badgeClass = item.tipe === 'GENERUS'
+                ? 'bg-fuchsia-50 text-fuchsia-800 border-fuchsia-200'
                 : 'bg-indigo-50 text-indigo-800 border-indigo-200';
 
             tr.innerHTML = `
                 <td class="px-1 py-2 text-center font-bold text-slate-500 text-[11px] border border-slate-200">${index + 1}</td>
                 <td class="px-1.5 py-2 font-extrabold text-slate-800 text-left text-[11px] leading-snug break-words border border-slate-200">${item.nama}</td>
-                <td class="px-1 py-2 text-center border border-slate-200">
+                <td class="px-1.5 py-2 text-center border border-slate-200">
                     <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border inline-block ${badgeClass}">
                         ${item.status}
                     </span>
                 </td>
-                <td class="px-1 py-2 text-center font-bold text-slate-700 text-[11px] border border-slate-200">${item.jenis_kelamin}</td>
-                <td class="px-1 py-2 text-center font-bold text-slate-600 text-[10px] border border-slate-200">${item.umur}</td>
-                <td class="px-1 py-2 text-center border border-slate-200">
+                <td class="px-1.5 py-2 text-center font-bold text-slate-700 text-[11px] border border-slate-200">${item.jenis_kelamin}</td>
+                <td class="px-1.5 py-2 text-center font-bold text-slate-600 text-[10px] border border-slate-200">${item.umur}</td>
+                <td class="px-1.5 py-2 text-center border border-slate-200">
                     ${item.is_disabilitas ? '<span class="text-teal-600 font-extrabold text-[10px]">♿ Ya</span>' : '<span class="text-slate-300 text-[10px]">-</span>'}
                 </td>
             `;
@@ -2757,194 +2820,734 @@ function loadRekapKelompokLengkap() {
         return;
     }
 
-
     // -------------------------------------------------------------
-    // MODE 2: TAMPILAN DEVELOPER / REKAP AGREGAT PER KELOMPOK
+    // MODE 2: TAMPILAN DEVELOPER (FORMAT LAPORAN PENEROBOSAN UMUM)
     // -------------------------------------------------------------
-    if (titleEl) titleEl.textContent = "Rekap Jamaah & Generus Per Kelompok";
+    if (tableEl) tableEl.classList.add('dev-rekap-table');
+    if (titleEl) titleEl.textContent = "LAPORAN PENEROBOSAN UMUM";
     if (filterContainer) filterContainer.style.display = 'flex';
+    if (infoHeaderDev) infoHeaderDev.classList.remove('hidden');
+    if (rekapBawahDev) rekapBawahDev.classList.remove('hidden');
+
+    const selectedFilterDesa = document.getElementById('filterDesaRekap').value;
+    const now = new Date();
+    const bulanNama = now.toLocaleDateString('id-ID', { month: 'long' }).toUpperCase();
+    const tahunKomplit = String(now.getFullYear());
+
+    if (document.getElementById('devInfoDesa')) {
+        document.getElementById('devInfoDesa').textContent = selectedFilterDesa ? selectedFilterDesa.toUpperCase() : "SEMUA DESA";
+    }
+    if (document.getElementById('devInfoBulan')) {
+        document.getElementById('devInfoBulan').textContent = bulanNama;
+    }
+    if (document.getElementById('devInfoTahun')) {
+        document.getElementById('devInfoTahun').textContent = tahunKomplit;
+    }
 
     thead.innerHTML = `
         <tr>
-            <th class="px-2.5 py-3 sticky-col">Kelompok</th>
-			<th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950 border-l border-indigo-200">BALITA</th>
-            <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950 border-l border-indigo-200">PAUD</th>
-            <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">TK</th>
-            <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">Cbr</th>
-            <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">Pra Rem</th>
-            <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">Rem</th>
-            <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950 border-r border-indigo-200">Usman</th>
-            <th class="px-1.5 py-3 text-center bg-fuchsia-200/80 text-fuchsia-950 font-extrabold whitespace-nowrap border-r border-indigo-300">Jml Generus</th>
-            <th class="px-1.5 py-3 text-center whitespace-nowrap">Nikah</th>
-            <th class="px-1.5 py-3 text-center whitespace-nowrap">Duda</th>
-            <th class="px-1.5 py-3 text-center whitespace-nowrap">Janda</th>
-            <th class="px-1.5 py-3 text-center whitespace-nowrap">Manula</th>
-            <th class="px-1.5 py-3 text-center text-blue-800 bg-blue-100/80 whitespace-nowrap">Opr.</th>
-            
-            <th class="px-1.5 py-3 text-center bg-indigo-100/80 font-black whitespace-nowrap border-l border-indigo-200">Jml Dewasa</th>
-            <th class="px-1.5 py-3 text-center bg-blue-100/80 text-blue-950 font-bold whitespace-nowrap border-l border-indigo-200">Jml L</th>
-            <th class="px-1.5 py-3 text-center bg-pink-100/80 text-pink-950 font-bold whitespace-nowrap">Jml P</th>
-            <th class="px-2 py-3 text-center bg-indigo-200 font-black whitespace-nowrap border-l border-indigo-300 text-indigo-950">Total</th>
+            <th rowspan="3" class="px-2 py-2 text-center align-middle bg-indigo-100 text-indigo-950 font-extrabold">NO</th>
+            <th rowspan="3" class="px-2.5 py-2 text-left align-middle sticky-col bg-indigo-100 text-indigo-950 font-extrabold">KELOMPOK</th>
+            <th colspan="21" class="px-2 py-2 text-center bg-indigo-100 text-indigo-950 font-extrabold">JUMLAH JAMAAH</th>
+            <th colspan="3" class="px-2 py-2 text-center bg-indigo-100 text-indigo-950 font-extrabold">JANDA</th>
+            <th rowspan="3" class="px-1.5 py-2 text-center align-middle bg-indigo-100 text-indigo-950 font-extrabold">DUDA</th>
+            <th rowspan="3" class="px-1.5 py-2 text-center align-middle bg-indigo-100 text-indigo-950 font-extrabold">MANULA</th>
+            <th rowspan="3" class="px-1.5 py-2 text-center align-middle bg-indigo-100 text-indigo-950 font-extrabold">SUB</th>
+            <th rowspan="3" class="px-1.5 py-2 text-center align-middle bg-indigo-100 text-indigo-950 font-extrabold">KK</th>
+            <th colspan="3" class="px-2 py-2 text-center bg-indigo-100 text-indigo-950 font-extrabold">JML PENGURUS</th>
+            <th rowspan="3" class="px-2.5 py-2 text-center align-middle bg-indigo-100 text-indigo-950 font-extrabold">PERSENAN</th>
+        </tr>
+        <tr>
+            <th colspan="3" class="px-1.5 py-1.5 text-center bg-indigo-100/90 text-indigo-950">BALITA</th>
+            <th colspan="3" class="px-1.5 py-1.5 text-center bg-indigo-100/90 text-indigo-950">CBR / PAUD - SD</th>
+            <th colspan="3" class="px-1.5 py-1.5 text-center bg-indigo-100/90 text-indigo-950">PRA REMAJA</th>
+            <th colspan="3" class="px-1.5 py-1.5 text-center bg-indigo-100/90 text-indigo-950">REMAJA</th>
+            <th colspan="3" class="px-1.5 py-1.5 text-center bg-indigo-100/90 text-indigo-950">USIA MANDIRI</th>
+            <th colspan="3" class="px-1.5 py-1.5 text-center bg-indigo-100/90 text-indigo-950">DEWASA</th>
+            <th colspan="3" class="px-1.5 py-1.5 text-center bg-indigo-200/90 text-indigo-950">TOTAL JAMAAH</th>
+
+            <th rowspan="2" class="px-1.5 py-1.5 text-center align-middle bg-indigo-100/90 text-indigo-950">JML</th>
+            <th colspan="2" class="px-1.5 py-1 text-center bg-indigo-100/90 text-indigo-950">SIAP DIWAYUH</th>
+
+            <th rowspan="2" class="px-1.5 py-1.5 text-center align-middle bg-indigo-100/90 text-indigo-950">4 S</th>
+            <th rowspan="2" class="px-1.5 py-1.5 text-center align-middle bg-indigo-100/90 text-indigo-950">LAIN</th>
+            <th rowspan="2" class="px-1.5 py-1.5 text-center align-middle bg-indigo-100/90 text-indigo-950">JML</th>
+        </tr>
+        <tr>
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">L</th>
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">P</th>
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">J</th>
+
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">L</th>
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">P</th>
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">J</th>
+
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">L</th>
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">P</th>
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">J</th>
+
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">L</th>
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">P</th>
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">J</th>
+
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">L</th>
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">P</th>
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">J</th>
+
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">L</th>
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">P</th>
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">J</th>
+
+            <th class="px-1 py-1 text-center bg-indigo-100 text-indigo-950">L</th>
+            <th class="px-1 py-1 text-center bg-indigo-100 text-indigo-950">P</th>
+            <th class="px-1 py-1 text-center bg-indigo-100 text-indigo-950">J</th>
+
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">BTN</th>
+            <th class="px-1 py-1 text-center bg-indigo-50 text-indigo-950">TR-AN</th>
         </tr>
     `;
 
-    const selectedFilterDesa = document.getElementById('filterDesaRekap').value;
-    const sarprasData = globalCache.sarpras || [];
-    const rekapMap = {};
+    const rowsData = [];
+    let noUrut = 1;
 
-    // Inisialisasi peta kelompok
     Object.keys(dataWilayah).forEach(desa => {
-        if (!selectedFilterDesa || selectedFilterDesa === desa) {
-            dataWilayah[desa].forEach(kelompok => {
-                const key = `${desa}__${kelompok}`;
-                rekapMap[key] = {
-                    desa, kelompok,
-                    balita: 0,paud: 0, tk: 0, caberawit: 0, praRemaja: 0, remaja: 0, usiaMandiri: 0, totalGenerus: 0,
-                    menikah: 0, duda: 0, janda: 0, manula: 0, operator: 0, 
-                    jamaahL: 0, jamaahP: 0,
-                    totalJamaah: 0, totalKeseluruhan: 0,
-                    subKlp: 0, masjid: 0, aula: 0, kmPria: 0, kmWanita: 0, kmMt: 0, kmTamu: 0
-                };
+        if (selectedFilterDesa && selectedFilterDesa !== desa) return;
+
+        dataWilayah[desa].forEach(kelompok => {
+            const members = getUniqueMembers(jamaahData, generusData, desa, kelompok);
+            const sarp = sarprasData.find(s =>
+                (s.desa || '').trim().toLowerCase() === desa.toLowerCase() &&
+                (s.kelompok || '').trim().toLowerCase() === kelompok.toLowerCase()
+            ) || {};
+
+            const grp = {
+                balita: { L: 0, P: 0 },
+                cbrPaudSd: { L: 0, P: 0 },
+                praRemaja: { L: 0, P: 0 },
+                remaja: { L: 0, P: 0 },
+                usiaMandiri: { L: 0, P: 0 },
+                dewasa: { L: 0, P: 0 },
+                jandaJml: 0,
+                siapBtn: 0,
+                siapTran: 0,
+                dudaJml: 0,
+                manulaJml: 0,
+                sub: parseInt(sarp.jumlah_sub_kelompok, 10) || 0,
+                kk: 0,
+                pengurus4S: 0,
+                pengurusLain: 0,
+                masjid: parseInt(sarp.jumlah_masjid, 10) || 0,
+                jedingL: parseInt(sarp.km_pria, 10) || 0,
+                jedingP: parseInt(sarp.km_wanita, 10) || 0,
+                aula: parseInt(sarp.jumlah_aula, 10) || 0,
+                madrasah: 0,
+                pondok: 0,
+                sekolah: 0
+            };
+
+            members.forEach(m => {
+                const jk = (m.jenis_kelamin || '').toUpperCase() === 'P' ? 'P' : 'L';
+                const st = (m.status || '').toLowerCase().trim();
+
+                if (m.tipe === 'GENERUS') {
+                    const keyGen = parseKategoriGenerus(m.status);
+                    if (keyGen === 'balita') {
+                        grp.balita[jk]++;
+                    } else if (keyGen === 'paud' || keyGen === 'tk' || keyGen === 'caberawit') {
+                        grp.cbrPaudSd[jk]++;
+                    } else if (keyGen === 'praRemaja') {
+                        grp.praRemaja[jk]++;
+                    } else if (keyGen === 'remaja') {
+                        grp.remaja[jk]++;
+                    } else if (keyGen === 'usiaMandiri') {
+                        grp.usiaMandiri[jk]++;
+                    }
+                } else {
+                    if (['menikah', 'manula', 'duda', 'janda'].includes(st)) {
+                        grp.dewasa[jk]++;
+                    }
+                    if (st === 'janda') grp.jandaJml++;
+                    if (st === 'duda') grp.dudaJml++;
+                    if (st === 'manula') grp.manulaJml++;
+                }
             });
-        }
-    });
 
-    // Jalankan deduplikasi per wilayah/kelompok untuk rekapitulasi angka agregat
-    Object.keys(rekapMap).forEach(key => {
-        const itemMap = rekapMap[key];
-        const uniqueList = getUniqueMembers(jamaahData, generusData, itemMap.desa, itemMap.kelompok);
+            const jBalita = grp.balita.L + grp.balita.P;
+            const jCbr = grp.cbrPaudSd.L + grp.cbrPaudSd.P;
+            const jPra = grp.praRemaja.L + grp.praRemaja.P;
+            const jRem = grp.remaja.L + grp.remaja.P;
+            const jUsman = grp.usiaMandiri.L + grp.usiaMandiri.P;
+            const jDewasa = grp.dewasa.L + grp.dewasa.P;
 
-        uniqueList.forEach(m => {
-            const st = (m.status || "").toLowerCase();
-            const jk = (m.jenis_kelamin || "").toUpperCase();
+            const totL = grp.balita.L + grp.cbrPaudSd.L + grp.praRemaja.L + grp.remaja.L + grp.usiaMandiri.L + grp.dewasa.L;
+            const totP = grp.balita.P + grp.cbrPaudSd.P + grp.praRemaja.P + grp.remaja.P + grp.usiaMandiri.P + grp.dewasa.P;
+            const totJ = totL + totP;
+            const pengurusJml = grp.pengurus4S + grp.pengurusLain;
 
-            if (jk === "L") itemMap.jamaahL++;
-            else if (jk === "P") itemMap.jamaahP++;
-
-            if (m.tipe === 'DEWASA') {
-                if (st === "menikah") itemMap.menikah++;
-                else if (st === "duda") itemMap.duda++;
-                else if (st === "janda") itemMap.janda++;
-                else if (st === "manula") itemMap.manula++;
-                else if (st === "operator") itemMap.operator++;
-                itemMap.totalJamaah++;
-            } else if (m.tipe === 'GENERUS') {
-                if (st === "balita") itemMap.balita++;
-				else if (st === "paud") itemMap.paud++;
-                else if (st === "tk") itemMap.tk++;
-                else if (st === "caberawit") itemMap.caberawit++;
-                else if (st === "pra remaja") itemMap.praRemaja++;
-                else if (st === "remaja") itemMap.remaja++;
-                else if (st === "usia mandiri") itemMap.usiaMandiri++;
-                itemMap.totalGenerus++;
-            }
-
-            itemMap.totalKeseluruhan++;
+            rowsData.push({
+                no: noUrut++,
+                desa,
+                kelompokRaw: kelompok,
+                kelompok: kelompok.toUpperCase(),
+                ...grp,
+                jBalita, jCbr, jPra, jRem, jUsman, jDewasa,
+                totL, totP, totJ, pengurusJml
+            });
         });
     });
 
-    // Mengisi data Sarpras
-    sarprasData.forEach(s => {
-        const sDesaClean = (s.desa || '').trim();
-        const sKlpClean = (s.kelompok || '').trim();
-        
-        if (!selectedFilterDesa || selectedFilterDesa === sDesaClean) {
-            // Cari kecocokan key dengan mengabaikan huruf besar/kecil
-            const targetKey = `${sDesaClean}__${sKlpClean}`.toLowerCase();
-            const matchedKey = Object.keys(rekapMap).find(k => k.toLowerCase() === targetKey);
-            
-            if (matchedKey && rekapMap[matchedKey]) {
-                rekapMap[matchedKey].subKlp = parseInt(s.jumlah_sub_kelompok, 10) || 0;
-                rekapMap[matchedKey].masjid = parseInt(s.jumlah_masjid, 10) || 0;
-                rekapMap[matchedKey].aula = parseInt(s.jumlah_aula, 10) || 0;
-                rekapMap[matchedKey].kmPria = parseInt(s.km_pria, 10) || 0;
-                rekapMap[matchedKey].kmWanita = parseInt(s.km_wanita, 10) || 0;
-                rekapMap[matchedKey].kmMt = parseInt(s.km_mt, 10) || 0;
-                rekapMap[matchedKey].kmTamu = parseInt(s.km_tamu, 10) || 0;
-            }
-        }
-    });
-
     tbody.innerHTML = '';
-    let totBalita = 0,totPaud = 0, totTk = 0, totCaberawit = 0, totPraRemaja = 0, totRemaja = 0, totUsiaMandiri = 0, totAllGenerus = 0;
-    let totMenikah = 0, totDuda = 0, totJanda = 0, totManula = 0, totOperator = 0;
-    let totJamaahL = 0, totJamaahP = 0;
-    let totAllJamaah = 0, totAllKeseluruhan = 0;
-
-    const items = Object.values(rekapMap);
-
-    items.forEach((item) => {
-		totBalita += item.balita;
-        totPaud += item.paud;
-        totTk += item.tk;
-        totCaberawit += item.caberawit;
-        totPraRemaja += item.praRemaja;
-        totRemaja += item.remaja;
-        totUsiaMandiri += item.usiaMandiri;
-        totAllGenerus += item.totalGenerus;
-
-        totMenikah += item.menikah;
-        totDuda += item.duda;
-        totJanda += item.janda;
-        totManula += item.manula;
-        totOperator += item.operator;
-        
-        totJamaahL += item.jamaahL;
-        totJamaahP += item.jamaahP;
-
-        totAllJamaah += item.totalJamaah;
-        totAllKeseluruhan += item.totalKeseluruhan;
-
+    rowsData.forEach(r => {
         const tr = document.createElement('tr');
         tr.className = "hover:bg-indigo-50/50 transition-colors";
-        
         tr.innerHTML = `
-            <td class="px-2.5 py-3 font-extrabold text-indigo-900 hover:text-indigo-600 hover:underline cursor-pointer sticky-col" onclick="showKelompokDetailModal('${item.kelompok}')" title="Klik untuk lihat anggota ${item.kelompok}">${item.kelompok}</td>
-			<td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900 border-l border-indigo-100">${item.balita}</td>
-            <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900 border-l border-indigo-100">${item.paud}</td>
-            <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.tk}</td>
-            <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.caberawit}</td>
-            <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.praRemaja}</td>
-            <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900">${item.remaja}</td>
-            <td class="px-1.5 py-3 text-center bg-fuchsia-50/40 font-bold text-fuchsia-900 border-r border-indigo-100">${item.usiaMandiri}</td>
-            <td class="px-1.5 py-3 text-center font-black bg-fuchsia-100/70 text-fuchsia-950 border-r border-indigo-200 text-[11px]">${item.totalGenerus}</td>
-            <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.menikah}</td>
-            <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.duda}</td>
-            <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.janda}</td>
-            <td class="px-1.5 py-3 text-center font-semibold text-slate-700">${item.manula}</td>
-            <td class="px-1.5 py-3 text-center font-black text-blue-700 bg-blue-50/60">${item.operator}</td>
-            
-            <td class="px-1.5 py-3 text-center font-black text-indigo-900 bg-indigo-50 border-l border-indigo-200 text-[11px]">${item.totalJamaah}</td>
-            <td class="px-1.5 py-3 text-center font-bold text-blue-900 bg-blue-50/40 border-l border-indigo-100">${item.jamaahL}</td>
-            <td class="px-1.5 py-3 text-center font-bold text-pink-900 bg-pink-50/40">${item.jamaahP}</td>
-            <td class="px-2 py-3 text-center font-black text-indigo-900 bg-indigo-200/80 border-l border-indigo-300 text-[12px]">${item.totalKeseluruhan}</td>
+            <td class="px-1.5 py-2 text-center font-bold text-slate-600">${r.no}</td>
+            <td class="px-2 py-2 font-extrabold text-indigo-900 hover:text-indigo-600 hover:underline cursor-pointer sticky-col" onclick="showKelompokDetailModal('${r.kelompokRaw}')" title="Klik untuk lihat anggota ${r.kelompok}">${r.kelompok}</td>
+
+            <td class="px-1 py-2 text-center">${r.balita.L}</td>
+            <td class="px-1 py-2 text-center">${r.balita.P}</td>
+            <td class="px-1 py-2 text-center font-bold">${r.jBalita}</td>
+
+            <td class="px-1 py-2 text-center">${r.cbrPaudSd.L}</td>
+            <td class="px-1 py-2 text-center">${r.cbrPaudSd.P}</td>
+            <td class="px-1 py-2 text-center font-bold">${r.jCbr}</td>
+
+            <td class="px-1 py-2 text-center">${r.praRemaja.L}</td>
+            <td class="px-1 py-2 text-center">${r.praRemaja.P}</td>
+            <td class="px-1 py-2 text-center font-bold">${r.jPra}</td>
+
+            <td class="px-1 py-2 text-center">${r.remaja.L}</td>
+            <td class="px-1 py-2 text-center">${r.remaja.P}</td>
+            <td class="px-1 py-2 text-center font-bold">${r.jRem}</td>
+
+            <td class="px-1 py-2 text-center">${r.usiaMandiri.L}</td>
+            <td class="px-1 py-2 text-center">${r.usiaMandiri.P}</td>
+            <td class="px-1 py-2 text-center font-bold">${r.jUsman}</td>
+
+            <td class="px-1 py-2 text-center">${r.dewasa.L}</td>
+            <td class="px-1 py-2 text-center">${r.dewasa.P}</td>
+            <td class="px-1 py-2 text-center font-bold">${r.jDewasa}</td>
+
+            <td class="px-1 py-2 text-center font-black bg-indigo-50/70">${r.totL}</td>
+            <td class="px-1 py-2 text-center font-black bg-indigo-50/70">${r.totP}</td>
+            <td class="px-1 py-2 text-center font-black bg-indigo-100/70">${r.totJ}</td>
+
+            <td class="px-1 py-2 text-center font-bold">${r.jandaJml}</td>
+            <td class="px-1 py-2 text-center">${r.siapBtn || ''}</td>
+            <td class="px-1 py-2 text-center">${r.siapTran || ''}</td>
+
+            <td class="px-1 py-2 text-center font-bold">${r.dudaJml}</td>
+            <td class="px-1 py-2 text-center font-bold">${r.manulaJml}</td>
+
+            <td class="px-1 py-2 text-center">${r.sub || ''}</td>
+            <td class="px-1 py-2 text-center font-bold">${r.kk}</td>
+
+            <td class="px-1 py-2 text-center">${r.pengurus4S}</td>
+            <td class="px-1 py-2 text-center">${r.pengurusLain || ''}</td>
+            <td class="px-1 py-2 text-center font-bold">${r.pengurusJml}</td>
+
+            <td class="px-2 py-2 text-center"></td>
         `;
         tbody.appendChild(tr);
     });
 
+    const sum = rowsData.reduce((acc, r) => {
+        acc.balitaL += r.balita.L; acc.balitaP += r.balita.P; acc.jBalita += r.jBalita;
+        acc.cbrL += r.cbrPaudSd.L; acc.cbrP += r.cbrPaudSd.P; acc.jCbr += r.jCbr;
+        acc.praL += r.praRemaja.L; acc.praP += r.praRemaja.P; acc.jPra += r.jPra;
+        acc.remL += r.remaja.L; acc.remP += r.remaja.P; acc.jRem += r.jRem;
+        acc.usmanL += r.usiaMandiri.L; acc.usmanP += r.usiaMandiri.P; acc.jUsman += r.jUsman;
+        acc.dewasaL += r.dewasa.L; acc.dewasaP += r.dewasa.P; acc.jDewasa += r.jDewasa;
+        acc.totL += r.totL; acc.totP += r.totP; acc.totJ += r.totJ;
+        acc.jandaJml += r.jandaJml; acc.siapBtn += r.siapBtn; acc.siapTran += r.siapTran;
+        acc.dudaJml += r.dudaJml; acc.manulaJml += r.manulaJml;
+        acc.sub += r.sub; acc.kk += r.kk;
+        acc.pengurus4S += r.pengurus4S; acc.pengurusLain += r.pengurusLain; acc.pengurusJml += r.pengurusJml;
+        acc.masjid += r.masjid; acc.jedingL += r.jedingL; acc.jedingP += r.jedingP;
+        acc.aula += r.aula; acc.madrasah += r.madrasah; acc.pondok += r.pondok; acc.sekolah += r.sekolah;
+        return acc;
+    }, {
+        balitaL: 0, balitaP: 0, jBalita: 0,
+        cbrL: 0, cbrP: 0, jCbr: 0,
+        praL: 0, praP: 0, jPra: 0,
+        remL: 0, remP: 0, jRem: 0,
+        usmanL: 0, usmanP: 0, jUsman: 0,
+        dewasaL: 0, dewasaP: 0, jDewasa: 0,
+        totL: 0, totP: 0, totJ: 0,
+        jandaJml: 0, siapBtn: 0, siapTran: 0,
+        dudaJml: 0, manulaJml: 0,
+        sub: 0, kk: 0,
+        pengurus4S: 0, pengurusLain: 0, pengurusJml: 0,
+        masjid: 0, jedingL: 0, jedingP: 0,
+        aula: 0, madrasah: 0, pondok: 0, sekolah: 0
+    });
+
     tfoot.innerHTML = `
         <tr>
-            <td class="px-2.5 py-4 text-left font-black uppercase sticky-col bg-indigo-200/90">TOTAL</td>
-			<td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80 border-l border-indigo-200">${totBalita}</td>
-            <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80 border-l border-indigo-200">${totPaud}</td>
-            <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totTk}</td>
-            <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totCaberawit}</td>
-            <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totPraRemaja}</td>
-            <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80">${totRemaja}</td>
-            <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-200/80 border-r border-indigo-200">${totUsiaMandiri}</td>
-            <td class="px-1.5 py-4 text-center font-black text-fuchsia-950 bg-fuchsia-300/80 border-r border-indigo-300 text-[12px]">${totAllGenerus}</td>
-            <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totMenikah}</td>
-            <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totDuda}</td>
-            <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totJanda}</td>
-            <td class="px-1.5 py-4 text-center font-black text-indigo-950">${totManula}</td>
-            <td class="px-1.5 py-4 text-center font-black text-blue-800 bg-blue-100/90">${totOperator}</td>
-            
-            <td class="px-1.5 py-4 text-center font-black text-indigo-950 bg-indigo-200/80 border-l border-indigo-200 text-[12px]">${totAllJamaah}</td>
-            <td class="px-1.5 py-4 text-center font-black text-blue-950 bg-blue-100/90 border-l border-indigo-200">${totJamaahL}</td>
-            <td class="px-1.5 py-4 text-center font-black text-pink-950 bg-pink-100/90">${totJamaahP}</td>
-            <td class="px-2 py-4 text-center font-black text-indigo-950 bg-indigo-300 border-l border-indigo-300 text-[13px]">${totAllKeseluruhan}</td>
+            <td colspan="2" class="px-2.5 py-3 text-left font-black uppercase sticky-col bg-indigo-200/95">JUMLAH</td>
+            <td class="px-1 py-3 text-center">${sum.balitaL}</td>
+            <td class="px-1 py-3 text-center">${sum.balitaP}</td>
+            <td class="px-1 py-3 text-center">${sum.jBalita}</td>
+
+            <td class="px-1 py-3 text-center">${sum.cbrL}</td>
+            <td class="px-1 py-3 text-center">${sum.cbrP}</td>
+            <td class="px-1 py-3 text-center">${sum.jCbr}</td>
+
+            <td class="px-1 py-3 text-center">${sum.praL}</td>
+            <td class="px-1 py-3 text-center">${sum.praP}</td>
+            <td class="px-1 py-3 text-center">${sum.jPra}</td>
+
+            <td class="px-1 py-3 text-center">${sum.remL}</td>
+            <td class="px-1 py-3 text-center">${sum.remP}</td>
+            <td class="px-1 py-3 text-center">${sum.jRem}</td>
+
+            <td class="px-1 py-3 text-center">${sum.usmanL}</td>
+            <td class="px-1 py-3 text-center">${sum.usmanP}</td>
+            <td class="px-1 py-3 text-center">${sum.jUsman}</td>
+
+            <td class="px-1 py-3 text-center">${sum.dewasaL}</td>
+            <td class="px-1 py-3 text-center">${sum.dewasaP}</td>
+            <td class="px-1 py-3 text-center">${sum.jDewasa}</td>
+
+            <td class="px-1 py-3 text-center">${sum.totL}</td>
+            <td class="px-1 py-3 text-center">${sum.totP}</td>
+            <td class="px-1 py-3 text-center">${sum.totJ}</td>
+
+            <td class="px-1 py-3 text-center">${sum.jandaJml}</td>
+            <td class="px-1 py-3 text-center">${sum.siapBtn || ''}</td>
+            <td class="px-1 py-3 text-center">${sum.siapTran || ''}</td>
+
+            <td class="px-1 py-3 text-center">${sum.dudaJml}</td>
+            <td class="px-1 py-3 text-center">${sum.manulaJml}</td>
+
+            <td class="px-1 py-3 text-center">${sum.sub}</td>
+            <td class="px-1 py-3 text-center">${sum.kk}</td>
+
+            <td class="px-1 py-3 text-center">${sum.pengurus4S}</td>
+            <td class="px-1 py-3 text-center">${sum.pengurusLain}</td>
+            <td class="px-1 py-3 text-center">${sum.pengurusJml}</td>
+
+            <td class="px-2 py-3 text-center"></td>
         </tr>
     `;
+
+    const wakilDesaCount = selectedFilterDesa ? 1 : Object.keys(dataWilayah).length;
+    const kelompokCount = rowsData.length;
+
+    const pengajianBulanIni = absensiData.filter(a => {
+        if (!a.tanggal_kegiatan || !a.tanggal_kegiatan.startsWith(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`)) return false;
+        if (selectedFilterDesa && a.desa !== selectedFilterDesa) return false;
+        return true;
+    });
+
+    const countPengajian = (keywordList) => {
+        const setKeg = new Set();
+        pengajianBulanIni.forEach(a => {
+            const nama = (a.nama_kegiatan || '').toLowerCase();
+            if (keywordList.some(k => nama.includes(k))) {
+                setKeg.add(`${a.nama_kegiatan}__${a.tanggal_kegiatan}`);
+            }
+        });
+        return setKeg.size;
+    };
+
+    const jmlPengDesa = countPengajian(['desa', 'umum', 'ppg', '30 point', 'khotbah']);
+    const jmlPengMuda = countPengajian(['remaja', 'muda']);
+    const jmlPengIbu = countPengajian(['ibu-ibu', 'ibu ibu']);
+    const jmlPengAgny = countPengajian(['agny']);
+    const jmlPengMuswrh = countPengajian(['musyawarah', 'muswrh']);
+    const jmlPengOrg = countPengajian(['organisasi']);
+
+    if (theadBawah && tbodyBawah) {
+        theadBawah.innerHTML = `
+            <tr>
+                <th colspan="11" class="px-2 py-1.5 border border-slate-400 bg-indigo-100">JUMLAH</th>
+                <th rowspan="2" class="px-2 py-1.5 border border-slate-400 bg-indigo-100 align-middle">MT</th>
+                <th rowspan="2" class="px-2 py-1.5 border border-slate-400 bg-indigo-100 align-middle">MS</th>
+                <th colspan="6" class="px-2 py-1.5 border border-slate-400 bg-indigo-100">JUMLAH PENGAJIAN / BULAN</th>
+            </tr>
+            <tr>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">WAKIL DESA</th>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">KELOMPOK</th>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">SUB</th>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">KK</th>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">Masjid</th>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">Jeding L</th>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">Jeding P</th>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">Aula</th>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">Madrasah</th>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">Pondok</th>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">Sekolah</th>
+
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">Desa</th>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">Muda-di</th>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">Ibu-ibu</th>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">Agny'</th>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">Muswrh</th>
+                <th class="px-1.5 py-1 border border-slate-400 bg-indigo-50">Organisasi</th>
+            </tr>
+        `;
+
+        tbodyBawah.innerHTML = `
+            <tr>
+                <td class="px-2 py-2 border border-slate-400">${wakilDesaCount}</td>
+                <td class="px-2 py-2 border border-slate-400">${kelompokCount}</td>
+                <td class="px-2 py-2 border border-slate-400">${sum.sub}</td>
+                <td class="px-2 py-2 border border-slate-400">${sum.kk}</td>
+                <td class="px-2 py-2 border border-slate-400">${sum.masjid}</td>
+                <td class="px-2 py-2 border border-slate-400">${sum.jedingL}</td>
+                <td class="px-2 py-2 border border-slate-400">${sum.jedingP}</td>
+                <td class="px-2 py-2 border border-slate-400">${sum.aula}</td>
+                <td class="px-2 py-2 border border-slate-400">${sum.madrasah}</td>
+                <td class="px-2 py-2 border border-slate-400">${sum.pondok}</td>
+                <td class="px-2 py-2 border border-slate-400">${sum.sekolah}</td>
+
+                <td class="px-2 py-2 border border-slate-400"></td>
+                <td class="px-2 py-2 border border-slate-400"></td>
+
+                <td class="px-2 py-2 border border-slate-400">${jmlPengDesa}</td>
+                <td class="px-2 py-2 border border-slate-400">${jmlPengMuda}</td>
+                <td class="px-2 py-2 border border-slate-400">${jmlPengIbu}</td>
+                <td class="px-2 py-2 border border-slate-400">${jmlPengAgny}</td>
+                <td class="px-2 py-2 border border-slate-400">${jmlPengMuswrh}</td>
+                <td class="px-2 py-2 border border-slate-400">${jmlPengOrg}</td>
+            </tr>
+        `;
+    }
+
+    window.lastDeveloperRekapExport = {
+        desaLabel: selectedFilterDesa ? selectedFilterDesa.toUpperCase() : "SEMUA DESA",
+        daerahLabel: "TAWANGMANGU",
+        bulanLabel: bulanNama,
+        tahunLabel: tahunKomplit,
+        rowsData,
+        sum,
+        bottomSummary: {
+            wakilDesaCount,
+            kelompokCount,
+            jmlPengDesa,
+            jmlPengMuda,
+            jmlPengIbu,
+            jmlPengAgny,
+            jmlPengMuswrh,
+            jmlPengOrg
+        }
+    };
+}
+
+async function exportTableToExcel(tbodyId, tfootId) {
+    const tbody = document.getElementById(tbodyId);
+    if (!tbody || tbody.rows.length === 0) {
+        showCustomModal("Export Gagal", "Tidak ada data untuk diexport ke Excel.", "⚠️");
+        return;
+    }
+
+    if (currentUser.role === 'DEVELOPER' && window.lastDeveloperRekapExport && typeof ExcelJS !== 'undefined') {
+        showDataLoading("Menyusun file Excel...");
+        try {
+            const exp = window.lastDeveloperRekapExport;
+            const wb = new ExcelJS.Workbook();
+            const ws = wb.addWorksheet("Laporan Penerobosan Umum");
+
+            const thinBorder = {
+                top: { style: 'thin', color: { argb: 'FF000000' } },
+                left: { style: 'thin', color: { argb: 'FF000000' } },
+                bottom: { style: 'thin', color: { argb: 'FF000000' } },
+                right: { style: 'thin', color: { argb: 'FF000000' } }
+            };
+
+            const headerFill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFD9E1F2' }
+            };
+
+            const totalFill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFEDF2FA' }
+            };
+
+            // Judul Utama (Kolom A s.d. AH = 34 kolom)
+            ws.mergeCells('A1:AH1');
+            const cTitle1 = ws.getCell('A1');
+            cTitle1.value = "LAPORAN PENEROBOSAN UMUM";
+            cTitle1.font = { name: 'Calibri', size: 14, bold: true };
+            cTitle1.alignment = { horizontal: 'center', vertical: 'middle' };
+            ws.getRow(1).height = 24;
+
+            ws.mergeCells('A2:AH2');
+            const cTitle2 = ws.getCell('A2');
+            cTitle2.value = "JUMLAH JAMAAH , PERSENAN , KEGIATAN DAN KEPENGURUSAN DESA";
+            cTitle2.font = { name: 'Calibri', size: 11, bold: true };
+            cTitle2.alignment = { horizontal: 'center', vertical: 'middle' };
+            ws.getRow(2).height = 20;
+
+            // Blok Identitas DESA / BULAN / TAHUN & DAERAH
+            ws.getCell('A4').value = "DESA";
+            ws.getCell('A4').font = { bold: true };
+            ws.getCell('C4').value = `:  ${exp.desaLabel}`;
+            ws.getCell('C4').font = { bold: true };
+
+            ws.getCell('T4').value = "BULAN";
+            ws.getCell('T4').font = { bold: true };
+            ws.getCell('V4').value = `:   ${exp.bulanLabel}`;
+            ws.getCell('V4').font = { bold: true };
+
+            ws.getCell('AE4').value = "TAHUN";
+            ws.getCell('AE4').font = { bold: true };
+            ws.getCell('AG4').value = `:  ${exp.tahunLabel}`;
+            ws.getCell('AG4').font = { bold: true };
+
+            ws.getCell('A5').value = "DAERAH";
+            ws.getCell('A5').font = { bold: true };
+            ws.getCell('C5').value = `:  ${exp.daerahLabel}`;
+            ws.getCell('C5').font = { bold: true };
+
+            // Header Tabel Utama (Baris 7, 8, 9)
+            const r7 = ws.getRow(7);
+            const r8 = ws.getRow(8);
+            const r9 = ws.getRow(9);
+            r7.height = 22;
+            r8.height = 20;
+            r9.height = 20;
+
+            ws.mergeCells('A7:A9');
+            ws.getCell('A7').value = "NO";
+
+            ws.mergeCells('B7:B9');
+            ws.getCell('B7').value = "KELOMPOK";
+
+            ws.mergeCells('C7:W7');
+            ws.getCell('C7').value = "JUMLAH JAMAAH";
+
+            ws.mergeCells('X7:Z7');
+            ws.getCell('X7').value = "JANDA";
+
+            ws.mergeCells('AA7:AA9');
+            ws.getCell('AA7').value = "DUDA";
+
+            ws.mergeCells('AB7:AB9');
+            ws.getCell('AB7').value = "MANULA";
+
+            ws.mergeCells('AC7:AC9');
+            ws.getCell('AC7').value = "SUB";
+
+            ws.mergeCells('AD7:AD9');
+            ws.getCell('AD7').value = "KK";
+
+            ws.mergeCells('AE7:AG7');
+            ws.getCell('AE7').value = "JML PENGURUS";
+
+            ws.mergeCells('AH7:AH9');
+            ws.getCell('AH7').value = "PERSENAN";
+
+            const subGroups = [
+                { start: 3, label: "BALITA" },
+                { start: 6, label: "CBR / PAUD - SD" },
+                { start: 9, label: "PRA REMAJA" },
+                { start: 12, label: "REMAJA" },
+                { start: 15, label: "USIA MANDIRI" },
+                { start: 18, label: "DEWASA" },
+                { start: 21, label: "TOTAL JAMAAH" }
+            ];
+
+            subGroups.forEach(sg => {
+                ws.mergeCells(8, sg.start, 8, sg.start + 2);
+                ws.getCell(8, sg.start).value = sg.label;
+                ws.getCell(9, sg.start).value = "L";
+                ws.getCell(9, sg.start + 1).value = "P";
+                ws.getCell(9, sg.start + 2).value = "J";
+            });
+
+            ws.mergeCells('X8:X9');
+            ws.getCell('X8').value = "JML";
+
+            ws.mergeCells('Y8:Z8');
+            ws.getCell('Y8').value = "SIAP DIWAYUH";
+            ws.getCell('Y9').value = "BTN";
+            ws.getCell('Z9').value = "TR-AN";
+
+            ws.mergeCells('AE8:AE9');
+            ws.getCell('AE8').value = "4 S";
+
+            ws.mergeCells('AF8:AF9');
+            ws.getCell('AF8').value = "LAIN";
+
+            ws.mergeCells('AG8:AG9');
+            ws.getCell('AG8').value = "JML";
+
+            [r7, r8, r9].forEach(row => {
+                row.eachCell({ includeEmpty: true }, cell => {
+                    cell.fill = headerFill;
+                    cell.font = { name: 'Calibri', size: 10, bold: true };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+                    cell.border = thinBorder;
+                });
+            });
+            ws.getCell('B7').alignment = { horizontal: 'left', vertical: 'middle' };
+
+            // Isi Baris Data Kelompok
+            let currentRow = 10;
+            exp.rowsData.forEach(r => {
+                const rowVals = [
+                    r.no, r.kelompok,
+                    r.balita.L, r.balita.P, r.jBalita,
+                    r.cbrPaudSd.L, r.cbrPaudSd.P, r.jCbr,
+                    r.praRemaja.L, r.praRemaja.P, r.jPra,
+                    r.remaja.L, r.remaja.P, r.jRem,
+                    r.usiaMandiri.L, r.usiaMandiri.P, r.jUsman,
+                    r.dewasa.L, r.dewasa.P, r.jDewasa,
+                    r.totL, r.totP, r.totJ,
+                    r.jandaJml, r.siapBtn || null, r.siapTran || null,
+                    r.dudaJml, r.manulaJml,
+                    r.sub || null, r.kk,
+                    r.pengurus4S, r.pengurusLain || null, r.pengurusJml,
+                    ""
+                ];
+                const excelRow = ws.getRow(currentRow);
+                excelRow.values = rowVals;
+                excelRow.height = 19;
+
+                excelRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                    cell.border = thinBorder;
+                    cell.font = {
+                        name: 'Calibri',
+                        size: 10,
+                        bold: colNumber === 2 || colNumber === 23 || colNumber === 33
+                    };
+                    if (colNumber === 2) {
+                        cell.alignment = { horizontal: 'left', vertical: 'middle' };
+                    } else if (colNumber === 34) {
+                        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                    } else {
+                        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                    }
+                });
+                currentRow++;
+            });
+
+            // Baris JUMLAH
+            const s = exp.sum;
+            const totalRowVals = [
+                "", "JUMLAH",
+                s.balitaL, s.balitaP, s.jBalita,
+                s.cbrL, s.cbrP, s.jCbr,
+                s.praL, s.praP, s.jPra,
+                s.remL, s.remP, s.jRem,
+                s.usmanL, s.usmanP, s.jUsman,
+                s.dewasaL, s.dewasaP, s.jDewasa,
+                s.totL, s.totP, s.totJ,
+                s.jandaJml, s.siapBtn || null, s.siapTran || null,
+                s.dudaJml, s.manulaJml,
+                s.sub, s.kk,
+                s.pengurus4S, s.pengurusLain, s.pengurusJml,
+                ""
+            ];
+            const totalRow = ws.getRow(currentRow);
+            totalRow.values = totalRowVals;
+            totalRow.height = 22;
+            totalRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                cell.fill = totalFill;
+                cell.border = thinBorder;
+                cell.font = { name: 'Calibri', size: 10, bold: true };
+                cell.alignment = { horizontal: colNumber === 2 ? 'left' : 'center', vertical: 'middle' };
+            });
+
+            // Tabel Ringkasan Bawah (Baris +2 dari totalRow)
+            const bTop = currentRow + 2;
+            const bSub = bTop + 1;
+            const bVal = bTop + 2;
+
+            ws.getRow(bTop).height = 20;
+            ws.getRow(bSub).height = 22;
+            ws.getRow(bVal).height = 22;
+
+            // Kolom A..L untuk JUMLAH (12 kolom: A=1 .. L=12)
+            ws.mergeCells(bTop, 1, bTop, 12);
+            ws.getCell(bTop, 1).value = "JUMLAH";
+
+            // Kolom M (13) = MT, Kolom N (14) = MS
+            ws.mergeCells(bTop, 13, bSub, 13);
+            ws.getCell(bTop, 13).value = "MT";
+
+            ws.mergeCells(bTop, 14, bSub, 14);
+            ws.getCell(bTop, 14).value = "MS";
+
+            // Kolom O..T (15..20) = JUMLAH PENGAJIAN / BULAN (6 kolom)
+            ws.mergeCells(bTop, 15, bTop, 20);
+            ws.getCell(bTop, 15).value = "JUMLAH PENGAJIAN / BULAN";
+
+            const bottomHeaders = [
+                "WAKIL DESA", "KELOMPOK", "SUB", "KK", "Masjid",
+                "Jeding L", "Jeding P", "Aula", "Madrasah", "Pondok", "Sekolah", "Jml",
+                "", "",
+                "Desa", "Muda-di", "Ibu-ibu", "Agny'", "Muswrh", "Organisasi"
+            ];
+
+            for (let c = 1; c <= 20; c++) {
+                if (c === 13 || c === 14) continue;
+                ws.getCell(bSub, c).value = bottomHeaders[c - 1];
+            }
+
+            const bs = exp.bottomSummary;
+            const bottomValues = [
+                bs.wakilDesaCount, bs.kelompokCount, s.sub, s.kk, s.masjid,
+                s.jedingL, s.jedingP, s.aula, s.madrasah, s.pondok, s.sekolah,
+                s.masjid + s.aula + s.madrasah + s.pondok + s.sekolah,
+                "", "",
+                bs.jmlPengDesa, bs.jmlPengMuda, bs.jmlPengIbu, bs.jmlPengAgny, bs.jmlPengMuswrh, bs.jmlPengOrg
+            ];
+
+            for (let c = 1; c <= 20; c++) {
+                ws.getCell(bVal, c).value = bottomValues[c - 1];
+            }
+
+            [bTop, bSub].forEach(rIdx => {
+                for (let c = 1; c <= 20; c++) {
+                    const cell = ws.getCell(rIdx, c);
+                    cell.fill = headerFill;
+                    cell.font = { name: 'Calibri', size: 10, bold: true };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+                    cell.border = thinBorder;
+                }
+            });
+
+            for (let c = 1; c <= 20; c++) {
+                const cell = ws.getCell(bVal, c);
+                cell.fill = totalFill;
+                cell.font = { name: 'Calibri', size: 10, bold: true };
+                cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                cell.border = thinBorder;
+            }
+
+            // Atur lebar kolom agar tidak terpotong saat dibuka di Excel
+            const colWidths = [5, 18, 4.5, 4.5, 5, 4.5, 4.5, 5, 4.5, 4.5, 5, 4.5, 4.5, 5, 4.5, 4.5, 5, 4.5, 4.5, 5, 5, 5, 6, 6, 5, 6, 7, 8, 5, 6, 5, 5, 6, 14];
+            colWidths.forEach((w, idx) => {
+                ws.getColumn(idx + 1).width = w;
+            });
+
+            const buffer = await wb.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Laporan_Penerobosan_Umum_${exp.desaLabel.replace(/\s+/g, '_')}_${exp.tahunLabel}.xlsx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (err) {
+            showCustomModal("Gagal Export", err.message || "Terjadi kesalahan saat membuat file Excel.", "❌");
+        } finally {
+            hideDataLoading();
+        }
+        return;
+    }
+
+    let table = document.getElementById('tableRekapKelompok');
+    let fileName = `Rekap_Jamaah_Sarpras_${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+    const wb = XLSX.utils.table_to_book(table, { sheet: "Data Jamaah" });
+    XLSX.writeFile(wb, fileName);
 }
 
 function setupYearFilter() {
@@ -3187,14 +3790,406 @@ function loadRekapAbsensi() {
 
 function exportTableToExcel(tbodyId, tfootId) {
     const tbody = document.getElementById(tbodyId);
-
     if (!tbody || tbody.rows.length === 0) {
         showCustomModal("Export Gagal", "Tidak ada data untuk diexport ke Excel.", "⚠️");
         return;
     }
 
+    const roleUpper = String(currentUser?.role || '').toUpperCase();
+
+    if (roleUpper === 'DEVELOPER') {
+        if (!window.lastDeveloperRekapExport && typeof loadRekapKelompokLengkap === 'function') {
+            loadRekapKelompokLengkap();
+        }
+    }
+
+    if (roleUpper === 'DEVELOPER' && window.lastDeveloperRekapExport && typeof XLSX !== 'undefined') {
+        const exp = window.lastDeveloperRekapExport;
+        const s = exp.sum;
+        const bs = exp.bottomSummary;
+
+        const TOTAL_COLS = 34; // Kolom A (0) s.d. AH (33)
+        const makeEmptyRow = () => Array.from({ length: TOTAL_COLS }, () => "");
+
+        const aoa = [];
+        const merges = [];
+
+        // Row 0 (Excel 1): Judul Utama
+        const rTitle1 = makeEmptyRow();
+        rTitle1[0] = "LAPORAN PENEROBOSAN UMUM";
+        aoa.push(rTitle1);
+        merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: 33 } });
+
+        // Row 1 (Excel 2): Subjudul
+        const rTitle2 = makeEmptyRow();
+        rTitle2[0] = "JUMLAH JAMAAH , PERSENAN , KEGIATAN DAN KEPENGURUSAN DESA";
+        aoa.push(rTitle2);
+        merges.push({ s: { r: 1, c: 0 }, e: { r: 1, c: 33 } });
+
+        // Row 2 (Excel 3): Spasi
+        aoa.push(makeEmptyRow());
+
+        // Row 3 (Excel 4): DESA | BULAN | TAHUN (di-merge agar teks panjang tidak terpotong)
+        const rMeta1 = makeEmptyRow();
+        rMeta1[0] = "DESA";
+        rMeta1[2] = `:  ${exp.desaLabel}`;
+        rMeta1[19] = "BULAN";
+        rMeta1[22] = `:  ${exp.bulanLabel}`;
+        rMeta1[29] = "TAHUN";
+        rMeta1[32] = `:  ${exp.tahunLabel}`;
+        aoa.push(rMeta1);
+        merges.push({ s: { r: 3, c: 0 }, e: { r: 3, c: 1 } });   // A4:B4 = DESA
+        merges.push({ s: { r: 3, c: 2 }, e: { r: 3, c: 9 } });   // C4:J4 = : SEMUA DESA
+        merges.push({ s: { r: 3, c: 19 }, e: { r: 3, c: 21 } }); // T4:V4 = BULAN
+        merges.push({ s: { r: 3, c: 22 }, e: { r: 3, c: 26 } }); // W4:AA4 = : NOVEMBER
+        merges.push({ s: { r: 3, c: 29 }, e: { r: 3, c: 31 } }); // AD4:AF4 = TAHUN
+        merges.push({ s: { r: 3, c: 32 }, e: { r: 3, c: 33 } }); // AG4:AH4 = : 2026
+
+        // Row 4 (Excel 5): DAERAH
+        const rMeta2 = makeEmptyRow();
+        rMeta2[0] = "DAERAH";
+        rMeta2[2] = `:  ${exp.daerahLabel}`;
+        aoa.push(rMeta2);
+        merges.push({ s: { r: 4, c: 0 }, e: { r: 4, c: 1 } });   // A5:B5 = DAERAH
+        merges.push({ s: { r: 4, c: 2 }, e: { r: 4, c: 9 } });   // C5:J5 = : TAWANGMANGU
+
+        // Row 5 (Excel 6): Spasi
+        aoa.push(makeEmptyRow());
+
+        // Row 6, 7, 8 (Excel 7, 8, 9): Header Tabel Utama 3 Tingkat
+        const h1 = makeEmptyRow();
+        const h2 = makeEmptyRow();
+        const h3 = makeEmptyRow();
+
+        h1[0] = "NO";
+        merges.push({ s: { r: 6, c: 0 }, e: { r: 8, c: 0 } });
+
+        h1[1] = "KELOMPOK";
+        merges.push({ s: { r: 6, c: 1 }, e: { r: 8, c: 1 } });
+
+        h1[2] = "JUMLAH JAMAAH";
+        merges.push({ s: { r: 6, c: 2 }, e: { r: 6, c: 22 } });
+
+        h1[23] = "JANDA";
+        merges.push({ s: { r: 6, c: 23 }, e: { r: 6, c: 25 } });
+
+        h1[26] = "DUDA";
+        merges.push({ s: { r: 6, c: 26 }, e: { r: 8, c: 26 } });
+
+        h1[27] = "MANULA";
+        merges.push({ s: { r: 6, c: 27 }, e: { r: 8, c: 27 } });
+
+        h1[28] = "SUB";
+        merges.push({ s: { r: 6, c: 28 }, e: { r: 8, c: 28 } });
+
+        h1[29] = "KK";
+        merges.push({ s: { r: 6, c: 29 }, e: { r: 8, c: 29 } });
+
+        h1[30] = "JML PENGURUS";
+        merges.push({ s: { r: 6, c: 30 }, e: { r: 6, c: 32 } });
+
+        h1[33] = "PERSENAN";
+        merges.push({ s: { r: 6, c: 33 }, e: { r: 8, c: 33 } });
+
+        const ageGroups = [
+            { startCol: 2, label: "BALITA" },
+            { startCol: 5, label: "CBR / PAUD - SD" },
+            { startCol: 8, label: "PRA REMAJA" },
+            { startCol: 11, label: "REMAJA" },
+            { startCol: 14, label: "USIA MANDIRI" },
+            { startCol: 17, label: "DEWASA" },
+            { startCol: 20, label: "TOTAL JAMAAH" }
+        ];
+
+        ageGroups.forEach(g => {
+            h2[g.startCol] = g.label;
+            merges.push({ s: { r: 7, c: g.startCol }, e: { r: 7, c: g.startCol + 2 } });
+            h3[g.startCol] = "L";
+            h3[g.startCol + 1] = "P";
+            h3[g.startCol + 2] = "J";
+        });
+
+        h2[23] = "JML";
+        merges.push({ s: { r: 7, c: 23 }, e: { r: 8, c: 23 } });
+
+        h2[24] = "SIAP DIWAYUH";
+        merges.push({ s: { r: 7, c: 24 }, e: { r: 7, c: 25 } });
+        h3[24] = "BTN";
+        h3[25] = "TR-AN";
+
+        h2[30] = "4 S";
+        merges.push({ s: { r: 7, c: 30 }, e: { r: 8, c: 30 } });
+
+        h2[31] = "LAIN";
+        merges.push({ s: { r: 7, c: 31 }, e: { r: 8, c: 31 } });
+
+        h2[32] = "JML";
+        merges.push({ s: { r: 7, c: 32 }, e: { r: 8, c: 32 } });
+
+        aoa.push(h1, h2, h3);
+
+        // Data Kelompok (mulai Row 9 / Excel 10)
+        const dataStartRow = aoa.length;
+        exp.rowsData.forEach(r => {
+            const row = makeEmptyRow();
+            row[0] = r.no;
+            row[1] = r.kelompok;
+
+            row[2] = r.balita.L; row[3] = r.balita.P; row[4] = r.jBalita;
+            row[5] = r.cbrPaudSd.L; row[6] = r.cbrPaudSd.P; row[7] = r.jCbr;
+            row[8] = r.praRemaja.L; row[9] = r.praRemaja.P; row[10] = r.jPra;
+            row[11] = r.remaja.L; row[12] = r.remaja.P; row[13] = r.jRem;
+            row[14] = r.usiaMandiri.L; row[15] = r.usiaMandiri.P; row[16] = r.jUsman;
+            row[17] = r.dewasa.L; row[18] = r.dewasa.P; row[19] = r.jDewasa;
+            row[20] = r.totL; row[21] = r.totP; row[22] = r.totJ;
+
+            row[23] = r.jandaJml;
+            row[24] = r.siapBtn || "";
+            row[25] = r.siapTran || "";
+            row[26] = r.dudaJml;
+            row[27] = r.manulaJml;
+            row[28] = r.sub || "";
+            row[29] = r.kk;
+            row[30] = r.pengurus4S;
+            row[31] = r.pengurusLain || "";
+            row[32] = r.pengurusJml;
+            row[33] = "";
+
+            aoa.push(row);
+        });
+        const dataEndRow = aoa.length - 1;
+
+        // Baris JUMLAH Utama
+        const totalRowIdx = aoa.length;
+        const rSum = makeEmptyRow();
+        rSum[1] = "JUMLAH";
+        rSum[2] = s.balitaL; rSum[3] = s.balitaP; rSum[4] = s.jBalita;
+        rSum[5] = s.cbrL; rSum[6] = s.cbrP; rSum[7] = s.jCbr;
+        rSum[8] = s.praL; rSum[9] = s.praP; rSum[10] = s.jPra;
+        rSum[11] = s.remL; rSum[12] = s.remP; rSum[13] = s.jRem;
+        rSum[14] = s.usmanL; rSum[15] = s.usmanP; rSum[16] = s.jUsman;
+        rSum[17] = s.dewasaL; rSum[18] = s.dewasaP; rSum[19] = s.jDewasa;
+        rSum[20] = s.totL; rSum[21] = s.totP; rSum[22] = s.totJ;
+        rSum[23] = s.jandaJml;
+        rSum[24] = s.siapBtn || "";
+        rSum[25] = s.siapTran || "";
+        rSum[26] = s.dudaJml;
+        rSum[27] = s.manulaJml;
+        rSum[28] = s.sub;
+        rSum[29] = s.kk;
+        rSum[30] = s.pengurus4S;
+        rSum[31] = s.pengurusLain;
+        rSum[32] = s.pengurusJml;
+        rSum[33] = "";
+        aoa.push(rSum);
+
+        // 2 Baris Kosong sebelum Tabel Bawah
+        aoa.push(makeEmptyRow(), makeEmptyRow());
+
+        // Tabel Ringkasan Bawah (Kolom 0..19 => A..T)
+        const bTopIdx = aoa.length;
+        const bSubIdx = bTopIdx + 1;
+        const bValIdx = bTopIdx + 2;
+
+        const bTop = makeEmptyRow();
+        const bSub = makeEmptyRow();
+        const bVal = makeEmptyRow();
+
+        bTop[0] = "JUMLAH";
+        merges.push({ s: { r: bTopIdx, c: 0 }, e: { r: bTopIdx, c: 11 } });
+
+        bTop[12] = "MT";
+        merges.push({ s: { r: bTopIdx, c: 12 }, e: { r: bSubIdx, c: 12 } });
+
+        bTop[13] = "MS";
+        merges.push({ s: { r: bTopIdx, c: 13 }, e: { r: bSubIdx, c: 13 } });
+
+        bTop[14] = "JUMLAH PENGAJIAN / BULAN";
+        merges.push({ s: { r: bTopIdx, c: 14 }, e: { r: bTopIdx, c: 19 } });
+
+        const subLabelsBawah = [
+            "WAKIL DESA", "KELOMPOK", "SUB", "KK", "Masjid",
+            "Jeding L", "Jeding P", "Aula", "Madrasah", "Pondok", "Sekolah", "Jml"
+        ];
+        subLabelsBawah.forEach((lbl, idx) => { bSub[idx] = lbl; });
+
+        const pengajianLabelsBawah = ["Desa", "Muda-di", "Ibu-ibu", "Agny'", "Muswrh", "Organisasi"];
+        pengajianLabelsBawah.forEach((lbl, idx) => { bSub[14 + idx] = lbl; });
+
+        const valsBawah = [
+            bs.wakilDesaCount, bs.kelompokCount, s.sub, s.kk, s.masjid,
+            s.jedingL, s.jedingP, s.aula, s.madrasah, s.pondok, s.sekolah,
+            s.masjid + s.aula + s.madrasah + s.pondok + s.sekolah
+        ];
+        valsBawah.forEach((val, idx) => { bVal[idx] = val; });
+
+        const valsPengajian = [
+            bs.jmlPengDesa, bs.jmlPengMuda, bs.jmlPengIbu,
+            bs.jmlPengAgny, bs.jmlPengMuswrh, bs.jmlPengOrg
+        ];
+        valsPengajian.forEach((val, idx) => { bVal[14 + idx] = val; });
+
+        aoa.push(bTop, bSub, bVal);
+
+        const ws = XLSX.utils.aoa_to_sheet(aoa);
+        ws['!merges'] = merges;
+
+        // Definisi Gaya (Border, Alignment, Font, Warna Fill)
+        const borderThin = {
+            top: { style: "thin", color: { rgb: "000000" } },
+            bottom: { style: "thin", color: { rgb: "000000" } },
+            left: { style: "thin", color: { rgb: "000000" } },
+            right: { style: "thin", color: { rgb: "000000" } }
+        };
+
+        const fillHeader = { patternType: "solid", fgColor: { rgb: "D9E1F2" } };
+        const fillTotalHighlight = { patternType: "solid", fgColor: { rgb: "E9EDF4" } };
+        const fillFooter = { patternType: "solid", fgColor: { rgb: "D9E1F2" } };
+
+        const setCellStyle = (r, c, style) => {
+            const addr = XLSX.utils.encode_cell({ r, c });
+            if (!ws[addr]) ws[addr] = { t: "s", v: "" };
+            ws[addr].s = style;
+        };
+
+        // Style Judul Utama & Subjudul
+        for (let c = 0; c < TOTAL_COLS; c++) {
+            setCellStyle(0, c, {
+                font: { name: "Calibri", sz: 14, bold: true, color: { rgb: "000000" } },
+                alignment: { horizontal: "center", vertical: "center" }
+            });
+            setCellStyle(1, c, {
+                font: { name: "Calibri", sz: 11, bold: true, color: { rgb: "000000" } },
+                alignment: { horizontal: "center", vertical: "center" }
+            });
+        }
+
+        // Style Identitas DESA / BULAN / TAHUN / DAERAH
+        [3, 4].forEach(r => {
+            for (let c = 0; c < TOTAL_COLS; c++) {
+                setCellStyle(r, c, {
+                    font: { name: "Calibri", sz: 10, bold: true, color: { rgb: "000000" } },
+                    alignment: { horizontal: "left", vertical: "center" }
+                });
+            }
+        });
+
+        // Style Header Tabel Utama (Row 6, 7, 8)
+        for (let r = 6; r <= 8; r++) {
+            for (let c = 0; c < TOTAL_COLS; c++) {
+                setCellStyle(r, c, {
+                    font: { name: "Calibri", sz: 10, bold: true, color: { rgb: "000000" } },
+                    fill: fillHeader,
+                    border: borderThin,
+                    alignment: {
+                        horizontal: (r === 6 && c === 1) ? "left" : "center",
+                        vertical: "center",
+                        wrapText: true
+                    }
+                });
+            }
+        }
+
+        // Style Baris Data Kelompok
+        const highlightCols = new Set([4, 7, 10, 13, 16, 19, 20, 21, 22, 23, 26, 27, 29, 32]);
+        for (let r = dataStartRow; r <= dataEndRow; r++) {
+            for (let c = 0; c < TOTAL_COLS; c++) {
+                const isTotalJamaahCol = (c === 20 || c === 21 || c === 22);
+                setCellStyle(r, c, {
+                    font: {
+                        name: "Calibri",
+                        sz: 10,
+                        bold: c === 1 || highlightCols.has(c),
+                        color: { rgb: "000000" }
+                    },
+                    fill: isTotalJamaahCol ? fillTotalHighlight : undefined,
+                    border: borderThin,
+                    alignment: {
+                        horizontal: c === 1 ? "left" : "center",
+                        vertical: "center"
+                    }
+                });
+            }
+        }
+
+        // Style Baris JUMLAH Utama
+        for (let c = 0; c < TOTAL_COLS; c++) {
+            setCellStyle(totalRowIdx, c, {
+                font: { name: "Calibri", sz: 10, bold: true, color: { rgb: "000000" } },
+                fill: fillFooter,
+                border: borderThin,
+                alignment: {
+                    horizontal: c === 1 ? "left" : "center",
+                    vertical: "center"
+                }
+            });
+        }
+
+        // Style Tabel Ringkasan Bawah (bTopIdx, bSubIdx, bValIdx, Kolom 0..19)
+        [bTopIdx, bSubIdx].forEach(r => {
+            for (let c = 0; c < 20; c++) {
+                setCellStyle(r, c, {
+                    font: { name: "Calibri", sz: 10, bold: true, color: { rgb: "000000" } },
+                    fill: fillHeader,
+                    border: borderThin,
+                    alignment: { horizontal: "center", vertical: "center", wrapText: true }
+                });
+            }
+        });
+
+        for (let c = 0; c < 20; c++) {
+            setCellStyle(bValIdx, c, {
+                font: { name: "Calibri", sz: 10, bold: true, color: { rgb: "000000" } },
+                fill: fillFooter,
+                border: borderThin,
+                alignment: { horizontal: "center", vertical: "center" }
+            });
+        }
+
+        // Atur Tinggi Baris agar rapi & tidak dempet
+        ws['!rows'] = [];
+        ws['!rows'][0] = { hpt: 24 };
+        ws['!rows'][1] = { hpt: 20 };
+        ws['!rows'][3] = { hpt: 19 };
+        ws['!rows'][4] = { hpt: 19 };
+        ws['!rows'][6] = { hpt: 22 };
+        ws['!rows'][7] = { hpt: 20 };
+        ws['!rows'][8] = { hpt: 20 };
+        for (let r = dataStartRow; r <= dataEndRow; r++) {
+            ws['!rows'][r] = { hpt: 19 };
+        }
+        ws['!rows'][totalRowIdx] = { hpt: 22 };
+        ws['!rows'][bTopIdx] = { hpt: 20 };
+        ws['!rows'][bSubIdx] = { hpt: 24 };
+        ws['!rows'][bValIdx] = { hpt: 22 };
+
+        // Atur Lebar Kolom agar presisi tanpa perlu geser manual
+        ws['!cols'] = [
+            { wch: 5.5 },  // A: NO
+            { wch: 24 },   // B: KELOMPOK
+            { wch: 5.5 }, { wch: 5.5 }, { wch: 6 },   // C-E: BALITA (L, P, J)
+            { wch: 5.5 }, { wch: 5.5 }, { wch: 6 },   // F-H: CBR / PAUD - SD (L, P, J)
+            { wch: 5.5 }, { wch: 5.5 }, { wch: 6 },   // I-K: PRA REMAJA (L, P, J)
+            { wch: 5.5 }, { wch: 5.5 }, { wch: 6 },   // L-N: REMAJA (L, P, J)
+            { wch: 5.5 }, { wch: 5.5 }, { wch: 6 },   // O-Q: USIA MANDIRI (L, P, J)
+            { wch: 5.5 }, { wch: 5.5 }, { wch: 6.5 }, // R-T: DEWASA (L, P, J)
+            { wch: 6 },   { wch: 6 },   { wch: 7 },   // U-W: TOTAL JAMAAH (L, P, J)
+            { wch: 6.5 }, { wch: 6 },   { wch: 7 },   // X-Z: JANDA (JML, BTN, TR-AN)
+            { wch: 7 },   { wch: 8.5 },               // AA-AB: DUDA, MANULA
+            { wch: 6 },   { wch: 6 },                 // AC-AD: SUB, KK
+            { wch: 5.5 }, { wch: 6 },   { wch: 6.5 }, // AE-AG: JML PENGURUS (4 S, LAIN, JML)
+            { wch: 15 }                               // AH: PERSENAN
+        ];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Laporan Penerobosan Umum");
+        const safeDesa = exp.desaLabel.replace(/[^a-zA-Z0-9_-]/g, '_');
+        XLSX.writeFile(wb, `Laporan_Penerobosan_Umum_${safeDesa}_${exp.tahunLabel}.xlsx`);
+        return;
+    }
+
     let table = document.getElementById('tableRekapKelompok');
-    let fileName = `Rekap_Jamaah_Sarpras_${new Date().toISOString().slice(0,10)}.xlsx`;
+    let fileName = `Rekap_Jamaah_Sarpras_${new Date().toISOString().slice(0, 10)}.xlsx`;
 
     const wb = XLSX.utils.table_to_book(table, { sheet: "Data Jamaah" });
     XLSX.writeFile(wb, fileName);
@@ -3492,8 +4487,9 @@ function openCenterPicker(selectEl) {
     const theme = getCurrentTheme();
 
     let titleText = "Pilih Opsi";
-    if (selectEl.options.length > 0 && !selectEl.options[0].value) {
-        titleText = selectEl.options[0].text.replace(/[^a-zA-Z0-9\s]/g, '').trim();
+    const labelEl = selectEl.closest('div')?.parentElement?.querySelector('label') || selectEl.closest('div')?.querySelector('label');
+    if (labelEl) {
+        titleText = labelEl.textContent.replace(/[^a-zA-Z0-9\s]/g, '').trim();
     } else {
         const labelEl = selectEl.closest('div')?.querySelector('label');
         if (labelEl) {
@@ -3507,7 +4503,7 @@ function openCenterPicker(selectEl) {
     optionsEl.className = "overflow-y-auto space-y-2.5 pr-1 flex-1 py-1";
     optionsEl.innerHTML = '';
     
-    const options = Array.from(selectEl.options);
+    const options = Array.from(selectEl.options).filter(opt => opt.value !== "");
 
     options.forEach((opt) => {
 		const isSelected = opt.value === selectEl.value;
@@ -3686,14 +4682,114 @@ function loadRekapSarprasDeveloper() {
 }
 
 // Fungsi untuk mengecek absensi berdasarkan Nama Kegiatan dan Bulan saja
+function formatTanggalSingkatId(isoDateStr) {
+    if (!isoDateStr) return '';
+    const parts = String(isoDateStr).split('-');
+    if (parts.length !== 3) return isoDateStr;
+
+    const tglNum = parseInt(parts[2], 10);
+    const blnIdx = parseInt(parts[1], 10) - 1;
+    const thnNum = parts[0];
+
+    const bulanPendek = [
+        "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+        "Jul", "Agu", "Sep", "Okt", "Nov", "Des"
+    ];
+
+    const namaBln = bulanPendek[blnIdx] || parts[1];
+    return `${tglNum} ${namaBln} ${thnNum}`;
+}
+
+function prefillAbsensiFromAlert(namaKegiatan = '', tanggalIso = '') {
+    // Simpan target prefill sementara agar tidak tertimpa reset saat pindah ke menu absensi
+    window._pendingAlertPrefill = {
+        namaKegiatan: namaKegiatan || '',
+        tanggalIso: tanggalIso || ''
+    };
+
+    showSection('absensi');
+    switchTabAbsensi('INPUT');
+    applyAlertPrefillToForm();
+}
+
+function applyAlertPrefillToForm() {
+    const pending = window._pendingAlertPrefill;
+    if (!pending) return;
+
+    const { namaKegiatan, tanggalIso } = pending;
+
+    // Reset mode edit agar tidak menimpa data lama
+    const editIdEl = document.getElementById('edit_absensi_id');
+    const editTglEl = document.getElementById('edit_tanggal_kegiatan');
+    const absBtnEl = document.getElementById('absBtn');
+    if (editIdEl) editIdEl.value = '';
+    if (editTglEl) editTglEl.value = '';
+    if (absBtnEl) absBtnEl.textContent = 'Simpan Absensi';
+
+    // Set Nama Kegiatan
+    if (namaKegiatan) {
+        const selectNama = document.getElementById('abs_nama');
+        const customInput = document.getElementById('abs_nama_custom');
+        const boxTargetCustom = document.getElementById('boxTargetCustom');
+
+        const standardOptions = [
+            "Materi PPG Pusat dan 30 Point",
+            "Pengajian Ibu-Ibu Daerah",
+            "Pengajian Umum Daerah",
+            "Pengajian Remaja Daerah",
+            "Asrama K. Khotbah"
+        ];
+
+        if (selectNama) {
+            if (standardOptions.includes(namaKegiatan)) {
+                selectNama.value = namaKegiatan;
+                if (customInput) {
+                    customInput.classList.add('hidden');
+                    customInput.value = '';
+                }
+                if (boxTargetCustom) {
+                    boxTargetCustom.classList.add('hidden');
+                }
+            } else {
+                selectNama.value = "LAINNYA";
+                if (customInput) {
+                    customInput.classList.remove('hidden');
+                    customInput.value = namaKegiatan;
+                }
+                if (boxTargetCustom) {
+                    boxTargetCustom.classList.remove('hidden');
+                }
+            }
+        }
+    }
+
+    // Set Tanggal Kegiatan (3 dropdown: abs_tgl, abs_bln, abs_thn)
+    if (tanggalIso) {
+        setAbsensiDateDefault(tanggalIso);
+    } else {
+        setAbsensiDateDefault();
+    }
+
+    // Pastikan desa & kelompok operator terisi / terkunci sesuai aturan role
+    if (currentUser && currentUser.role === 'OPERATOR') {
+        applyRoleRestrictionsUI();
+    }
+
+    // Kosongkan field jumlah agar siap diisi operator
+    ['abs_laki', 'abs_perempuan', 'abs_ijin', 'abs_infaq'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+
+    window._pendingAlertPrefill = null;
+}
+
 function checkOperatorMonthlyAttendance() {
     const alertContainer = document.getElementById('dashboardAlertContainer');
     if (!alertContainer) return;
 
-    // Reset kontainer alert
     alertContainer.innerHTML = '';
 
-    // Fitur ini khusus untuk role OPERATOR
     if (!currentUser || currentUser.role !== 'OPERATOR') {
         return;
     }
@@ -3701,62 +4797,97 @@ function checkOperatorMonthlyAttendance() {
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
-    const currentYearMonth = `${year}-${month}`; // Format YYYY-MM (bulan berjalan)
+    const currentYearMonth = `${year}-${month}`;
 
     const namaBulanArr = [
-        "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
         "Juli", "Agustus", "September", "Oktober", "November", "Desember"
     ];
     const namaBulanIni = namaBulanArr[now.getMonth()];
 
     const absensiList = globalCache.absensi || [];
 
-    // 1. Kumpulkan semua nama kegiatan unik yang sudah di-input oleh kelompok MANAPUN pada bulan ini
-    const monthActivitiesSet = new Set();
+    // 1. Kumpulkan semua nama kegiatan & tanggal-tanggal acaranya di bulan berjalan
+    const monthActivityDatesMap = new Map();
+
     absensiList.forEach(item => {
-        if (item.tanggal_kegiatan && item.tanggal_kegiatan.startsWith(currentYearMonth) && item.nama_kegiatan) {
-            monthActivitiesSet.add(item.nama_kegiatan.trim());
+        if (
+            item.tanggal_kegiatan &&
+            item.tanggal_kegiatan.startsWith(currentYearMonth) &&
+            item.nama_kegiatan
+        ) {
+            const namaKeg = item.nama_kegiatan.trim();
+            if (!monthActivityDatesMap.has(namaKeg)) {
+                monthActivityDatesMap.set(namaKeg, new Set());
+            }
+            monthActivityDatesMap.get(namaKeg).add(item.tanggal_kegiatan);
         }
     });
 
-    // Jika di bulan ini belum ada satupun kelompok yang mengisi data, alert tidak ditampilkan
-    if (monthActivitiesSet.size === 0) {
+    if (monthActivityDatesMap.size === 0) {
         return;
     }
 
-    // 2. Kumpulkan nama kegiatan apa saja yang SUDAH di-input oleh operator yang sedang login pada bulan ini
-    const mySubmittedActivitiesSet = new Set();
+    // 2. Kumpulkan pasangan (nama_kegiatan + tanggal_kegiatan) yang SUDAH diisi operator ini
+    const mySubmittedSet = new Set();
+
     absensiList.forEach(item => {
-        if (item.desa === currentUser.desa &&
+        if (
+            item.desa === currentUser.desa &&
             item.kelompok === currentUser.kelompok &&
             item.tanggal_kegiatan &&
             item.tanggal_kegiatan.startsWith(currentYearMonth) &&
-            item.nama_kegiatan) {
-            mySubmittedActivitiesSet.add(item.nama_kegiatan.trim());
+            item.nama_kegiatan
+        ) {
+            const namaKeg = item.nama_kegiatan.trim();
+            mySubmittedSet.add(`${namaKeg}__${item.tanggal_kegiatan}`);
         }
     });
 
-    // 3. Cari nama kegiatan yang sudah ada di sistem bulan ini tapi BELUM diisi sama sekali oleh kelompok ini
-    const missingActivities = [];
-    monthActivitiesSet.forEach(namaKegiatan => {
-        if (!mySubmittedActivitiesSet.has(namaKegiatan)) {
-            missingActivities.push(namaKegiatan);
-        }
+    // 3. Cari tanggal kegiatan mana saja yang belum diisi oleh kelompok operator ini
+    const missingItems = [];
+
+    monthActivityDatesMap.forEach((datesSet, namaKeg) => {
+        const sortedDates = Array.from(datesSet).sort();
+        const unsubmittedDates = sortedDates.filter(tglIso => !mySubmittedSet.has(`${namaKeg}__${tglIso}`));
+
+        unsubmittedDates.forEach(tglIso => {
+            missingItems.push({
+                namaKegiatan: namaKeg,
+                tanggalIso: tglIso,
+                labelTanggal: formatTanggalSingkatId(tglIso)
+            });
+        });
     });
 
-    // Urutkan abjad nama kegiatan
-    missingActivities.sort();
+    missingItems.sort((a, b) => {
+        if (a.tanggalIso !== b.tanggalIso) return a.tanggalIso.localeCompare(b.tanggalIso);
+        return a.namaKegiatan.localeCompare(b.namaKegiatan);
+    });
 
-    // 4. Tampilkan alert jika ada nama kegiatan bulan ini yang terlewat oleh kelompok tersebut
-    if (missingActivities.length > 0) {
-        let listHtml = missingActivities.map(nama => `
-            <div class="bg-white/90 border border-rose-100 p-2.5 rounded-xl flex items-center justify-between gap-2 shadow-2xs mb-1.5">
-                <span class="text-xs font-extrabold text-slate-800 truncate">• ${nama}</span>
-                <span class="text-[10px] font-black bg-rose-100 text-rose-800 px-2.5 py-1 rounded-lg border border-rose-200 shrink-0">
-                    Belum Diisi
-                </span>
-            </div>
-        `).join('');
+    // 4. Render alert lengkap dengan informasi tanggal acara & aksi prefill langsung
+    if (missingItems.length > 0) {
+        const firstItem = missingItems[0];
+        const encodedFirstNama = encodeURIComponent(firstItem.namaKegiatan);
+        const encodedFirstTgl = encodeURIComponent(firstItem.tanggalIso);
+
+        const listHtml = missingItems.map(item => {
+            const safeNama = encodeURIComponent(item.namaKegiatan);
+            const safeTgl = encodeURIComponent(item.tanggalIso);
+            return `
+                <button type="button"
+                    onclick="prefillAbsensiFromAlert(decodeURIComponent('${safeNama}'), decodeURIComponent('${safeTgl}'))"
+                    class="w-full text-left bg-white/90 hover:bg-rose-50/90 border border-rose-100 hover:border-rose-300 p-2.5 rounded-xl flex items-center justify-between gap-2 shadow-2xs mb-1.5 transition-all cursor-pointer">
+                    <div class="min-w-0">
+                        <div class="text-xs font-extrabold text-slate-800 truncate">• ${item.namaKegiatan}</div>
+                        <div class="text-[10px] font-bold text-rose-700 mt-0.5">📅 Tanggal Acara: ${item.labelTanggal}</div>
+                    </div>
+                    <span class="text-[10px] font-black bg-rose-100 text-rose-800 px-2.5 py-1 rounded-lg border border-rose-200 shrink-0">
+                        Isi Sekarang &raquo;
+                    </span>
+                </button>
+            `;
+        }).join('');
 
         alertContainer.innerHTML = `
             <div class="bg-gradient-to-r from-rose-500/10 via-red-500/10 to-amber-500/10 border-2 border-rose-300/80 p-4 rounded-2xl shadow-lg backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in-up">
@@ -3776,7 +4907,9 @@ function checkOperatorMonthlyAttendance() {
                         </div>
                     </div>
                 </div>
-                <button type="button" onclick="showSection('absensi')" class="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-extrabold text-xs rounded-xl shadow-md transition-all active:scale-95 shrink-0 text-center">
+                <button type="button"
+                    onclick="prefillAbsensiFromAlert(decodeURIComponent('${encodedFirstNama}'), decodeURIComponent('${encodedFirstTgl}'))"
+                    class="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-extrabold text-xs rounded-xl shadow-md transition-all active:scale-95 shrink-0 text-center">
                     Lengkapi Absensi &raquo;
                 </button>
             </div>

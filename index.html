@@ -13,8 +13,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <style>
 		@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
@@ -298,6 +298,29 @@
 		#dataFetchOverlay.active {
 			opacity: 1;
 			visibility: visible;
+		}
+		
+		/* Header bertingkat 3 baris pada mode developer agar L, P, J tetap terlihat saat scroll ke bawah */
+		#tableRekapKelompok.dev-rekap-table thead tr:nth-child(1) th:not(.sticky-col) {
+			position: sticky !important;
+			top: 0px !important;
+			z-index: 22 !important;
+		}
+		#tableRekapKelompok.dev-rekap-table thead tr:nth-child(2) th:not(.sticky-col) {
+			position: sticky !important;
+			top: 34px !important;
+			z-index: 21 !important;
+		}
+		#tableRekapKelompok.dev-rekap-table thead tr:nth-child(3) th:not(.sticky-col) {
+			position: sticky !important;
+			top: 64px !important;
+			z-index: 20 !important;
+		}
+		#tableRekapKelompok.dev-rekap-table thead th.sticky-col {
+			position: sticky !important;
+			top: 0px !important;
+			left: 0px !important;
+			z-index: 40 !important;
 		}
 	</style>
 </head>
@@ -763,6 +786,28 @@
                     </select>
                     <input type="text" id="abs_nama_custom" placeholder="Ketik nama kegiatan lainnya..." oninput="autoCapitalize(this)" class="hidden rounded-box-input w-full p-3 text-sm font-semibold mt-2 border-fuchsia-300 focus:border-fuchsia-500">
                 </div>
+				
+				<div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Tanggal Kegiatan</label>
+                    <div class="grid grid-cols-3 gap-2 sm:gap-3">
+                        <select id="abs_tgl" required class="rounded-box-input w-full p-2.5 sm:p-3 text-xs sm:text-sm font-semibold"></select>
+                        <select id="abs_bln" required class="rounded-box-input w-full p-2.5 sm:p-3 text-xs sm:text-sm font-semibold">
+                            <option value="01">Januari</option>
+                            <option value="02">Februari</option>
+                            <option value="03">Maret</option>
+                            <option value="04">April</option>
+                            <option value="05">Mei</option>
+                            <option value="06">Juni</option>
+                            <option value="07">Juli</option>
+                            <option value="08">Agustus</option>
+                            <option value="09">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Desember</option>
+                        </select>
+                        <select id="abs_thn" required class="rounded-box-input w-full p-2.5 sm:p-3 text-xs sm:text-sm font-semibold"></select>
+                    </div>
+                </div>
 
                 <!-- CONTAINER TARGET PESERTA CUSTOM (MUNCUL JIKA PILIH 'LAINNYA') -->
 				<div id="boxTargetCustom" class="hidden space-y-2 bg-fuchsia-50/60 p-3.5 rounded-2xl border border-fuchsia-200/80 mt-3 animate-fade-in-up">
@@ -1133,7 +1178,7 @@
                 <!-- REKAPAN KELOMPOK -->
                 <div id="sectionRekapKelompok" class="hidden space-y-4">
                     <div class="flex justify-between items-center flex-wrap gap-3 bg-white/50 p-3 rounded-2xl border border-indigo-100">
-                        <h4 class="text-xs font-extrabold text-indigo-900 uppercase ml-1">Rekap Jamaah, Generus & Sarpras Per Kelompok</h4>
+                        <h4 id="judulRekapKelompok" class="text-xs font-extrabold text-indigo-900 uppercase ml-1">LAPORAN PENEROBOSAN UMUM</h4>
                         <div class="flex items-center gap-2 no-print">
                             <span class="text-xs text-indigo-600 font-bold">Filter:</span>
                             <select id="filterDesaRekap" onchange="loadRekapKelompokLengkap()" class="text-[11px] sm:text-xs px-3 py-2 rounded-xl border-[2px] border-indigo-200 bg-white font-bold text-indigo-900 focus:outline-none focus:border-indigo-500 shadow-sm">
@@ -1142,40 +1187,29 @@
                         </div>
                     </div>
 
+                    <div id="infoHeaderLaporanDev" class="hidden bg-white/80 border border-indigo-200 rounded-2xl p-3 text-[11px] font-extrabold text-slate-800 grid grid-cols-2 gap-x-4 gap-y-1">
+                        <div>DESA : <span id="devInfoDesa" class="text-indigo-900">SEMUA DESA</span></div>
+                        <div>BULAN : <span id="devInfoBulan" class="text-indigo-900">-</span></div>
+                        <div>DAERAH : <span id="devInfoDaerah" class="text-indigo-900">TAWANGMANGU</span></div>
+                        <div>TAHUN : <span id="devInfoTahun" class="text-indigo-900">-</span></div>
+                    </div>
+
                     <div class="border border-indigo-100 rounded-2xl shadow-inner overflow-hidden">
                         <div class="table-vertical-scroll">
                             <table id="tableRekapKelompok" class="w-full text-[10px] sm:text-[11px] text-left">
-                                <thead class="bg-gradient-to-b from-indigo-100 to-indigo-200/80 text-indigo-950 font-extrabold border-b border-indigo-300">
-                                    <tr>
-                                        <th class="px-2.5 py-3 sticky-col">Kelompok</th>
-                                        <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950 border-l border-indigo-200">PAUD</th>
-                                        <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">TK</th>
-                                        <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">Cbr</th>
-                                        <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">Pra Rem</th>
-                                        <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950">Rem</th>
-                                        <th class="px-1.5 py-3 text-center whitespace-nowrap bg-fuchsia-100 text-fuchsia-950 border-r border-indigo-200">Usman</th>
-                                        <th class="px-1.5 py-3 text-center bg-fuchsia-200/80 text-fuchsia-950 font-extrabold whitespace-nowrap border-r border-indigo-300">Jml Generus</th>
-                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Nikah</th>
-                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Duda</th>
-                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Janda</th>
-                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Manula</th>
-                                        <th class="px-1.5 py-3 text-center text-blue-800 bg-blue-100/80 whitespace-nowrap">Opr.</th>
-                                        
-                                        <th class="px-1.5 py-3 text-center bg-blue-100/80 text-blue-950 font-bold whitespace-nowrap border-l border-indigo-200">Jml L</th>
-                                        <th class="px-1.5 py-3 text-center bg-pink-100/80 text-pink-950 font-bold whitespace-nowrap">Jml P</th>
-
-                                        <th class="px-1.5 py-3 text-center bg-indigo-100/80 font-black whitespace-nowrap border-l border-indigo-200">Jml Dewasa</th>
-                                        <th class="px-2 py-3 text-center bg-indigo-200 font-black whitespace-nowrap border-l border-indigo-300 text-indigo-950">Total</th>
-                                        <th class="px-1.5 py-3 text-center border-l border-indigo-300 whitespace-nowrap">Sub</th>
-                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Msjd</th>
-                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Aula</th>
-                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Toilet (L/P)</th>
-                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Kmr MT</th>
-                                        <th class="px-1.5 py-3 text-center whitespace-nowrap">Kmr Tmu</th>
-                                    </tr>
-                                </thead>
+                                <thead class="bg-gradient-to-b from-indigo-100 to-indigo-200/80 text-indigo-950 font-extrabold border-b border-indigo-300"></thead>
                                 <tbody id="tbodyRekapKelompok" class="divide-y divide-indigo-100 text-slate-700 bg-white/60"></tbody>
                                 <tfoot id="tfootRekapKelompok" class="bg-indigo-100/90 font-black text-indigo-950 border-t border-indigo-200"></tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- TABEL RINGKASAN BAWAH KHUSUS MODE DEVELOPER -->
+                    <div id="rekapBawahDeveloper" class="hidden border border-indigo-200 rounded-2xl shadow-inner overflow-hidden bg-white/80">
+                        <div class="table-vertical-scroll">
+                            <table id="tableRekapBawahDev" class="w-full text-[10px] sm:text-[11px] text-center">
+                                <thead id="theadRekapBawahDev" class="bg-indigo-100 text-indigo-950 font-extrabold"></thead>
+                                <tbody id="tbodyRekapBawahDev" class="font-black text-slate-900 bg-white"></tbody>
                             </table>
                         </div>
                     </div>
